@@ -81,17 +81,19 @@ OUTSTR  EQU 8526H
 ; OUT:      P=3, RF.1 = received character
 ; TRASHED:  R8
 
-MY_INPUT
+B96IN_Return
+    SEP R3
+B96IN
     ; Load the starting point for the LED animation
     LDI HIGH KnightRider
     PHI R8
     LDI LOW KnightRider
     PLO R8
 
-B96IN           ; Wait for the stop bit
-    B3  B96IN
+B96StopBitLoop      ; Wait for the stop bit
+    B3  B96StopBitLoop
 
-    LDI $FF     ; Initialize input character in RF.1 to $FF
+    LDI $FF         ; Initialize input character in RF.1 to $FF
     PHI RF
 
 DrawLights
@@ -112,7 +114,7 @@ DrawLights
     B3  FoundStartBit
 
 B96WaitStartBit
-    LDI $00     ; animation inner loop counter
+    LDI $00         ; animation inner loop counter
 
 B96StartBitLoop
     NOP
@@ -126,7 +128,7 @@ B96StartBitLoop
     BR  DrawLights
 
 FoundStartBit
-    LDI  $01    ; Set up D and DF, which takes about a quarter of a bit duration
+    LDI  $01        ; Set up D and DF, which takes about a quarter of a bit duration
     SHR
     BR   SkipDelay
     
@@ -137,17 +139,17 @@ B96DelayLoop
     BNZ B96DelayLoop
     ; When done with delay, D=0 and DF=1
     
-SkipDelay       ; read current bit
+SkipDelay           ; read current bit
     B3  B96IN4
-    SKP         ; if BIT=0 (EF3 PIN HIGH), leave DF=1
+    SKP             ; if BIT=0 (EF3 PIN HIGH), leave DF=1
 B96IN4
-    SHR         ; if BIT=1 (EF3 PIN LOW), set DF=0
-    GHI RF      ; load incoming byte
-    SHRC        ; shift new bit into MSB, and oldest bit into DF
+    SHR             ; if BIT=1 (EF3 PIN LOW), set DF=0
+    GHI RF          ; load incoming byte
+    SHRC            ; shift new bit into MSB, and oldest bit into DF
     PHI RF
     LBDF StartDelay
-
-    SEP R3
+    
+    BR  B96IN_Return
 
 ;__________________________________________________________________________________________________
 ; Customized serial output routine
@@ -157,6 +159,8 @@ B96IN4
 ; OUT:      P=3
 ; TRASHED:  RF.0, RF.1
 
+B96OUT_Return
+    SEP R3
 B96OUT
     GHI RF          ; start by setting LEDs to output character
     STR R2
@@ -227,7 +231,7 @@ DONE96              ;FINISH LAST BIT TIMING
 DNE961
     REQ             ; Send stop bit: Q=0
 
-    SEP R3          ; Return
+    BR B96OUT_Return
 
 ;__________________________________________________________________________________________________
 ; Main program starting point
@@ -267,9 +271,9 @@ Exit
 
 SerialOK
     ; Get one input character from serial port in RF.1
-    LDI HIGH MY_INPUT
+    LDI HIGH B96IN
     PHI R7
-    LDI LOW MY_INPUT
+    LDI LOW B96IN
     PLO R7
     SEP R7
 
@@ -294,7 +298,7 @@ SerialOK
 ;__________________________________________________________________________________________________
 ; Read-only Data
 
-SerialError     TEXT        "Unsupported serial settings. Must be 9600 baud inverted.\r\n\000"
+SerialError     TEXT        "Unsupported serial settings. Must be 9600 baud.\r\n\000"
 KnightRider     DB          $00, $00, $80, $80, $C0, $C0, $E0, $60, $70, $30, $38, $18, $1C, $0C, $0E, $06, $07, $03, $03, $01, $01, $00, $00, $01, $01, $03, $03, $07, $06, $0E, $0C, $1C, $18, $38, $30, $70, $60, $E0, $C0, $C0, $80, $80, $00, $00
 
     END
