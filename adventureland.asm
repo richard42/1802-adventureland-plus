@@ -344,9 +344,6 @@ MainLoop
     BR  MainLoop
 
 ;__________________________________________________________________________________________________
-; Read/Write Data
-
-;__________________________________________________________________________________________________
 ; Read-only Data
 
 SerialError     BYTE        "Unsupported serial settings. Must be 9600 baud.\r\n"
@@ -367,6 +364,19 @@ StartingMsg     BYTE        " W E L C O M E   T O \n A D V E N T U R E - 1+ \r\n
 ClsMsg          DB          $1B, $5B, $32, $4A, $1B, $48, $00
 
                 INCL           "adventureland_data.asm"
+
+;__________________________________________________________________________________________________
+; Read/Write Data
+
+Array_TPS       BLK         80
+Array_IA        BLK         IL
+Array_NV        DB          0, 0
+Loadflag        DB          0
+Endflag         DB          0
+Darkflag        DB          0
+Room            DB          0
+LampOil         DB          0
+StateFlags      DW          0
 
                 END
 
