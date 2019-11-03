@@ -89,41 +89,41 @@ MY_INPUT
     PLO R8
 
 B96IN           ; Wait for the stop bit
-	B3	B96IN
+    B3  B96IN
 
-	LDI	$FF     ; Initialize input character in RF.1 to $FF
-	PHI RF
+    LDI $FF     ; Initialize input character in RF.1 to $FF
+    PHI RF
 
 DrawLights
     LDA R8
-    STR	R2
-	B3  FoundStartBit
-	OUT 4
-	DEC	R2
+    STR R2
+    B3  FoundStartBit
+    OUT 4
+    DEC R2
     GLO R8
-	B3  FoundStartBit
+    B3  FoundStartBit
     SMI LOW KnightRider+44
     BNZ B96WaitStartBit
     LDI LOW KnightRider
-	B3  FoundStartBit
+    B3  FoundStartBit
     PLO R8
     LDI HIGH KnightRider
     PHI R8
-	B3  FoundStartBit
+    B3  FoundStartBit
 
 B96WaitStartBit
     LDI $00     ; animation inner loop counter
 
 B96StartBitLoop
-	NOP
-	NOP
-	B3  FoundStartBit
-	SMI $01
-	NOP
-	NOP
-	B3  FoundStartBit
-	BNZ B96StartBitLoop
-	BR  DrawLights
+    NOP
+    NOP
+    B3  FoundStartBit
+    SMI $01
+    NOP
+    NOP
+    B3  FoundStartBit
+    BNZ B96StartBitLoop
+    BR  DrawLights
 
 FoundStartBit
     LDI  $01    ; Set up D and DF, which takes about a quarter of a bit duration
@@ -131,23 +131,23 @@ FoundStartBit
     BR   SkipDelay
     
 StartDelay
-	LDI $02
+    LDI $02
 B96DelayLoop
-	SMI	$01
-	BNZ	B96DelayLoop
-	; When done with delay, D=0 and DF=1
+    SMI $01
+    BNZ B96DelayLoop
+    ; When done with delay, D=0 and DF=1
     
 SkipDelay       ; read current bit
-	B3	B96IN4
-	SKP		    ; if BIT=0 (EF3 PIN HIGH), leave DF=1
+    B3  B96IN4
+    SKP         ; if BIT=0 (EF3 PIN HIGH), leave DF=1
 B96IN4
-	SHR		    ; if BIT=1 (EF3 PIN LOW), set DF=0
-	GHI RF	    ; load incoming byte
-	SHRC		; shift new bit into MSB, and oldest bit into DF
-	PHI RF
-	LBDF StartDelay
+    SHR         ; if BIT=1 (EF3 PIN LOW), set DF=0
+    GHI RF      ; load incoming byte
+    SHRC        ; shift new bit into MSB, and oldest bit into DF
+    PHI RF
+    LBDF StartDelay
 
-	SEP	R3
+    SEP R3
 
 ;__________________________________________________________________________________________________
 ; Customized serial output routine
@@ -163,58 +163,58 @@ B96OUT
     OUT 4
     DEC R2
     
-	LDI	08H         ; RF.0 is data bit counter
-	PLO	RF
+    LDI 08H         ; RF.0 is data bit counter
+    PLO RF
 
 STBIT               ; Send Start Bit (Space)
-	SEQ		        ;  2
-	NOP		        ;  5
-	NOP		        ;  8
-	GHI RF	        ; 10
-	SHRC		    ; 12 DF = 1st bit to transmit
-	PHI RF	        ; 14
-	PHI RF	        ; 16
-	NOP		        ; 19 
-	BDF	STBIT1	    ; 21 First bit = 1?
-	BR	QHI		    ; 23 bit = 0, output Space
+    SEQ             ;  2
+    NOP             ;  5
+    NOP             ;  8
+    GHI RF          ; 10
+    SHRC            ; 12 DF = 1st bit to transmit
+    PHI RF          ; 14
+    PHI RF          ; 16
+    NOP             ; 19 
+    BDF STBIT1      ; 21 First bit = 1?
+    BR  QHI         ; 23 bit = 0, output Space
 STBIT1
-	BR	QLO		    ; 23 bit = 1, output Mark
+    BR  QLO         ; 23 bit = 1, output Mark
 
 QHI1
-	DEC	RF
-	GLO	RF
-	BZ	DONE96      ;AT 8.5 INSTRUCTIONS EITHER DONE OR REQ
+    DEC RF
+    GLO RF
+    BZ  DONE96      ;AT 8.5 INSTRUCTIONS EITHER DONE OR REQ
 
 ;DELAY
     NOP
     NOP
 
 QHI
-	SEQ	            ; Q ON
-	GHI RF
-	SHRC		    ; PUT NEXT BIT IN DF
-	PHI RF
-	LBNF	QHI1	; 5.5 TURN Q OFF AFTER 6 MORE INSTRUCTION TIMES
+    SEQ             ; Q ON
+    GHI RF
+    SHRC            ; PUT NEXT BIT IN DF
+    PHI RF
+    LBNF    QHI1    ; 5.5 TURN Q OFF AFTER 6 MORE INSTRUCTION TIMES
 
 QLO1
-	DEC	RF
-	GLO	RF
-	BZ	DONE96	    ; AT 8.5 INSTRUCTIONS EITHER DONE OR SEQ
+    DEC RF
+    GLO RF
+    BZ  DONE96      ; AT 8.5 INSTRUCTIONS EITHER DONE OR SEQ
 
 ;DELAY
     NOP
     NOP
 
 QLO
-	REQ             ;Q OFF
-	GHI RF
-	SHRC		    ;PUT NEXT BIT IN DF
-	PHI RF
-	LBDF QLO1       ;5.5 TURN Q ON AFTER 6 MORE INSTRUCTION TIMES
+    REQ             ;Q OFF
+    GHI RF
+    SHRC            ;PUT NEXT BIT IN DF
+    PHI RF
+    LBDF QLO1       ;5.5 TURN Q ON AFTER 6 MORE INSTRUCTION TIMES
 
-	DEC	RF
-	GLO	RF
-	BZ	DONE96      ;AT 8.5 INSTRUCTIONS EITHER DONE OR REQ
+    DEC RF
+    GLO RF
+    BZ  DONE96      ;AT 8.5 INSTRUCTIONS EITHER DONE OR REQ
 
 ;DELAY
     NOP
@@ -225,9 +225,9 @@ DONE96              ;FINISH LAST BIT TIMING
     NOP
 
 DNE961
-    REQ		        ; Send stop bit: Q=0
+    REQ             ; Send stop bit: Q=0
 
-	SEP	R3	        ; Return
+    SEP R3          ; Return
 
 ;__________________________________________________________________________________________________
 ; Main program starting point
@@ -240,7 +240,7 @@ START
     LDI LOW BAUD
     PLO R7
     LDA R7
-	PHI	RE
+    PHI RE
     LDN R7
     PLO RE
     SMI $02
