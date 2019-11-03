@@ -255,6 +255,23 @@ OutStrDone
     SEP  R5
 
 ;__________________________________________________________________________________________________
+; Clear screen
+
+; IN:       N/A
+; OUT:      N/A
+; TRASHED:  R7, R8, RF
+
+ClearScreen
+    LDI  HIGH ClsMsg
+    PHI  R8
+    LDI  LOW ClsMsg
+    PLO  R8
+    
+    SEP  R4
+    DW   OutString
+    SEP  R5
+
+;__________________________________________________________________________________________________
 ; Main program starting point
     ORG $100    ; fixme remove
 
@@ -291,10 +308,14 @@ Exit
     SEP R0  ;BACK TO THE MONITOR PROGRAM WE GO
 
 SerialOK
+    ; clear screen
+    SEP  R4
+    DW   ClearScreen
+
     ; Print initial message
-    LDI  HIGH StartingMessage
+    LDI  HIGH StartingMsg
     PHI  R8
-    LDI  LOW StartingMessage
+    LDI  LOW StartingMsg
     PLO  R8
     SEP  R4
     DW   OutString
@@ -330,7 +351,7 @@ MainLoop
 
 SerialError     TEXT        "Unsupported serial settings. Must be 9600 baud.\r\n"
 KnightRider     DB          $00, $00, $80, $80, $C0, $C0, $E0, $60, $70, $30, $38, $18, $1C, $0C, $0E, $06, $07, $03, $03, $01, $01, $00, $00, $01, $01, $03, $03, $07, $06, $0E, $0C, $1C, $18, $38, $30, $70, $60, $E0, $C0, $C0, $80, $80, $00, $00
-StartingMessage TEXT        " W E L C O M E   T O \n A D V E N T U R E - 1+ \r\n\n\n\n\n"
+StartingMsg     TEXT        " W E L C O M E   T O \n A D V E N T U R E - 1+ \r\n\n\n\n\n"
                 TEXT        "The object of your adventure is to find treasures and return them\r\n"
                 TEXT        "to the proper place for you to accumulate points.  I'm your clone.  Give me\r\n"
                 TEXT        "commands that consist of a verb & noun, i.e. GO EAST, TAKE KEY, CLIMB TREE,\r\n"
@@ -343,7 +364,7 @@ StartingMessage TEXT        " W E L C O M E   T O \n A D V E N T U R E - 1+ \r\n
                 TEXT        "HAPPY ADVENTURING!!!\r\n\n\n\n\n"
                 TEXT        "************************** Press any key to continue **************************\r\n"
                 DB          $00
-
+ClsMsg          DB          $1B, $5B, $32, $4A, $1B, $48, $00
 
     END
 
