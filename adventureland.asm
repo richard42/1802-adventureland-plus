@@ -349,22 +349,24 @@ MainLoop
 ;__________________________________________________________________________________________________
 ; Read-only Data
 
-SerialError     TEXT        "Unsupported serial settings. Must be 9600 baud.\r\n"
+SerialError     BYTE        "Unsupported serial settings. Must be 9600 baud.\r\n"
 KnightRider     DB          $00, $00, $80, $80, $C0, $C0, $E0, $60, $70, $30, $38, $18, $1C, $0C, $0E, $06, $07, $03, $03, $01, $01, $00, $00, $01, $01, $03, $03, $07, $06, $0E, $0C, $1C, $18, $38, $30, $70, $60, $E0, $C0, $C0, $80, $80, $00, $00
-StartingMsg     TEXT        " W E L C O M E   T O \n A D V E N T U R E - 1+ \r\n\n\n\n\n"
-                TEXT        "The object of your adventure is to find treasures and return them\r\n"
-                TEXT        "to the proper place for you to accumulate points.  I'm your clone.  Give me\r\n"
-                TEXT        "commands that consist of a verb & noun, i.e. GO EAST, TAKE KEY, CLIMB TREE,\r\n"
-                TEXT        "SAVE GAME, TAKE INVENTORY, FIND AXE, etc.\r\n\n"
-                TEXT        "You'll need some special items to do some things, but I'm sure that you'll be\r\n"
-                TEXT        "a good adventurer and figure these things out (which is most of the fun of\r\n"
-                TEXT        "this game).\r\n\n"
-                TEXT        "Note that going in the opposite direction won't always get you back to where\r\n"
-                TEXT        "you were.\r\n\n\n"
-                TEXT        "HAPPY ADVENTURING!!!\r\n\n\n\n\n"
-                TEXT        "************************** Press any key to continue **************************\r\n"
+StartingMsg     BYTE        " W E L C O M E   T O \n A D V E N T U R E - 1+ \r\n\n\n\n\n"
+                BYTE        "The object of your adventure is to find treasures and return them\r\n"
+                BYTE        "to the proper place for you to accumulate points.  I'm your clone.  Give me\r\n"
+                BYTE        "commands that consist of a verb & noun, i.e. GO EAST, TAKE KEY, CLIMB TREE,\r\n"
+                BYTE        "SAVE GAME, TAKE INVENTORY, FIND AXE, etc.\r\n\n"
+                BYTE        "You'll need some special items to do some things, but I'm sure that you'll be\r\n"
+                BYTE        "a good adventurer and figure these things out (which is most of the fun of\r\n"
+                BYTE        "this game).\r\n\n"
+                BYTE        "Note that going in the opposite direction won't always get you back to where\r\n"
+                BYTE        "you were.\r\n\n\n"
+                BYTE        "HAPPY ADVENTURING!!!\r\n\n\n\n\n"
+                BYTE        "************************** Press any key to continue **************************\r\n", 0
                 DB          $00
 ClsMsg          DB          $1B, $5B, $32, $4A, $1B, $48, $00
 
-    END
+                INCL           "adventureland_data.asm"
+
+                END
 
