@@ -31,9 +31,7 @@ RETURN  EQU 8AEDH
 ;M(7FCE) GOES INTO RE.0
 BAUD    EQU 7FCDH
 
-OUTCRLF EQU 8513H
-HEXCRLF EQU 8519H
-OUTSTR  EQU 8526H
+MON_OUTSTR  EQU 8526H
 
 ;__________________________________________________________________________________________________
 ; Start of our Boot Loader
@@ -234,6 +232,29 @@ DNE961
     BR B96OUT_Return
 
 ;__________________________________________________________________________________________________
+; String print routine
+
+; IN:       R8 = pointer to null-terminated string
+; OUT:      N/A
+; TRASHED:  R7, R8, RF
+
+OutString
+    LDI  HIGH B96OUT
+    PHI  R7
+    LDI  LOW B96OUT
+    PLO  R7
+
+OutStrLoop1
+    LDA  R8
+    BZ   OutStrDone
+    PHI  RF
+    SEP  R7
+    BR   OutStrLoop1
+
+OutStrDone
+    SEP  R5
+
+;__________________________________________________________________________________________________
 ; Main program starting point
     ORG $100    ; fixme remove
 
@@ -259,7 +280,7 @@ SerialNotSupported
     LDI LOW SerialError
     PLO R7
     SEP R4
-    DW  OUTSTR
+    DW  MON_OUTSTR
 
 Exit    
     LDI $8B
@@ -270,6 +291,15 @@ Exit
     SEP R0  ;BACK TO THE MONITOR PROGRAM WE GO
 
 SerialOK
+    ; Print initial message
+    LDI  HIGH StartingMessage
+    PHI  R8
+    LDI  LOW StartingMessage
+    PLO  R8
+    SEP  R4
+    DW   OutString
+
+MainLoop
     ; Get one input character from serial port in RF.1
     LDI HIGH B96IN
     PHI R7
@@ -290,7 +320,7 @@ SerialOK
     SEP R7
 
     ; get next keypress
-    BR  SerialOK
+    BR  MainLoop
 
 ;__________________________________________________________________________________________________
 ; Read/Write Data
@@ -298,8 +328,22 @@ SerialOK
 ;__________________________________________________________________________________________________
 ; Read-only Data
 
-SerialError     TEXT        "Unsupported serial settings. Must be 9600 baud.\r\n\000"
+SerialError     TEXT        "Unsupported serial settings. Must be 9600 baud.\r\n"
 KnightRider     DB          $00, $00, $80, $80, $C0, $C0, $E0, $60, $70, $30, $38, $18, $1C, $0C, $0E, $06, $07, $03, $03, $01, $01, $00, $00, $01, $01, $03, $03, $07, $06, $0E, $0C, $1C, $18, $38, $30, $70, $60, $E0, $C0, $C0, $80, $80, $00, $00
+StartingMessage TEXT        " W E L C O M E   T O \n A D V E N T U R E - 1+ \r\n\n\n\n\n"
+                TEXT        "The object of your adventure is to find treasures and return them\r\n"
+                TEXT        "to the proper place for you to accumulate points.  I'm your clone.  Give me\r\n"
+                TEXT        "commands that consist of a verb & noun, i.e. GO EAST, TAKE KEY, CLIMB TREE,\r\n"
+                TEXT        "SAVE GAME, TAKE INVENTORY, FIND AXE, etc.\r\n\n"
+                TEXT        "You'll need some special items to do some things, but I'm sure that you'll be\r\n"
+                TEXT        "a good adventurer and figure these things out (which is most of the fun of\r\n"
+                TEXT        "this game).\r\n\n"
+                TEXT        "Note that going in the opposite direction won't always get you back to where\r\n"
+                TEXT        "you were.\r\n\n\n"
+                TEXT        "HAPPY ADVENTURING!!!\r\n\n\n\n\n"
+                TEXT        "************************** Press any key to continue **************************\r\n"
+                DB          $00
+
 
     END
 
