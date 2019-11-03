@@ -161,15 +161,20 @@ B96IN4
 ; TRASHED:  RB.0, RF.0
 
 B96OUT
-	LDI	08H
+    GLO RB          ; start by setting LEDs to output character
+    STR R2
+    OUT 4
+    DEC R2
+    
+	LDI	08H         ; RF.0 is data bit counter
 	PLO	RF
 
-STBIT
-	SEQ		        ;  2  START BIT
+STBIT               ; Send Start Bit (Space)
+	SEQ		        ;  2
 	NOP		        ;  5
 	NOP		        ;  8
 	GLO	RB	        ; 10
-	SHRC		    ; 12 DF=1ST BIT OUT
+	SHRC		    ; 12 DF = 1st bit to transmit
 	PLO	RB	        ; 14
 	PLO	RB	        ; 16
 	NOP		        ; 19 
@@ -181,7 +186,7 @@ STBIT1
 QHI1
 	DEC	RF
 	GLO	RF
-	BZ	DONE96	;AT 8.5 INSTRUCTIONS EITHER DONE OR REQ
+	BZ	DONE96      ;AT 8.5 INSTRUCTIONS EITHER DONE OR REQ
 
 ;DELAY
     NOP
