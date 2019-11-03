@@ -31,9 +31,6 @@ RETURN  EQU 8AEDH
 ;M(7FCE) GOES INTO RE.0
 BAUD    EQU 7FCDH
 
-INPUT   EQU 8005H
-OUTPUT  EQU 821DH
-
 OUTCRLF EQU 8513H
 HEXCRLF EQU 8519H
 OUTSTR  EQU 8526H
@@ -80,38 +77,38 @@ OUTSTR  EQU 8526H
 ;__________________________________________________________________________________________________
 ; Customized serial input routine
 
-; IN:       N/A
-; OUT:      RB.0 = received character
-; TRASHED:  R7
+; IN:       P=7
+; OUT:      P=3, RF.1 = received character
+; TRASHED:  R8
 
 MY_INPUT
     ; Load the starting point for the LED animation
     LDI HIGH KnightRider
-    PHI R7
+    PHI R8
     LDI LOW KnightRider
-    PLO R7
+    PLO R8
 
 B96IN           ; Wait for the stop bit
 	B3	B96IN
 
-	LDI	$FF     ; Initialize input character in RB.0 to $FF
-	PLO	RB
+	LDI	$FF     ; Initialize input character in RF.1 to $FF
+	PHI RF
 
 DrawLights
-    LDA R7
+    LDA R8
     STR	R2
 	B3  FoundStartBit
 	OUT 4
 	DEC	R2
-    GLO R7
+    GLO R8
 	B3  FoundStartBit
     SMI LOW KnightRider+44
     BNZ B96WaitStartBit
     LDI LOW KnightRider
 	B3  FoundStartBit
-    PLO R7
+    PLO R8
     LDI HIGH KnightRider
-    PHI R7
+    PHI R8
 	B3  FoundStartBit
 
 B96WaitStartBit
@@ -145,23 +142,23 @@ SkipDelay       ; read current bit
 	SKP		    ; if BIT=0 (EF3 PIN HIGH), leave DF=1
 B96IN4
 	SHR		    ; if BIT=1 (EF3 PIN LOW), set DF=0
-	GLO	RB	    ; load incoming byte
+	GHI RF	    ; load incoming byte
 	SHRC		; shift new bit into MSB, and oldest bit into DF
-	PLO	RB
+	PHI RF
 	LBDF StartDelay
 
-	SEP	R5
+	SEP	R3
 
 ;__________________________________________________________________________________________________
 ; Customized serial output routine
 ; 9600 baud, inverted RS232 logic
 
-; IN:       RB.0 = character to transmit
-; OUT:      N/A
-; TRASHED:  RB.0, RF.0
+; IN:       P=7, RF.1 = character to transmit
+; OUT:      P=3
+; TRASHED:  RF.0, RF.1
 
 B96OUT
-    GLO RB          ; start by setting LEDs to output character
+    GHI RF          ; start by setting LEDs to output character
     STR R2
     OUT 4
     DEC R2
@@ -173,10 +170,10 @@ STBIT               ; Send Start Bit (Space)
 	SEQ		        ;  2
 	NOP		        ;  5
 	NOP		        ;  8
-	GLO	RB	        ; 10
+	GHI RF	        ; 10
 	SHRC		    ; 12 DF = 1st bit to transmit
-	PLO	RB	        ; 14
-	PLO	RB	        ; 16
+	PHI RF	        ; 14
+	PHI RF	        ; 16
 	NOP		        ; 19 
 	BDF	STBIT1	    ; 21 First bit = 1?
 	BR	QHI		    ; 23 bit = 0, output Space
@@ -194,9 +191,9 @@ QHI1
 
 QHI
 	SEQ	            ; Q ON
-	GLO	RB
+	GHI RF
 	SHRC		    ; PUT NEXT BIT IN DF
-	PLO	RB
+	PHI RF
 	LBNF	QHI1	; 5.5 TURN Q OFF AFTER 6 MORE INSTRUCTION TIMES
 
 QLO1
@@ -210,9 +207,9 @@ QLO1
 
 QLO
 	REQ             ;Q OFF
-	GLO	RB
+	GHI RF
 	SHRC		    ;PUT NEXT BIT IN DF
-	PLO	RB
+	PHI RF
 	LBDF QLO1       ;5.5 TURN Q ON AFTER 6 MORE INSTRUCTION TIMES
 
 	DEC	RF
@@ -230,7 +227,7 @@ DONE96              ;FINISH LAST BIT TIMING
 DNE961
     REQ		        ; Send stop bit: Q=0
 
-	SEP	R5	        ; Return
+	SEP	R3	        ; Return
 
 ;__________________________________________________________________________________________________
 ; Main program starting point
@@ -269,20 +266,27 @@ Exit
     SEP R0  ;BACK TO THE MONITOR PROGRAM WE GO
 
 SerialOK
-    ; Get one input character from serial port in RB.0
-    SEP R4
-    DW  MY_INPUT
+    ; Get one input character from serial port in RF.1
+    LDI HIGH MY_INPUT
+    PHI R7
+    LDI LOW MY_INPUT
+    PLO R7
+    SEP R7
 
     ; Exit back to monitor when ESCAPE is pressed
-    GLO RB
+    GHI RF
     SMI 1BH
     BZ  Exit
 
     ; Echo character back
-    SEP R4
-    DW  B96OUT
-    BR  SerialOK    ; get next keypress
+    LDI HIGH B96OUT
+    PHI R7
+    LDI LOW B96OUT
+    PLO R7
+    SEP R7
 
+    ; get next keypress
+    BR  SerialOK
 
 ;__________________________________________________________________________________________________
 ; Read/Write Data
