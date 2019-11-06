@@ -359,6 +359,52 @@ GenRandom
     SEP  R5    
 
 ;__________________________________________________________________________________________________
+; Restore internal variables to starting state
+
+; IN:       N/A
+; OUT:      
+; TRASHED:  
+
+GameReset
+    LDI  LOW Array_I2               ; start by initializing item locations
+    PLO  R8
+    LDI  HIGH Array_I2
+    PHI  R8
+    LDI  LOW Array_IA
+    PLO  R9
+    LDI  HIGH Array_IA
+    PHI  R9
+    LDI  IL
+    PLO  R7
+GRLoop1
+    LDA  R8
+    STR  R9
+    INC  R9
+    DEC  R7
+    GLO  R7
+    BNZ  GRLoop1
+    INC  R9
+    INC  R9
+    LDI  $00
+    STR  R9                         ; Loadflag = 0
+    INC  R9
+    STR  R9                         ; Endflag = 0
+    INC  R9
+    STR  R9                         ; Darkflag = 0
+    LDI  AR
+    INC  R9
+    STR  R9                         ; Room = AR
+    LDI  LI
+    INC  R9
+    STR  R9                         ; lamp_oil = LT
+    LDI  $00
+    INC  R9
+    STR  R9
+    INC  R9
+    STR  R9                         ; state_flags = 0
+    SEP  R5
+
+;__________________________________________________________________________________________________
 ; Main program starting point
     ORG $200    ; fixme remove
 
@@ -396,31 +442,6 @@ Exit
 
 SerialOK
     ; beginning of main() function
-    LDI  LOW Array_I2               ; start by initializing variables
-    PLO  R8
-    LDI  HIGH Array_I2
-    PHI  R8
-    LDI  LOW Array_IA
-    PLO  R9
-    LDI  HIGH Array_IA
-    PHI  R9
-    LDI  IL
-    PLO  R7
-MainL1
-    LDA  R8
-    STR  R9
-    INC  R9
-    DEC  R7
-    GLO  R7
-    BNZ  MainL1
-    INC  R9
-    INC  R9
-    LDI  $01
-    STR  R9                         ; Loadflag = 1
-    LDI  $00
-    INC  R9
-    STR  R9                         ; Endflag = 0
-    
     ; clear screen
     SEP  R4
     DW   ClearScreen
@@ -445,24 +466,10 @@ MainL1
     DW   ClearScreen
 
     ; start of main loop
-    DEC  R9                         ; Loadflag is 1 because we just set it above
-MainLoad                            ; R9 must point to Loadflag
-    LDI  $00
-    STR  R9                         ; Loadflag = 0
-    INC  R9
-    INC  R9
-    STR  R9                         ; Darkflag = 0
-    LDI  AR
-    INC  R9
-    STR  R9                         ; Room = AR
-    LDI  LI
-    INC  R9
-    STR  R9                         ; lamp_oil = LT
-    LDI  $00
-    INC  R9
-    STR  R9
-    INC  R9
-    STR  R9                         ; state_flags = 0
+MainLoad
+    ; reset all game state
+    SEP  R4
+    DW   GameReset
     ; /////////////////////////////
     ; fixme: add state loading code here
     ; /////////////////////////////
