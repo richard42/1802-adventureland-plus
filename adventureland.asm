@@ -88,24 +88,34 @@ B96IN
     LDI LOW KnightRider
     PLO R8
 
-B96StopBitLoop      ; Wait for the stop bit
+B96StopBitLoop              ; Wait for the stop bit
     B3  B96StopBitLoop
 
-    LDI $FF         ; Initialize input character in RF.1 to $FF
+    LDI $FF                 ; Initialize input character in RF.1 to $FF
     PHI RF
 
 DrawLights
-    LDA R8
-    STR R2
+    LDA R8                  ; load next bit pattern in LED animation
+    STR R2                  ; put it on the stack
     B3  FoundStartBit
-    OUT 4
-    DEC R2
-    GLO R8
+    OUT 4                   ; output to LEDs
+    DEC R2                  ; restore stack pointer to original value
+    GLO R8                  ; load the low byte of the current bit pattern pointer
+    SMI LOW KnightRider+44  ; is it at the end of the animation sequence?
     B3  FoundStartBit
-    SMI LOW KnightRider+44
-    BNZ B96WaitStartBit
-    LDI LOW KnightRider
-    B3  FoundStartBit
+    BNZ B96WaitStartBit     ; if not, go burn CPU cycles and wait for the start bit
+    
+    LDI LOW Rand_VarX       ; we have to reset the pointer, so begin by instead
+    PLO R8
+    LDI HIGH Rand_VarX      ; loading a pointer to the psuedo-random generator's X value
+    B3 FoundStartBit
+    PHI R8
+    LDN R8
+    ADI $01                 ; and incrementing this value in memory, to make the generator's
+    STR R8                  ; values non-deterministic
+    B3 FoundStartBit
+    
+    LDI LOW KnightRider     ; now re-load the bit pattern pointer
     PLO R8
     LDI HIGH KnightRider
     PHI R8
@@ -272,6 +282,46 @@ ClearScreen
     SEP  R5
 
 ;__________________________________________________________________________________________________
+; Generate a psuedo-random byte
+
+; IN:       N/A
+; OUT:      D=psuedo-random number
+; TRASHED:  R7
+
+GenRandom
+    LDI  LOW Rand_VarX
+    PLO  R7
+    LDI  HIGH Rand_VarX
+    PHI  R7
+    SEX  R7
+
+    LDN  R7         ; D = VarX
+    ADI  $01
+    STR  R7
+    INC  R7
+    LDA  R7         ; D = VarA
+    INC  R7
+    XOR             ; D = VarA XOR VarC
+    DEC  R7
+    DEC  R7
+    DEC  R7
+    XOR             ; D = VarA XOR VarC XOR VarX
+    INC  R7
+    STR  R7         ; VarA = D
+    INC  R7
+    ADD
+    STXD
+    SHR
+    XOR
+    INC  R7
+    INC  R7
+    ADD
+    STR  R7
+
+    SEX  R2
+    SEP  R5    
+
+;__________________________________________________________________________________________________
 ; Main program starting point
     ORG $100    ; fixme remove
 
@@ -377,6 +427,11 @@ Darkflag        DB          0
 Room            DB          0
 LampOil         DB          0
 StateFlags      DW          0
+
+Rand_VarX       DB          18
+Rand_VarA       DB          166
+Rand_VarB       DB          220
+Rand_VarC       DB          64
 
                 END
 
