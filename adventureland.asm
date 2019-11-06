@@ -265,6 +265,43 @@ OutStrDone
     SEP  R5
 
 ;__________________________________________________________________________________________________
+; Print a 2-digit number
+
+; IN:       D = number to print, R8 = pointer to start of string
+; OUT:      N/A
+; TRASHED:  D, R7
+
+Print2Digit
+    PHI  R7                         ; save number to print
+    LDI  $30                        ; ASCII 0
+    PLO  R7
+    GHI  R7
+P2D_Tens
+    SMI  10
+    BM   P2D_TensDone
+    INC  R7
+    BR   P2D_Tens
+P2D_TensDone
+    ADI  10                         ; D is now number of singles
+    PHI  R7
+    GLO  R7
+    STR  R8                         ; set the tens digit
+    INC  R8
+    LDI  $30                        ; ASCII 0
+    PLO  R7
+    GHI  R7
+P2D_Ones
+    SMI  1
+    BM   P2D_OnesDone
+    INC  R7
+    BR   P2D_Ones
+P2D_OnesDone
+    GLO  R7
+    STR  R8
+    DEC  R8
+    SEP  R5
+
+;__________________________________________________________________________________________________
 ; Clear screen
 
 ; IN:       N/A
@@ -323,7 +360,7 @@ GenRandom
 
 ;__________________________________________________________________________________________________
 ; Main program starting point
-    ORG $100    ; fixme remove
+    ORG $200    ; fixme remove
 
 START
     ; First, check that the serial port setup is supported
@@ -355,14 +392,40 @@ Exit
     LDI $DF
     PLO R0
     SEX R0
-    SEP R0  ;BACK TO THE MONITOR PROGRAM WE GO
+    SEP R0                          ; BACK TO THE MONITOR PROGRAM WE GO
 
 SerialOK
+    ; beginning of main() function
+    LDI  LOW Array_I2               ; start by initializing variables
+    PLO  R8
+    LDI  HIGH Array_I2
+    PHI  R8
+    LDI  LOW Array_IA
+    PLO  R9
+    LDI  HIGH Array_IA
+    PHI  R9
+    LDI  IL
+    PLO  R7
+MainL1
+    LDA  R8
+    STR  R9
+    INC  R9
+    DEC  R7
+    GLO  R7
+    BNZ  MainL1
+    INC  R9
+    INC  R9
+    LDI  $01
+    STR  R9                         ; Loadflag = 1
+    LDI  $00
+    INC  R9
+    STR  R9                         ; Endflag = 0
+    
     ; clear screen
     SEP  R4
     DW   ClearScreen
 
-    ; Print initial message
+    ; Print welcome message
     LDI  HIGH StartingMsg
     PHI  R8
     LDI  LOW StartingMsg
@@ -370,28 +433,176 @@ SerialOK
     SEP  R4
     DW   OutString
 
-MainLoop
-    ; Get one input character from serial port in RF.1
+    ; wait for key press
     LDI HIGH B96IN
     PHI R7
     LDI LOW B96IN
     PLO R7
     SEP R7
+    
+    ; clear screen
+    SEP  R4
+    DW   ClearScreen
 
-    ; Exit back to monitor when ESCAPE is pressed
-    GHI RF
-    SMI 1BH
-    BZ  Exit
+    ; start of main loop
+    DEC  R9                         ; Loadflag is 1 because we just set it above
+MainLoad                            ; R9 must point to Loadflag
+    LDI  $00
+    STR  R9                         ; Loadflag = 0
+    INC  R9
+    INC  R9
+    STR  R9                         ; Darkflag = 0
+    LDI  AR
+    INC  R9
+    STR  R9                         ; Room = AR
+    LDI  LI
+    INC  R9
+    STR  R9                         ; lamp_oil = LT
+    LDI  $00
+    INC  R9
+    STR  R9
+    INC  R9
+    STR  R9                         ; state_flags = 0
+    ; /////////////////////////////
+    ; fixme: add state loading code here
+    ; /////////////////////////////
+    ; clear screen
+    SEP  R4
+    DW   ClearScreen
+    ; look()
+    SEP  R4
+    DW   Do_Look
+    ; NV[0] = 0
+    LDI  LOW Array_NV
+    PLO  R9
+    LDI  HIGH Array_NV
+    PHI  R9
+    LDI  $00
+    STR  R9
+    ; turn()
+    SEP  R4
+    DW   Do_Turn
+MainGetInput
+    ; get_input()
+    SEP  R4
+    DW   Do_GetInput
+    ; if command parsing failed, try again
+    BNZ  MainGetInput
+    ; turn()
+    SEP  R4
+    DW   Do_Turn
+    ; reload R9 to point to Endflag
+    LDI  LOW Endflag
+    PLO  R9
+    LDI  HIGH Endflag
+    PHI  R9
+    LDN  R9
+    BNZ  Exit                       ; quit if endflag != 0
+    DEC  R9
+    LDN  R9
+    BNZ  MainLoad                   ; loop back and re-load if loadflag != 0
+    ; deal with lamp oil
+    LDI  LOW Array_IA+9
+    PLO  RA
+    LDI  HIGH Array_IA+9
+    PHI  RA
+    LDN  RA
+    SMI  $FF
+    BNZ  MainNoLamp
+    LDI  LOW LampOil
+    PLO  R9
+    LDI  HIGH LampOil
+    PHI  R9
+    LDN  R9
+    SMI  $01
+    STR  R9                         ; lamp_oil--
+    BPZ  LampNotEmpty
+    LDI  HIGH LampEmptyMsg          ; print Lamp is Empty message
+    PHI  R8
+    LDI  LOW LampEmptyMsg
+    PLO  R8
+    SEP  R4
+    DW   OutString
+    LDI  $00
+    STR  RA                         ; IA[9] = 0
+    BR   MainNoLamp
+LampNotEmpty
+    SMI  25                         ; is our oil level < 25?
+    BPZ  MainNoLamp
+    LDI  HIGH LampLow1Msg           ; print Lamp is low message
+    PHI  R8
+    LDI  LOW LampLow1Msg
+    PLO  R8
+    SEP  R4
+    DW   OutString
+    LDI  HIGH PrintNumber
+    PHI  R8
+    LDI  LOW PrintNumber
+    PLO  R8
+    LDN  R9                         ; D = lamp_oil
+    SEP  R4
+    DW   Print2Digit
+    SEP  R4
+    DW   OutString
+    LDI  HIGH LampLow2Msg
+    PHI  R8
+    LDI  LOW LampLow2Msg
+    PLO  R8
+    SEP  R4
+    DW   OutString
+MainNoLamp
+    ; NV[0] = 0
+    LDI  LOW Array_NV
+    PLO  R9
+    LDI  HIGH Array_NV
+    PHI  R9
+    LDI  $00
+    STR  R9
+    ; turn()
+    SEP  R4
+    DW   Do_Turn
+MainLoopTail
+    ; reload R9 to point to Endflag
+    LDI  LOW Endflag
+    PLO  R9
+    LDI  HIGH Endflag
+    PHI  R9
+    LDN  R9
+    BNZ  Exit                       ; if endflag != 0, quit
+    DEC  R9
+    LDN  R9
+    BNZ  MainLoad                   ; if loadflag != 0, loop back and re-load
+    BR   MainGetInput               ; otherwise, get next command
 
-    ; Echo character back
-    LDI HIGH B96OUT
-    PHI R7
-    LDI LOW B96OUT
-    PLO R7
-    SEP R7
+;__________________________________________________________________________________________________
+; Adventure get_input() function
 
-    ; get next keypress
-    BR  MainLoop
+; IN:       N/A
+; OUT:      D = return value (1 if failed, 0 if command OK)
+; TRASHED:  N/A
+
+Do_GetInput
+    SEP  R5
+
+;__________________________________________________________________________________________________
+; Adventure look() function
+
+; IN:       N/A
+; OUT:      N/A
+; TRASHED:  N/A
+
+Do_Look
+    SEP  R5
+
+;__________________________________________________________________________________________________
+; Adventure turn() function
+
+; IN:       N/A
+; OUT:      N/A
+; TRASHED:  N/A
+
+Do_Turn
+    SEP  R5
 
 ;__________________________________________________________________________________________________
 ; Read-only Data
@@ -410,6 +621,9 @@ StartingMsg     BYTE        " W E L C O M E   T O \n A D V E N T U R E - 1+ \r\n
                 BYTE        "you were.\r\n\n\n"
                 BYTE        "HAPPY ADVENTURING!!!\r\n\n\n\n\n"
                 BYTE        "************************** Press any key to continue **************************\r\n", 0
+LampEmptyMsg    BYTE        "Your lamp has run out of oil!\r\n", 0
+LampLow1Msg     BYTE        "Your lamp will run out of oil in ",0
+LampLow2Msg     BYTE        " turns!\n",0
                 DB          $00
 ClsMsg          DB          $1B, $5B, $32, $4A, $1B, $48, $00
 
@@ -418,7 +632,7 @@ ClsMsg          DB          $1B, $5B, $32, $4A, $1B, $48, $00
 ;__________________________________________________________________________________________________
 ; Read/Write Data
 
-Array_TPS       BLK         80
+Array_TPS       BLK         80      ; These data members must all stay in this order
 Array_IA        BLK         IL
 Array_NV        DB          0, 0
 Loadflag        DB          0
@@ -428,10 +642,12 @@ Room            DB          0
 LampOil         DB          0
 StateFlags      DW          0
 
-Rand_VarX       DB          18
+Rand_VarX       DB          18      ; These data members must all stay in this order
 Rand_VarA       DB          166
 Rand_VarB       DB          220
 Rand_VarC       DB          64
+
+PrintNumber     DB          0,0,0   ; temporary location for storing 2-digit number to print
 
                 END
 
