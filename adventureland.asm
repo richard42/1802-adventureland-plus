@@ -163,16 +163,16 @@ B96IN4
 ; Customized serial output routine
 ; 9600 baud, inverted RS232 logic
 
-; IN:       P=7, RF.1 = character to transmit
+; IN:       P=7, D = character to transmit, R2 is stack pointer
 ; OUT:      P=3
-; TRASHED:  RF.0, RF.1
+; TRASHED:  RF
 
 B96OUT_Return
     SEP R3
 B96OUT
-    GHI RF          ; start by setting LEDs to output character
+    PHI RF          ; save output character in RF.1
     STR R2
-    OUT 4
+    OUT 4           ; set LEDs to output character
     DEC R2
     
     LDI 08H         ; RF.0 is data bit counter
@@ -257,7 +257,6 @@ OutString
 OutStrLoop1
     LDA  R8
     BZ   OutStrDone
-    PHI  RF
     SEP  R7
     BR   OutStrLoop1
 
@@ -278,7 +277,7 @@ Print2Digit
     GHI  R7
 P2D_Tens
     SMI  10
-    BM   P2D_TensDone
+    BL   P2D_TensDone
     INC  R7
     BR   P2D_Tens
 P2D_TensDone
@@ -292,7 +291,7 @@ P2D_TensDone
     GHI  R7
 P2D_Ones
     SMI  1
-    BM   P2D_OnesDone
+    BL   P2D_OnesDone
     INC  R7
     BR   P2D_Ones
 P2D_OnesDone
@@ -406,7 +405,6 @@ GRLoop1
 
 ;__________________________________________________________________________________________________
 ; Main program starting point
-    ORG $200    ; fixme remove
 
 START
     ; First, check that the serial port setup is supported
@@ -575,21 +573,335 @@ MainLoopTail
     LDI  HIGH Endflag
     PHI  R9
     LDN  R9
-    BNZ  Exit                       ; if endflag != 0, quit
+    LBNZ  Exit                      ; if endflag != 0, quit
     DEC  R9
     LDN  R9
-    BNZ  MainLoad                   ; if loadflag != 0, loop back and re-load
-    BR   MainGetInput               ; otherwise, get next command
+    LBNZ  MainLoad                  ; if loadflag != 0, loop back and re-load
+    LBR   MainGetInput              ; otherwise, get next command
 
 ;__________________________________________________________________________________________________
 ; Adventure get_input() function
 
 ; IN:       N/A
 ; OUT:      D = return value (1 if failed, 0 if command OK)
-; TRASHED:  N/A
+; TRASHED:  R7, R8, R9, RA, RB, RC, RD, RF
 
 Do_GetInput
-    SEP  R5
+    ; print input prompt
+    LDI  HIGH InputPromptMsg
+    PHI  R8
+    LDI  LOW InputPromptMsg
+    PLO  R8
+    SEP  R4
+    DW   OutString
+    ; now we are in the gets() function. set up loop variables
+    LDI  $00
+    PLO  RA                         ; RA.0 is character counter; only 79 are allowed
+    LDI  HIGH Array_TPS
+    PHI  R9
+    LDI  LOW Array_TPS
+    PLO  R9                         ; R9 is pointer to input line
+GILoop1
+    ; wait for key press
+    LDI  HIGH B96IN
+    PHI  R7
+    LDI  LOW B96IN
+    PLO  R7
+    SEP  R7
+    ; load R7 to point to serial output routine in case I need to print. this saves code space
+    LDI  HIGH B96OUT
+    PHI  R7
+    LDI  LOW B96OUT
+    PLO  R7
+    ; handle backspace
+    GHI  RF
+    SMI  $8
+    BZ   GIBackspace
+    GHI  RF
+    SMI  $7F
+    BNZ  GILoop1N1
+GIBackspace
+    GLO  RA                         ; if line length is 0
+    BZ   GILoop1                    ; then just go back for another input character
+    LDI  $08                        ; otherwise, erase last character
+    SEP  R7
+    LDI  $20                        ; ' '
+    SEP  R7
+    LDI  $08                        ; '\b'
+    SEP  R7
+    DEC  RA                         ; decrement character count
+    DEC  R9                         ; decrement input line pointer
+    BR   GILoop1                    ; and then go back for another input character
+GILoop1N1
+    ; handle enter or return
+    GHI  RF
+    SMI  $0A
+    BZ   GIEnter
+    GHI  RF
+    SMI  $0D
+    BNZ  GILoop1N2
+GIEnter
+    LDI  '\r'                       ; '\n'
+    SEP  R7
+    LDI  '\n'                       ; '\n'
+    SEP  R7
+    BR   GIgetsDone
+GILoop1N2
+    ; ensure that input character is valid
+    GHI  RF
+    SMI  $20
+    BZ   GICharOk
+    GHI  RF
+    SMI  $41
+    BL   GILoop1
+    GHI  RF
+    SMI  $5B
+    BL   GICharOk
+    GHI  RF
+    SMI  $61
+    BL   GILoop1
+    GHI  RF
+    SMI  $7B
+    BGE  GILoop1
+GICharOk
+    GHI  RF
+    STR  R9                         ; add input character to our string
+    INC  R9
+    INC  RA                         ; increment string length counter
+    SEP  R7                         ; echo character to serial output
+    GLO  RA                         ; how long is the input line?
+    SMI  79
+    BL   GILoop1                    ; if < 79 characters, go get another
+GIgetsDone
+    LDI  $00                        ; null-terminate input string
+    STR  R9
+    LDI  HIGH Array_TPS
+    PHI  R9
+    LDI  LOW Array_TPS
+    PLO  R9                         ; reload R9 to point to beginning of input string
+    ; now we are back in the get_input() function.
+    ; If the line is empty, go prompt for another command
+    LDN  R9
+    BZ   Do_GetInput
+    ; otherwise, start parsing. begin by skipping any leading spaces
+GIParseLoop1
+    LDA  R9
+    BZ   GIParseLoop1Done
+    SMI  $20                        ; ' '
+    BZ   GIParseLoop1
+GIParseLoop1Done
+    DEC  R9
+    ; store pointer to first word in RA
+    GLO  R9
+    PLO  RA
+    GHI  R9
+    PHI  RA
+    ; convert entire string to uppercase
+GIParseLoop2
+    LDA  R9
+    BZ   GIParseLoop2Done
+    SMI  $61
+    BL   GIParseLoop2
+    ADI  $41
+    DEC  R9
+    STR  R9
+    INC  R9
+    BR   GIParseLoop2
+GIParseLoop2Done
+    ; reload pointer to start of first word, and find the end (the next space)
+    GLO  RA
+    PLO  R9
+    GHI  RA
+    PHI  R9
+GIParseLoop3
+    LDA  R9
+    BZ   GIParseLoop3Done
+    SMI  $20                        ; ' '
+    BNZ  GIParseLoop3
+GIParseLoop3Done
+    ; if we found a space, NULL-terminate the first word
+    DEC  R9
+    LDN  R9
+    BZ   GIParseLoop4
+    LDI  $00
+    STR  R9
+    INC  R9
+    ; skip any additional spaces in between words
+GIParseLoop4
+    LDA  R9
+    SMI  $20                        ; ' '
+    BZ   GIParseLoop4
+    DEC  R9
+    ; store pointer to second word in RB
+    GLO  R9
+    PLO  RB
+    GHI  R9
+    PHI  RB
+    ; find matches for both words
+    LDI  LOW Array_NV               ; RC = pointer to NV[2]
+    PLO  RC
+    LDI  HIGH Array_NV
+    PHI  RC
+    LDI  LOW Array_NVS              ; RD = pointer to NVS[2][NL][4], NL=60
+    PLO  RD
+    LDI  HIGH Array_NVS
+    PHI  RD
+    LDI  $00
+    PHI  RF                         ; RF.1 = i, for (i = 0; i < 2; i++)
+    GLO  RA                         ; load pointer to first word in R9
+    PLO  R9
+    GHI  RA
+    PHI  R9
+GIParseLoop5
+    LDI  $00
+    STR  RC                         ; NV[i] = 0
+    LDN  R9
+    LBZ  GIParseLoop5Tail
+    LDI  $00
+    PLO  RF                         ; RF.0 = j, for (j = 0; j < NL; j++)
+GIParseLoop5_1
+    GLO  RD
+    PLO  R8
+    GHI  RD
+    PHI  R8                         ; R8 = s = NVS[i][j]
+    LDN  R8
+    SMI  '*'                        ; if first character of word is '*'
+    LBNZ GIParseLoop5_1Next1
+    INC  R8                         ; then skip it
+    LBR  GIParseLoop5_1Next1        ; fixme remove
+    ORG $300                        ; fixme remove
+GIParseLoop5_1Next1
+    ; comparestring()
+    SEX  R8
+    LDA  R9                         ; Load 1st character in input word
+    BZ   GIParseLoop5_1WordEnd
+    SM                              ; compare to 1st character in table word
+    LBNZ  GIParseLoop5_1NoMatch
+    INC  R8
+    LDA  R9                         ; Load 2nd character in input word
+    BZ   GIParseLoop5_1WordEnd
+    SM                              ; compare to 2nd character in table word
+    LBNZ  GIParseLoop5_1NoMatch
+    INC  R8
+    LDA  R9                         ; Load 3rd character in input word
+    BZ   GIParseLoop5_1WordEnd
+    SM                              ; compare to 3rd character in table word
+    LBNZ  GIParseLoop5_1NoMatch
+    SKP                             ; fall through to GIParseLoop5_1Match
+GIParseLoop5_1WordEnd
+    LDN  R8
+    LBNZ  GIParseLoop5_1NoMatch
+GIParseLoop5_1Match
+    GLO  RF
+    STR  RC                         ; NV[i] = j
+    GLO  RD
+    PLO  R8
+    GHI  RD
+    PHI  R8                         ; R8 = NVS[i][j]
+GIParseLoop5_1_1                    ; while (NVS[i][NV[i]][0] == '*') NV[i]--;
+    LDN  R8
+    SMI  '*'
+    BNZ  GIParseLoop5Tail
+    LDN  RC
+    SMI  $01
+    STR  RC                         ; NV[i]--
+    DEC  R8
+    DEC  R8
+    DEC  R8
+    DEC  R8
+    BR   GIParseLoop5_1_1
+GIParseLoop5_1NoMatch
+    SEX  R2
+    INC  RD
+    INC  RD
+    INC  RD
+    INC  RD                         ; move word table pointer to next word
+    GHI  RF                         ; test i variable
+    BNZ  GIParseLoop5_1Next2
+    GLO  RA                         ; reload pointer to first word in R9
+    PLO  R9
+    GHI  RA
+    PHI  R9
+    BR   GIParseLoop5_1Next3
+GIParseLoop5_1Next2
+    GLO  RB                         ; reload pointer to second word in R9
+    PLO  R9
+    GHI  RB
+    PHI  R9
+GIParseLoop5_1Next3
+    INC  RF
+    GLO  RF
+    SMI  NL                         ; NL = 60
+    LBNF  GIParseLoop5_1            ; go check the next word in the table
+GIParseLoop5Tail
+    INC  RC                         ; point to next element in NV array
+    GLO  RB                         ; load pointer to second word in R9
+    PLO  R9
+    GHI  RB
+    PHI  R9
+    LDI  LOW Array_NVS+NL*4         ; RD = pointer to second half of NVS[2][NL][4], NL=60
+    PLO  RD
+    LDI  HIGH Array_NVS+NL*4
+    PHI  RD
+    GHI  RF
+    ADI  $1                         ; i++
+    PHI  RF
+    SMI  $2
+    LBNF GIParseLoop5               ; branch if less
+    ; validate first word (verb)
+    DEC  RC
+    DEC  RC
+    LDA  RC
+    BNZ  GIParseVerbOk
+    LDI  HIGH InputError1Msg
+    PHI  R8
+    LDI  LOW InputError1Msg
+    PLO  R8
+    SEP  R4
+    DW   OutString                  ; print "I don't know how to "
+    GLO  RA
+    PLO  R8
+    GHI  RA
+    PHI  R8
+    SEP  R4
+    DW   OutString                  ; print first word
+    LDI  '!'
+    SEP  R7
+    LDI  $0D
+    SEP  R7
+    LDI  $0A
+    SEP  R7                         ; print '!\r\n'
+    LDI  $01
+    SEP  R5                         ; return 1
+GIParseVerbOk
+    ; validate second word (noun)
+    LDN  RB                         ; D is word[0][0]
+    BZ   GIParseAllGood
+    LDN  RC                         ; D is NV[1]
+    BNZ  GIParseAllGood
+    LDI  HIGH InputError2Msg
+    PHI  R8
+    LDI  LOW InputError2Msg
+    PLO  R8
+    SEP  R4
+    DW   OutString                  ; print "I don't know what a "
+    GLO  RB
+    PLO  R8
+    GHI  RB
+    PHI  R8
+    SEP  R4
+    DW   OutString                  ; print second word
+    LDI  HIGH InputError3Msg
+    PHI  R8
+    LDI  LOW InputError3Msg
+    PLO  R8
+    SEP  R4
+    DW   OutString                  ; print " is!\n"
+    LDI  $01
+    SEP  R5                         ; return 1
+GIParseAllGood
+    LDI  $00
+    SEP  R5                         ; return 0
 
 ;__________________________________________________________________________________________________
 ; Adventure look() function
@@ -630,8 +942,11 @@ StartingMsg     BYTE        " W E L C O M E   T O \n A D V E N T U R E - 1+ \r\n
                 BYTE        "************************** Press any key to continue **************************\r\n", 0
 LampEmptyMsg    BYTE        "Your lamp has run out of oil!\r\n", 0
 LampLow1Msg     BYTE        "Your lamp will run out of oil in ",0
-LampLow2Msg     BYTE        " turns!\n",0
-                DB          $00
+LampLow2Msg     BYTE        " turns!\r\n",0
+InputPromptMsg  BYTE        "\r\nTell me what to do? ",0
+InputError1Msg  BYTE        "I don't know how to ",0        ; append with "!\n"
+InputError2Msg  BYTE        "I don't know what a ", 0
+InputError3Msg  BYTE        " is!\r\n", 0
 ClsMsg          DB          $1B, $5B, $32, $4A, $1B, $48, $00
 
                 INCL           "adventureland_data.asm"
