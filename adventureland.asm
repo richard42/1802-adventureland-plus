@@ -908,9 +908,176 @@ GIParseAllGood
 
 ; IN:       N/A
 ; OUT:      N/A
-; TRASHED:  N/A
+; TRASHED:  R7, R8, R9, RA, RB, RC, RF
 
 Do_Look
+    LDI  LOW Darkflag
+    PLO  R9
+    LDI  HIGH Darkflag
+    PHI  R9
+    LDA  R9                         ; D == is_dark
+    BZ   LKNotDark
+    SEX  R9                         ; R9 is pointing to 'room'
+    LDI  LOW Array_IA+9
+    PLO  RA
+    LDI  HIGH Array_IA+9
+    PHI  RA
+    LDN  RA
+    SHL
+    BDF  LKNotDark
+    SHR
+    SM
+    BZ   LKNotDark
+    ; it's dark. print a message and return
+    LDI  HIGH Look1Msg
+    PHI  R8
+    LDI  LOW Look1Msg
+    PLO  R8
+    SEP  R4
+    DW   OutString
+    SEP  R5
+LKNotDark
+    LDN  R9
+    SHL                             ; D = room * 2
+    ADI  LOW Table_RSS
+    PLO  RA
+    LDI  HIGH Table_RSS
+    ADCI $00
+    PHI  RA
+    LDA  RA
+    PHI  RB
+    LDA  RA
+    PLO  RB                         ; RB = RSS[room]
+    LDA  RB
+    SMI  '*'
+    BZ   LKPrintRoom1
+    DEC  RB
+    LDI  HIGH Look2Msg              ; print "I'm in a " prefix
+    PHI  R8
+    LDI  LOW Look2Msg
+    PLO  R8
+    SEP  R4
+    DW   OutString
+LKPrintRoom1
+    GLO  RB
+    PLO  R8
+    GHI  RB
+    PHI  R8
+    SEP  R4
+    DW   OutString                  ; print the room description
+    LDI  $00
+    PLO  RB                         ; RB.0 is item counter 'i' for loop
+    PHI  RB                         ; RB.1 is flag which specifies whether item list prefix has been printed
+    LDI  LOW Array_IA
+    PLO  RA
+    LDI  HIGH Array_IA
+    PHI  RA                         ; RA is pointer to start of IA[]
+LKLoop1
+    SEX  R9                         ; R9 is pointing to 'room'
+    LDA  RA
+    SM
+    LBNZ LKLoop1Tail
+    ; we have found an item in this room.  start by printing the item list header if necessary
+    GHI  RB
+    LBNZ LKLoop1Next1
+    LDI  $01
+    PHI  RB
+    LDI  HIGH Look3Msg
+    PHI  R8
+    LDI  LOW Look3Msg
+    PLO  R8
+    SEP  R4
+    DW   OutString
+LKLoop1Next1
+    ; print item description
+    GLO  RB                         ; D = item number (i)
+    SHL
+    ADI  LOW Table_IAS
+    PLO  R8
+    LDI  HIGH Table_IAS
+    ADCI $00
+    PHI  R8
+    LDA  R8
+    PHI  RC
+    LDA  R8
+    PLO  RC                         ; RC = pointer to item description
+    LDI  ' '
+    SEP  R7
+    LDI  ' '
+    SEP  R7
+    LDI  ' '
+    SEP  R7
+LKLoop1_1
+    LDN  RC
+    BZ   LKLoop1_1Tail
+    SMI  '/'
+    BZ   LKLoop1_1Tail
+    LDA  RC
+    SEP  R7
+    BR   LKLoop1_1
+LKLoop1_1Tail
+    LDI  '\r'
+    SEP  R7
+    LDI  '\n'
+    SEP  R7
+LKLoop1Tail
+    INC  RB
+    GLO  RB
+    SMI  IL
+    LBNF LKLoop1
+    ; now print room exits
+    SEX  R9
+    LDN  R9                         ; D = room
+    ADD
+    ADD
+    SHL                             ; D = room * 6
+    ADI  LOW Array_RM
+    PLO  R9
+    LDI  HIGH Array_RM
+    ADCI $00
+    PHI  R9                         ; R9 is pointer to RM[room][0]
+    LDI  $00
+    PLO  RB                         ; RB.0 is direction counter 'i' for loop
+    PHI  RB                         ; RB.1 is flag which specifies whether exit list header has been printed
+LKLoop2
+    LDA  R9
+    BZ  LKLoop2Tail
+    ; we have found an exit from this room.  start by printing the exit list header if necessary
+    GHI  RB
+    BNZ  LKLoop2Next1
+    LDI  $01
+    PHI  RB
+    LDI  HIGH Look4Msg
+    PHI  R8
+    LDI  LOW Look4Msg
+    PLO  R8
+    SEP  R4
+    DW   OutString
+LKLoop2Next1
+    GLO  RB
+    SHL
+    SHL
+    SHL
+    ADI  LOW Array_DIR
+    PLO  R8
+    LDI  HIGH Array_DIR
+    ADCI $00
+    PHI  R8
+    SEP  R4
+    DW   OutString                  ; print direction
+    LDI  ' '
+    SEP  R7
+LKLoop2Tail
+    INC  RB
+    GLO  RB
+    SMI  6
+    BL   LKLoop2
+    LDI  '\r'
+    SEP  R7
+    LDI  '\n'
+    SEP  R7
+    LDI  '\n'
+    SEP  R7
     SEP  R5
 
 ;__________________________________________________________________________________________________
@@ -928,6 +1095,7 @@ Do_Turn
 
 SerialError     BYTE        "Unsupported serial settings. Must be 9600 baud.\r\n"
 KnightRider     DB          $00, $00, $80, $80, $C0, $C0, $E0, $60, $70, $30, $38, $18, $1C, $0C, $0E, $06, $07, $03, $03, $01, $01, $00, $00, $01, $01, $03, $03, $07, $06, $0E, $0C, $1C, $18, $38, $30, $70, $60, $E0, $C0, $C0, $80, $80, $00, $00
+ClsMsg          DB          $1B, $5B, $32, $4A, $1B, $48, $00
 StartingMsg     BYTE        " W E L C O M E   T O \n A D V E N T U R E - 1+ \r\n\n\n\n\n"
                 BYTE        "The object of your adventure is to find treasures and return them\r\n"
                 BYTE        "to the proper place for you to accumulate points.  I'm your clone.  Give me\r\n"
@@ -944,12 +1112,15 @@ LampEmptyMsg    BYTE        "Your lamp has run out of oil!\r\n", 0
 LampLow1Msg     BYTE        "Your lamp will run out of oil in ",0
 LampLow2Msg     BYTE        " turns!\r\n",0
 InputPromptMsg  BYTE        "\r\nTell me what to do? ",0
-InputError1Msg  BYTE        "I don't know how to ",0        ; append with "!\n"
+InputError1Msg  BYTE        "I don't know how to ",0
 InputError2Msg  BYTE        "I don't know what a ", 0
 InputError3Msg  BYTE        " is!\r\n", 0
-ClsMsg          DB          $1B, $5B, $32, $4A, $1B, $48, $00
+Look1Msg        BYTE        "I can't see.  It's too dark!\r\n", 0
+Look2Msg        BYTE        "I'm in a ", 0
+Look3Msg        BYTE        "\r\n\nVisible Items Here:\r\n", 0
+Look4Msg        BYTE        "\r\nObvious Exits:\r\n   ", 0
 
-                INCL           "adventureland_data.asm"
+                INCL        "adventureland_data.asm"
 
 ;__________________________________________________________________________________________________
 ; Read/Write Data

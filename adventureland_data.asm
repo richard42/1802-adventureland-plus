@@ -176,6 +176,8 @@ Array_NVS   BYTE    "AUT",0, "GO",0,0, "*ENT", "*RUN", "*WAL", "*CLI", "JUM",0, 
             BYTE    "RUG",0, "RUB",0, "HON",0, "FRU",0, "OX",0,0, "RIN",0, "CHI",0, "*BIT", "BRA",0, "SIG",0
             BYTE    "BLA",0, "WEB",0, "*WRI", "SWA",0, "LAV",0, "ARO",0, "HAL",0, "TRE",0, "*STU", "FIR",0
 
+; Array DIR has dimensions 6 x 8
+Array_DIR   BYTE    "North",0,0,0, "South",0,0,0, "East",0,0,0,0, "West",0,0,0,0, "Up",0,0,0,0,0,0, "Down",0
 
 ; Array RM has dimensions 34 x 6
 Array_RM    DB   0,  7, 10,  1,  0, 24
