@@ -172,6 +172,7 @@ B96OUT_Return
 B96OUT
     PHI RF          ; save output character in RF.1
     STR R2
+    SEX R2
     OUT 4           ; set LEDs to output character
     DEC R2
     
@@ -354,15 +355,14 @@ GenRandom
     ADD
     STR  R7
 
-    SEX  R2
     SEP  R5    
 
 ;__________________________________________________________________________________________________
 ; Restore internal variables to starting state
 
 ; IN:       N/A
-; OUT:      
-; TRASHED:  
+; OUT:      N/A
+; TRASHED:  R7, R8, R9
 
 GameReset
     LDI  LOW Array_I2               ; start by initializing item locations
@@ -507,9 +507,9 @@ MainGetInput
     LDN  R9
     BNZ  MainLoad                   ; loop back and re-load if loadflag != 0
     ; deal with lamp oil
-    LDI  LOW Array_IA+9
+    LDI  LOW (Array_IA+9)
     PLO  RA
-    LDI  HIGH Array_IA+9
+    LDI  HIGH (Array_IA+9)
     PHI  RA
     LDN  RA
     SMI  $FF
@@ -839,9 +839,9 @@ GIParseLoop5Tail
     PLO  R9
     GHI  RB
     PHI  R9
-    LDI  LOW Array_NVS+NL*4         ; RD = pointer to second half of NVS[2][NL][4], NL=60
+    LDI  LOW (Array_NVS+NL*4)       ; RD = pointer to second half of NVS[2][NL][4], NL=60
     PLO  RD
-    LDI  HIGH Array_NVS+NL*4
+    LDI  HIGH (Array_NVS+NL*4)
     PHI  RD
     GHI  RF
     ADI  $1                         ; i++
@@ -918,9 +918,9 @@ Do_Look
     LDA  R9                         ; D == is_dark
     BZ   LKNotDark
     SEX  R9                         ; R9 is pointing to 'room'
-    LDI  LOW Array_IA+9
+    LDI  LOW (Array_IA+9)
     PLO  RA
-    LDI  HIGH Array_IA+9
+    LDI  HIGH (Array_IA+9)
     PHI  RA
     LDN  RA
     SHL
@@ -987,7 +987,7 @@ LKLoop1
     LDI  LOW Look3Msg
     PLO  R8
     SEP  R4
-    DW   OutString
+    DW   OutString                  ; print: "Visible Items Here:"
 LKLoop1Next1
     ; print item description
     GLO  RB                         ; D = item number (i)
@@ -1085,9 +1085,121 @@ LKLoop2Tail
 
 ; IN:       N/A
 ; OUT:      N/A
-; TRASHED:  N/A
+; TRASHED:  R7, R8, R9, RA, RB, RF
 
 Do_Turn
+    LDI  $00
+    PLO  R9                         ; R9.0 = i ((is_dark) && (IA[9] != room) && (IA[9] != -1))
+    PHI  R9                         ; R9.1 = go_direction
+    LDI  LOW Array_NV
+    PLO  R7
+    LDI  HIGH Array_NV
+    PHI  R7
+    LDA  R7                         ; D = NV[0]
+    SMI  $01
+    BNZ  TUNoGo
+    LDN  R7
+    BNZ  TUHaveNoun
+    LDI  HIGH Turn1Msg
+    PHI  R8
+    LDI  LOW Turn1Msg
+    PLO  R8
+    SEP  R4
+    DW   OutString                  ; print "Where do you want me to go? Give me a direction too.\n"
+    SEP  R5                         ; return
+TUHaveNoun
+    SMI  $07
+    LBDF TUNoDirection              ; BGE
+    LDN  R7
+    PHI  R9                         ; go_direction = NV[1]
+    BR   TUHaveDirection
+TUNoGo
+    DEC  R7
+    LDN  R7                         ; D = NV[0]
+    SMI  54
+    LBNF TUNoDirection              ; BL
+    SMI  6
+    LBDF TUNoDirection              ; BGE
+    ADI  7
+    PHI  R9                         ; go_direction = NV[0] - 53
+TUHaveDirection
+    LDI  LOW Darkflag
+    PLO  RA
+    LDI  HIGH Darkflag
+    PHI  RA
+    LDA  RA                         ; D == is_dark
+    SEX  RA                         ; RA is pointing to 'room'
+    BZ   TUNotDark
+    LDI  LOW (Array_IA+9)
+    PLO  RB
+    LDI  HIGH (Array_IA+9)
+    PHI  RB                         ; RB is pointer to IA[9]
+    LDN  RB
+    SHL
+    BDF  TUNotDark
+    SHR
+    SM
+    BZ   TUNotDark
+    ; it's dark. print a message
+    INC  R9                         ; i = 1
+    LDI  HIGH Turn2Msg
+    PHI  R8
+    LDI  LOW Turn2Msg
+    PLO  R8
+    SEP  R4                         ; print: "Warning: it's dangerous to move in the dark!\n"
+    DW   OutString
+    SEX  RA
+TUNotDark
+    GHI  R9
+    STR  R2                         ; put go_direction on top of stack
+    LDX                             ; D = room
+    ADD
+    ADD
+    SHL                             ; D = room * 6
+    SEX  R2
+    ADD                             ; D = room * 6 + go_direction
+    ADI  LOW (Array_RM-1)
+    PLO  RB
+    LDI  HIGH (Array_RM-1)
+    ADCI $00
+    PHI  RB                         ; RB is pointer to RM[room][go_direction-1]
+    LDN  RB
+    PHI  R9                         ; R9.1 = j
+    LBNZ TUExitNotBlocked
+    GLO  R9
+    BNZ  TUBlockedAndDark
+    LDI  HIGH Turn3Msg
+    PHI  R8
+    LDI  LOW Turn3Msg
+    PLO  R8
+    SEP  R4                         ; print: "I can't go in that direction.\n"
+    DW   OutString
+    SEP  R5                         ; return
+TUBlockedAndDark
+    LDI  HIGH Turn4Msg
+    PHI  R8
+    LDI  LOW Turn4Msg
+    PLO  R8
+    SEP  R4                         ; print: "I fell down and broke my neck.\n"
+    DW   OutString
+    LDI  RL-1
+    PHI  R9                         ; j = RL-1
+    DEC  RA
+    LDI  $00
+    STR  RA                         ; is_dark = false
+    INC  RA
+    BR   TUSetRoom
+TUExitNotBlocked
+    SEP  R4
+    DW   ClearScreen
+TUSetRoom
+    GHI  R9
+    STR  RA                         ; room = j
+    SEP  R4
+    DW   Do_Look                    ; look()
+    SEP  R5                         ; return
+TUNoDirection
+    ; fixme: add rest of turn handling code
     SEP  R5
 
 ;__________________________________________________________________________________________________
@@ -1119,6 +1231,10 @@ Look1Msg        BYTE        "I can't see.  It's too dark!\r\n", 0
 Look2Msg        BYTE        "I'm in a ", 0
 Look3Msg        BYTE        "\r\n\nVisible Items Here:\r\n", 0
 Look4Msg        BYTE        "\r\nObvious Exits:\r\n   ", 0
+Turn1Msg        BYTE        "Where do you want me to go? Give me a direction too.\r\n", 0
+Turn2Msg        BYTE        "Warning: it's dangerous to move in the dark!\r\n", 0
+Turn3Msg        BYTE        "I can't go in that direction.\r\n", 0
+Turn4Msg        BYTE        "I fell down and broke my neck.\r\n", 0
 
                 INCL        "adventureland_data.asm"
 
