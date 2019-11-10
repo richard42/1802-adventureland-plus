@@ -160,7 +160,7 @@ Array_C     DB  $00, $4B, $08, $01, $13, $06, $08, $00, $0A, $00, $00, $00, $75,
             DB  $2F, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $01, $00, $00, $00
             DB  $08, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $01, $2F, $00, $00
             DB  $18, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $70, $00, $00, $00
-
+            DB  $FF
 
 ; Array NVS has dimensions 2 x 60
 Array_NVS   BYTE    "AUT",0, "GO",0,0, "*ENT", "*RUN", "*WAL", "*CLI", "JUM",0, "BEA",0, "CHO",0, "*CUT"
@@ -169,7 +169,7 @@ Array_NVS   BYTE    "AUT",0, "GO",0,0, "*ENT", "*RUN", "*WAL", "*CLI", "JUM",0, 
             BYTE    "*SHO", "*SEE", "DRA",0, "SCO",0, "INV",0, "SAV",0, "WAK",0, "UNL",0, "REA",0, "OPE",0
             BYTE    "ATT",0, "*KIL", "DRI",0, "*EAT", "BUN",0, "FIN",0, "*LOC", "HEL",0, "SAY",0, "WIN",0
             BYTE    "DOO",0, "SCR",0, "*YEL", "*HOL", "NORT", "SOUT", "EAST", "WEST", "UP",0,0, "DOWN"
-            BYTE    "ANY",0, "NORT", "SOUT", "EAST", "WEST", "UP",0,0, "DOWN", "NET",0, "FIS",0, "AWA",0
+            BYTE    "ANY",0, "NOR",0, "SOU",0, "EAS",0, "WES",0, "UP",0,0, "DOWN", "NET",0, "FIS",0, "AWA",0
             BYTE    "MIR",0, "AXE",0, "AXE",0, "WAT",0, "BOT",0, "GAM",0, "HOL",0, "LAM",0, "*ON",0, "OFF",0
             BYTE    "DOO",0, "MUD",0, "*MED", "BEE",0, "SCO",0, "GAS",0, "FLI",0, "EGG",0, "OIL",0, "*SLI"
             BYTE    "KEY",0, "HEL",0, "BUN",0, "INV",0, "LED",0, "THR",0, "CRO",0, "BRI",0, "BEA",0, "DRA",0
@@ -191,7 +191,7 @@ Array_RM    DB   0,  7, 10,  1,  0, 24
             DB   0,  7,  0,  0,  0,  0
             DB   7,  0,  0,  0, 20,  0
             DB  11, 10,  0,  1,  0, 26
-            DB  11, 11, 23, 11,  0,  0
+            DB  11, 11, 23, 11,  0,  0      ; AR = 11
             DB  13, 15, 15,  0,  0, 13
             DB   0,  0,  0, 14, 12,  0
             DB  17, 12, 13, 16, 16, 17
@@ -203,7 +203,7 @@ Array_RM    DB   0,  7, 10,  1,  0, 24
             DB   0,  0,  0,  0,  0,  9
             DB   0,  0,  0,  0,  0,  0
             DB   0,  0,  0, 21,  0,  0
-            DB  10,  1, 10, 11,  0,  0
+            DB  10,  1, 10, 11,  0,  0      ; 23
             DB   0,  0,  0,  0,  0,  0
             DB  11,  0,  1, 11,  0,  0
             DB   0,  0,  0,  0,  0,  0

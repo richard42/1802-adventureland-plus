@@ -1199,7 +1199,184 @@ TUSetRoom
     DW   Do_Look                    ; look()
     SEP  R5                         ; return
 TUNoDirection
-    ; fixme: add rest of turn handling code
+    LDI  $00
+    PHI  R9                         ; R9.1 = command_found = false
+    PLO  R9
+    INC  R9                         ; R9.0 = command_allowed = true
+    LDI  LOW Array_C
+    PLO  RA
+    LDI  HIGH Array_C
+    PHI  RA                         ; RA = C[cmd]
+TULoop1
+    LDI  LOW Array_NV
+    PLO  R7
+    LDI  HIGH Array_NV
+    PHI  R7                         ; R7 = NV
+    LDN  RA
+    PLO  R8                         ; R8.0 = i = C[cmd][0]
+    BZ   TULoop1Next1
+    LDN  R7
+    LBZ  TULoop1Done                ; if (NV[0] == 0 && i != 0) break;
+    GLO  R8
+TULoop1Next1
+    SEX  R7
+    SM
+    BNZ  TULoop1Tail
+    INC  RA
+    LDN  RA
+    DEC  RA
+    PLO  R8                         ; R8.0 = i = C[cmd][1]
+    BZ   TULoop1CheckCommand
+    INC  R7
+    SM                              ; D = i - NV[1]
+    DEC  R7
+    BZ   TULoop1CheckCommand
+    LDN  R7                         ; D = NV[0]
+    BNZ  TULoop1Tail
+TULoop1GetChances                   ; get random number between 1 and 100
+    SEP  R4
+    DW   GenRandom                  ; R7 is trashed
+    SHR
+    SMI  100
+    BGE  TULoop1GetChances
+    ADI  101
+    STR  R2
+    SEX  R2
+    GLO  R8                         ; D = i
+    SM
+    BL   TULoop1Tail
+TULoop1CheckCommand
+    LDI  $01
+    PHI  R9                         ; R9.1 = command_found = true
+    SEP  R4
+    DW   Do_CheckLogics
+    PLO  R9                         ; R9.0 = command_allowed = check_logics(cmd)
+    BZ   TULoop1Tail
+    GLO  RA                         ; pre-increment C[cmd] pointer
+    PLO  R8                         ; and store original value in R8
+    ADI  $10
+    PLO  RA
+    PLO  RB
+    GHI  RA
+    PHI  R8                         ; R8 is pAcVar
+    ADCI $00
+    PHI  RA
+    PHI  RB
+    DEC  RB
+    DEC  RB
+    DEC  RB
+    DEC  RB                         ; RB is C[cmd][y]
+TULoop1_1
+    LDN  RB                         ; D = ac
+    SEP  R4
+    DW   Do_Action
+    BNZ  TULoop1_1Done              ; if (failed) break;
+    LDI  LOW Loadflag
+    PLO  R7
+    LDI  HIGH Loadflag
+    PHI  R7
+    LDA  R7
+    BNZ  TULoop1Done                ; if (loadflag) break twice
+    LDN  R7
+    BNZ  TULoop1Done                ; if (endflag) break twice
+TULoo1_1Tail
+    INC  RB                         ; y++
+    GLO  RB
+    STR  R2
+    GLO  RA
+    SM
+    BNZ  TULoop1_1                  ; loop if C[cmd][y] != C[cmd+1][0]
+TULoop1_1Done
+    LDI  LOW Array_NV
+    PLO  R7
+    LDI  HIGH Array_NV
+    PHI  R7                         ; R7 = NV
+    LDN  R7
+    BNZ  TULoop1Done                ; if (NV[0] != 0) break;
+    BR   TULoop1Tail2               ; skip C[cmd] pointer advancement because we already did it
+TULoop1Tail
+    GLO  RA
+    ADI  $10
+    PLO  RA
+    GHI  RA
+    ADCI $00
+    PHI  RA                         ; RA = C[cmd+1]
+TULoop1Tail2
+    LDN  RA
+    SMI  $FF
+    BNZ  TULoop1
+TULoop1Done
+    LDI  LOW Array_NV
+    PLO  R7
+    LDI  HIGH Array_NV
+    PHI  R7
+    LDN  R7                         ; D = NV[0]
+    SMI  10
+    BZ   TUCarryDrop
+    LDN  R7
+    SMI  18
+    BNZ  TUNotCarryDrop
+TUCarryDrop
+    GLO  R9                         ; D = command_allowed
+    BZ   TURunCarryDrop
+    GHI  R9                         ; D = command_found
+    BNZ  TUNotCarryDrop
+TURunCarryDrop                      ; if (!command_found || !command_allowed)
+    SEP  R4
+    DW   Do_CarryDrop               ; carry_drop()
+    SEP  R5                         ; return
+TUNotCarryDrop
+    LDN  R7                         ; D = NV[0]
+    BZ   TUDone
+    GHI  R9                         ; D = command_found
+    BNZ  TUCommandWasFound
+    LDI  LOW Turn5Msg
+    PLO  R8
+    LDI  HIGH Turn5Msg
+    PHI  R8
+    SEP  R4                         ; print: "I don't understand your command."
+    DW   OutString
+    SEP  R5
+TUCommandWasFound
+    GLO  R9                         ; D = command_allowed
+    BNZ  TUDone
+    LDI  LOW Turn6Msg
+    PLO  R8
+    LDI  HIGH Turn6Msg
+    PHI  R8
+    SEP  R4                         ; print: "I can't do that yet."
+    DW   OutString
+TUDone
+    SEP  R5
+
+;__________________________________________________________________________________________________
+; Adventure check_logics() function
+
+; IN:       RA=C[cmd]
+; OUT:      D=1 if command is allowed, 0 otherwise
+; TRASHED:  R7, R8, RB, RC, ...
+
+Do_CheckLogics
+    SEP  R5
+
+;__________________________________________________________________________________________________
+; Adventure action() function
+
+; IN:       D=ac, R8=pAcVar
+; OUT:      D=1 if action failed, 0 otherwise
+; TRASHED:  R7, RC, RD, RE
+
+Do_Action
+    SEP  R5
+
+;__________________________________________________________________________________________________
+; Adventure carry_drop() function
+
+; IN:       N/A
+; OUT:      N/A
+; TRASHED:  
+
+Do_CarryDrop
     SEP  R5
 
 ;__________________________________________________________________________________________________
@@ -1235,6 +1412,8 @@ Turn1Msg        BYTE        "Where do you want me to go? Give me a direction too
 Turn2Msg        BYTE        "Warning: it's dangerous to move in the dark!\r\n", 0
 Turn3Msg        BYTE        "I can't go in that direction.\r\n", 0
 Turn4Msg        BYTE        "I fell down and broke my neck.\r\n", 0
+Turn5Msg        BYTE        "I don't understand your command.\r\n", 0
+Turn6Msg        BYTE        "I can't do that yet.\r\n", 0
 
                 INCL        "adventureland_data.asm"
 
