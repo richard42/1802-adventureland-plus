@@ -1334,9 +1334,7 @@ TUNotCarryDrop
     PLO  R8
     LDI  HIGH Turn5Msg
     PHI  R8
-    SEP  R4                         ; print: "I don't understand your command."
-    DW   OutString
-    SEP  R5
+    BR   TUPrintAndReturn           ; print: "I don't understand your command."
 TUCommandWasFound
     GLO  R9                         ; D = command_allowed
     BNZ  TUDone
@@ -1344,9 +1342,189 @@ TUCommandWasFound
     PLO  R8
     LDI  HIGH Turn6Msg
     PHI  R8
+TUPrintAndReturn
     SEP  R4                         ; print: "I can't do that yet."
     DW   OutString
 TUDone
+    SEP  R5
+
+;__________________________________________________________________________________________________
+; Adventure carry_drop() function
+
+; IN:       N/A
+; OUT:      N/A
+; TRASHED:  R7, R8, R9, RA, RF
+
+Do_CarryDrop
+    LDI  LOW Array_NV
+    PLO  R7
+    LDI  HIGH Array_NV
+    PHI  R7                         ; R7 = NV
+    LDA  R7
+    PLO  RA                         ; RA.0 = NV[0]
+    LDN  R7
+    PHI  RA                         ; RA.1 = NV[1]
+    BNZ  CDHaveNoun
+    LDI  LOW CarryDrop1Msg
+    PLO  R8
+    LDI  HIGH CarryDrop1Msg
+    PHI  R8
+    LBR  CDPrintAndReturn           ; print: "What?"
+CDHaveNoun
+    GLO  RA
+    SMI  10
+    LBNZ CDNotTake
+    ; check to make sure we don't have too many items
+    LDI  LOW Array_IA
+    PLO  R7
+    LDI  HIGH Array_IA
+    PHI  R7                         ; R7 points to IA array
+    LDI  0
+    PLO  RF                         ; RF.0 = number of items in inventory
+    LDI  IL
+CDLoop1
+    PHI  RF                         ; RF.1 = item counter
+    LDA  R7
+    SMI  $FF
+    BNZ  CDLoop1Tail
+    INC  RF
+CDLoop1Tail
+    GHI  RF
+    SMI  $01
+    LBNZ CDLoop1
+    LDI  MX
+    STR  R2
+    GLO  RF
+    SM                              ; DF/D = items - MX
+    BL   CDNotTake
+    LDI  LOW CarryDrop2Msg
+    PLO  R8
+    LDI  HIGH CarryDrop2Msg
+    PHI  R8
+    SEP  R4                         ; print: "I can't. I'm carrying too much!"
+    DW   OutString
+    SEP  R5                         ; return
+CDNotTake
+    LDI  IL
+    PLO  RF                         ; RF.0 = item counter
+    GHI  RA                         ; D = NV[1]
+    SHL
+    SHL
+    ADI  LOW (Array_NVS+240)
+    PLO  R9
+    LDI  HIGH (Array_NVS+240)
+    ADCI $00
+    PHI  R9                         ; R9 points to NVS[1][NV[1]], which is a 3-letter uppercase noun given by the user
+    LDI  LOW Table_IAS
+    PLO  R7
+    LDI  HIGH Table_IAS
+    PHI  R7                         ; R7 points to IAS table
+    SEX  R8
+CDLoop2
+    LDA  R7
+    PHI  R8
+    LDA  R7
+    PLO  R8                         ; R8 = pointer to IAS[j][0]
+CDLoop2_1
+    LDA  R8                         ; find end of item description string
+    BNZ  CDLoop2_1
+    DEC  R8
+    DEC  R8
+    LDN  R8
+    SMI  '/'                        ; if last character is not a slash
+    BNZ  CDLoop2Tail                ; then skip this item
+CDLoop2_2
+    DEC  R8                         ; else find the preceding slash
+    LDN  R8
+    SMI  '/'
+    BNZ  CDLoop2_2
+    INC  R8                         ; R8 is first character in short uppercase object name
+    ; comparestring()
+    LDA  R9                         ; Load 1st character in input noun
+    SM                              ; compare to 1st character in object name
+    BNZ  CDLoop2_2NoMatch1
+    INC  R8
+    LDA  R9                         ; Load 2nd character in input noun
+    SM                              ; compare to 2nd character in object name
+    BNZ  CDLoop2_2NoMatch2
+    INC  R8
+    LDN  R9                         ; Load 3rd character in input noun
+    BZ   CDLoop2_FoundObject
+    SM                              ; compare to 3rd character in object name
+    BZ   CDLoop2_FoundObject
+CDLoop2_2NoMatch2
+    DEC  R9
+CDLoop2_2NoMatch1
+    DEC  R9                         ; restore R9 to point to start of input noun
+CDLoop2Tail
+    DEC  RF
+    GLO  RF
+    BNZ  CDLoop2
+CDLoop2Done
+    LDI  LOW CarryDrop7Msg
+    PLO  R8
+    LDI  HIGH CarryDrop7Msg
+    PHI  R8
+    SEP  R4                         ; print: "It's beyond my power to do that."
+    DW   OutString
+    SEP  R5
+
+CDLoop2_FoundObject
+    ; we found the object!
+    SEX  R2
+    GLO  RF
+    STR  R2
+    LDI  IL
+    SM                              ; D = j (item index)
+    ADI  LOW Array_IA
+    PLO  R9
+    LDI  HIGH Array_IA
+    ADCI $00
+    PHI  R9                         ; R9 = pointer to IA[j]
+    LDI  LOW Room
+    PLO  R8
+    LDI  HIGH Room
+    PHI  R8                         ; R8 = pointer to 'room'
+    GLO  RA                         ; D = NV[0]
+    SMI  10
+    BNZ  CDDropItem
+CDTakeItem
+    SEX  R8
+    LDN  R9
+    SM
+    BNZ  CDItemNotHere
+    LDI  $FF
+    STR  R9                         ; IA[j] = -1;
+    LDI  LOW CarryDrop3Msg
+    PLO  R8
+    LDI  HIGH CarryDrop3Msg
+    PHI  R8
+    BR   CDPrintAndReturn           ; print: "OK, taken."
+CDItemNotHere
+    LDI  LOW CarryDrop4Msg
+    PLO  R8
+    LDI  HIGH CarryDrop4Msg
+    PHI  R8
+    BR   CDPrintAndReturn           ; print: "I don't see it here."
+CDDropItem
+    LDN  R9
+    SMI  $FF
+    BNZ  CDItemNotHeld              ; not in my inventory
+    LDN  R8
+    STR  R9                         ; IA[j] = room;
+    LDI  LOW CarryDrop5Msg
+    PLO  R8
+    LDI  HIGH CarryDrop5Msg
+    PHI  R8
+    BR   CDPrintAndReturn           ; print: "OK, dropped."
+CDItemNotHeld
+    LDI  LOW CarryDrop6Msg
+    PLO  R8
+    LDI  HIGH CarryDrop6Msg
+    PHI  R8                         ; print: "I'm not carrying it!"
+CDPrintAndReturn
+    SEP  R4
+    DW   OutString
     SEP  R5
 
 ;__________________________________________________________________________________________________
@@ -1357,6 +1535,7 @@ TUDone
 ; TRASHED:  R7, R8, RB, RC, ...
 
 Do_CheckLogics
+    LDI  $00
     SEP  R5
 
 ;__________________________________________________________________________________________________
@@ -1367,16 +1546,7 @@ Do_CheckLogics
 ; TRASHED:  R7, RC, RD, RE
 
 Do_Action
-    SEP  R5
-
-;__________________________________________________________________________________________________
-; Adventure carry_drop() function
-
-; IN:       N/A
-; OUT:      N/A
-; TRASHED:  
-
-Do_CarryDrop
+    LDI  $00
     SEP  R5
 
 ;__________________________________________________________________________________________________
@@ -1414,6 +1584,13 @@ Turn3Msg        BYTE        "I can't go in that direction.\r\n", 0
 Turn4Msg        BYTE        "I fell down and broke my neck.\r\n", 0
 Turn5Msg        BYTE        "I don't understand your command.\r\n", 0
 Turn6Msg        BYTE        "I can't do that yet.\r\n", 0
+CarryDrop1Msg   BYTE        "What?\r\n", 0
+CarryDrop2Msg   BYTE        "I can't. I'm carrying too much!\r\n", 0
+CarryDrop3Msg   BYTE        "OK, taken.\r\n", 0
+CarryDrop4Msg   BYTE        "I don't see it here.\r\n", 0
+CarryDrop5Msg   BYTE        "OK, dropped.\r\n", 0
+CarryDrop6Msg   BYTE        "I'm not carrying it!\r\n", 0
+CarryDrop7Msg   BYTE        "It's beyond my power to do that.\r\n", 0
 
                 INCL        "adventureland_data.asm"
 
