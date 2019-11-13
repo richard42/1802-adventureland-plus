@@ -1532,11 +1532,200 @@ CDPrintAndReturn
 
 ; IN:       RA=C[cmd]
 ; OUT:      D=1 if command is allowed, 0 otherwise
-; TRASHED:  R7, R8, RB, RC, ...
+; TRASHED:  R7, R8, RB, RC
 
 Do_CheckLogics
+    GLO  RA
+    STXD
+    GHI  RA
+    STXD                            ; push RA on the stack
+    LDI  $05
+    PLO  R7                         ; R7.0 = loop counter
+    INC  RA
+    INC  RA                         ; RA points to C[cmd][2]
+    LDI  LOW Room
+    PLO  RC
+    LDI  HIGH Room
+    PHI  RC                         ; RC = pointer to Room
+CLLoop1
+    INC  RC
+    INC  RC                         ; RC = pointer to StateFlags
+    LDA  RC
+    PHI  RB
+    LDN  RC
+    PLO  RB                         ; RB = value of StateFlags
+    DEC  RC
+    DEC  RC
+    DEC  RC                         ; RC = pointer to Room
+    LDA  RA
+    PHI  R7                         ; R7.1 = ll
+    PLO  R8
+CLLoop1_1
+    BZ   CLLoop1_1Done
+    GHI  RB
+    SHR
+    PHI  RB
+    GLO  RB
+    SHRC
+    PLO  RB
+    DEC  R8
+    GLO  R8
+    BR   CLLoop1_1
+CLLoop1_1Done
+    GLO  RB
+    ANI  $01
+    PHI  R8                         ; R8.1 = ((state_flags >> ll) && 1)
+    GHI  R7                         ; D = ll
+    ADI  LOW Array_IA
+    PLO  RB
+    LDI  HIGH Array_IA
+    ADCI $00
+    PHI  RB                         ; RB = pointer to IA[ll]
+    LDA  RA                         ; D = k
+    LBZ  CLLoop1Tail                ; skip this predicate if k == 0
+CLLoopCheck1
+    SEX  RC                         ; M(R(X)) points to Room
+    SMI  $01
+    BNZ  CLLoopCheck2
+    LDN  RB
+    SMI  $FF
+    LBZ  CLLoop1Tail                ; if (k == 1) allowed = (IA[ll] == -1);
+    LBR  CLReturnFalse
+CLLoopCheck2
+    SMI  $01
+    BNZ  CLLoopCheck3
+    LDN  RB
+    SM
+    LBZ  CLLoop1Tail                ; if (k == 2) allowed = (IA[ll] == room);
+    LBR  CLReturnFalse
+CLLoopCheck3
+    SMI  $01
+    LBNZ CLLoopCheck4
+    LDN  RB
+    SM
+    BZ   CLLoop1Tail
+    LDN  RB
+    SMI  $FF
+    BZ   CLLoop1Tail                ; if (k == 3) allowed = (IA[ll] == room || IA[ll] == -1);
+    BR   CLReturnFalse
+CLLoopCheck4
+    SMI  $01
+    BNZ  CLLoopCheck5
+    GHI  R7
+    SM
+    BZ   CLLoop1Tail                ; if (k == 4) allowed = (room == ll);
+    BR   CLReturnFalse
+CLLoopCheck5
+    SMI  $01
+    BNZ  CLLoopCheck6
+    LDN  RB
+    SM
+    BNZ  CLLoop1Tail                ; if (k == 5) allowed = (IA[ll] != room);
+    BR   CLReturnFalse
+CLLoopCheck6
+    SMI  $01
+    BNZ  CLLoopCheck7
+    LDN  RB
+    SMI  $FF
+    BNZ  CLLoop1Tail                ; if (k == 6) allowed = (IA[ll] != -1);
+    BR   CLReturnFalse
+CLLoopCheck7
+    SMI  $01
+    BNZ  CLLoopCheck8
+    GHI  R7
+    SM
+    BNZ  CLLoop1Tail                ; if (k == 7) allowed = (room != ll);
+    BR   CLReturnFalse
+CLLoopCheck8
+    SMI  $01
+    BNZ  CLLoopCheck9
+    GHI  R8                         ; D = ((state_flags >> ll) && 1)
+    BNZ  CLLoop1Tail                ; if (k == 8) allowed = (state_flags & (1 << ll)) != 0;
+    BR   CLReturnFalse
+CLLoopCheck9
+    SMI  $01
+    BNZ  CLLoopCheck10
+    GHI  R8                         ; D = ((state_flags >> ll) && 1)
+    BZ   CLLoop1Tail                ; if (k == 9) allowed = (state_flags & (1 << ll)) == 0;
+    BR   CLReturnFalse
+CLLoopCheck10
+    SMI  $01
+    BNZ  CLLoopCheck11
+    LDI  LOW Array_IA
+    PLO  RB
+    LDI  HIGH Array_IA
+    PHI  RB                         ; RB = pointer to IA[0]
+    LDI  IL
+    PLO  R8                         ; R8 = loop counter IL
+CLCheck10Loop1
+    LDA  RB
+    SMI  $FF
+    BZ   CLLoop1Tail                ; if (k == 10) for (i=0; i<IL; i++) if (IA[i] == -1) allowed = true;
+    DEC  R8
+    GLO  R8
+    BNZ  CLCheck10Loop1
+    BR   CLReturnFalse
+CLLoopCheck11
+    SMI  $01
+    BNZ  CLLoopCheck12
+    LDI  LOW Array_IA
+    PLO  RB
+    LDI  HIGH Array_IA
+    PHI  RB                         ; RB = pointer to IA[0]
+    LDI  IL
+    PLO  R8                         ; R8 = loop counter IL
+CLCheck11Loop1
+    LDA  RB
+    SMI  $FF
+    BZ   CLReturnFalse              ; if (k == 11) for (i=0; i<IL; i++) if (IA[i] == -1) allowed = false;
+    DEC  R8
+    GLO  R8
+    BNZ  CLCheck11Loop1
+    BR   CLLoop1Tail
+CLLoopCheck12
+    SMI  $01
+    BNZ  CLLoopCheck13
+    LDN  RB
+    SM
+    BZ   CLReturnFalse
+    LDN  RB
+    SMI  $FF
+    BZ   CLReturnFalse              ; if (k == 12) allowed = (IA[ll] != -1 && IA[ll] != room);
+    BR   CLLoop1Tail
+CLLoopCheck13
+    SMI  $01
+    BNZ  CLLoopCheck14
+    LDN  RB
+    BNZ  CLLoop1Tail                ; if (k == 13) allowed = (IA[ll] != 0);
+    BR   CLReturnFalse
+CLLoopCheck14
+    SMI  $01
+CLDebug1
+    BNZ  CLDebug1                   ; deadlock here if invalid 'k' was found
+    LDN  RB
+    BNZ  CLReturnFalse              ; if (k == 14) allowed = (IA[ll] == 0);
+CLLoop1Tail
+    DEC  R7
+    GLO  R7
+    LBNZ CLLoop1
+CLReturnTrue
+    SEX  R2
+    INC  R2
+    LDXA
+    PHI  RA
+    LDX
+    PLO  RA                         ; restore original value of RA
+    LDI  $01
+    SEP  R5                         ; return false
+CLReturnFalse
+    SEX  R2
+    INC  R2
+    LDXA
+    PHI  RA
+    LDX
+    PLO  RA                         ; restore original value of RA
     LDI  $00
-    SEP  R5
+    SEP  R5                         ; return false
 
 ;__________________________________________________________________________________________________
 ; Adventure action() function
