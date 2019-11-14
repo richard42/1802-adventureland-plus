@@ -776,21 +776,21 @@ GIParseLoop5_1Next1
     LDA  R9                         ; Load 1st character in input word
     BZ   GIParseLoop5_1WordEnd
     SM                              ; compare to 1st character in table word
-    LBNZ  GIParseLoop5_1NoMatch
+    BNZ  GIParseLoop5_1NoMatch
     INC  R8
     LDA  R9                         ; Load 2nd character in input word
     BZ   GIParseLoop5_1WordEnd
     SM                              ; compare to 2nd character in table word
-    LBNZ  GIParseLoop5_1NoMatch
+    BNZ  GIParseLoop5_1NoMatch
     INC  R8
     LDA  R9                         ; Load 3rd character in input word
     BZ   GIParseLoop5_1WordEnd
     SM                              ; compare to 3rd character in table word
-    LBNZ  GIParseLoop5_1NoMatch
+    BNZ  GIParseLoop5_1NoMatch
     SKP                             ; fall through to GIParseLoop5_1Match
 GIParseLoop5_1WordEnd
     LDN  R8
-    LBNZ  GIParseLoop5_1NoMatch
+    BNZ  GIParseLoop5_1NoMatch
 GIParseLoop5_1Match
     GLO  RF
     STR  RC                         ; NV[i] = j
@@ -1241,7 +1241,6 @@ TULoop1GetChances                   ; get random number between 1 and 100
     BGE  TULoop1GetChances
     ADI  101
     STR  R2
-    SEX  R2
     GLO  R8                         ; D = i
     SM
     BL   TULoop1Tail
@@ -1268,9 +1267,11 @@ TULoop1CheckCommand
     DEC  RB                         ; RB is C[cmd][y]
 TULoop1_1
     LDN  RB                         ; D = ac
+    BZ   TULoop1_1SkipAction
     SEP  R4
     DW   Do_Action
     BNZ  TULoop1_1Done              ; if (failed) break;
+TULoop1_1SkipAction
     LDI  LOW Loadflag
     PLO  R7
     LDI  HIGH Loadflag
@@ -1603,7 +1604,7 @@ CLLoopCheck3
     LBNZ CLLoopCheck4
     LDN  RB
     SM
-    BZ   CLLoop1Tail
+    LBZ  CLLoop1Tail
     LDN  RB
     SMI  $FF
     BZ   CLLoop1Tail                ; if (k == 3) allowed = (IA[ll] == room || IA[ll] == -1);
@@ -1732,11 +1733,69 @@ CLReturnFalse
 
 ; IN:       D=ac, R8=pAcVar
 ; OUT:      D=1 if action failed, 0 otherwise
-; TRASHED:  R7, RC, RD, RE
+; TRASHED:  R7, RC, RD, RE, RF
 
 Do_Action
+    STR  R2                         ; save 'ac' variable
+    SMI  52
+    BL   DAPrintMessage
+    SMI  50
+    BGE  DAPrintMessage
+    ADI  50
+    BR   DACheck52
+DAPrintMessage
+    ADI  52
+    PLO  RC                         ; save message number
+    GLO  R8
+    STXD
+    GHI  R8
+    STXD                            ; push R8 on the stack
+    GLO  RC
+    SHL
+    ADI  LOW Table_MSS
+    PLO  RC
+    LDI  HIGH Table_MSS
+    ADCI $00
+    PHI  RC
+    LDA  RC
+    PHI  R8
+    LDN  RC
+    PLO  R8                         ; R8 points to message to print
+    SEP  R4
+    DW   OutString
+    LDI  $0D
+    SEP  R7
+    LDI  $0A
+    SEP  R7                         ; print '\r\n'
+    INC  R2
+    LDXA
+    PHI  R8
+    LDX
+    PLO  R8                         ; restore original value of R8
     LDI  $00
-    SEP  R5
+    SEP  R5                         ; return false (action didn't fail)
+DACheck52
+    BNZ  DACheck53
+
+DACheck53
+    SMI  $01
+    BNZ  DACheck54
+
+DACheck54
+    LDI  $00
+    SEP  R5                         ; return false (action didn't fail)
+
+;    if (ac == 52)
+;    {
+;        j = 0;
+;        for (i=1; i<IL; i++) if (IA[i] == -1) j++;
+;        if (j >= MX)
+;        {
+;            printf("I can't. I'm carrying too much!\n");
+;            return true;
+;        }
+;        else IA[get_action_variable(pAcVar)] = -1;
+;    }
 
 ;__________________________________________________________________________________________________
 ; Read-only Data
