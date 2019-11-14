@@ -1251,13 +1251,13 @@ TULoop1CheckCommand
     DW   Do_CheckLogics
     PLO  R9                         ; R9.0 = command_allowed = check_logics(cmd)
     BZ   TULoop1Tail
-    GLO  RA                         ; pre-increment C[cmd] pointer
-    PLO  R8                         ; and store original value in R8
+    GLO  RA                         ; pre-increment C[cmd] pointer to use as an end-of-loop marker
+    PLO  RE                         ; and store original value in RE
     ADI  $10
     PLO  RA
     PLO  RB
     GHI  RA
-    PHI  R8                         ; R8 is pAcVar
+    PHI  RE                         ; RE is pAcVar
     ADCI $00
     PHI  RA
     PHI  RB
@@ -1731,9 +1731,9 @@ CLReturnFalse
 ;__________________________________________________________________________________________________
 ; Adventure action() function
 
-; IN:       D=ac, R8=pAcVar
+; IN:       D=ac, RE=pAcVar
 ; OUT:      D=1 if action failed, 0 otherwise
-; TRASHED:  R7, RC, RD, RE, RF
+; TRASHED:  R7, R8, RC, RD, RF
 
 Do_Action
     STR  R2                         ; save 'ac' variable
@@ -1744,22 +1744,16 @@ Do_Action
     ADI  50
     BR   DACheck52
 DAPrintMessage
-    ADI  52
-    PLO  RC                         ; save message number
-    GLO  R8
-    STXD
-    GHI  R8
-    STXD                            ; push R8 on the stack
-    GLO  RC
+    ADI  52                         ; D = message number
     SHL
     ADI  LOW Table_MSS
-    PLO  RC
+    PLO  R7
     LDI  HIGH Table_MSS
     ADCI $00
-    PHI  RC
-    LDA  RC
+    PHI  R7
+    LDA  R7
     PHI  R8
-    LDN  RC
+    LDN  R7
     PLO  R8                         ; R8 points to message to print
     SEP  R4
     DW   OutString
@@ -1767,11 +1761,6 @@ DAPrintMessage
     SEP  R7
     LDI  $0A
     SEP  R7                         ; print '\r\n'
-    INC  R2
-    LDXA
-    PHI  R8
-    LDX
-    PLO  R8                         ; restore original value of R8
     LDI  $00
     SEP  R5                         ; return false (action didn't fail)
 DACheck52
