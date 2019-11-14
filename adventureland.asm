@@ -1731,12 +1731,17 @@ CLReturnFalse
 ;__________________________________________________________________________________________________
 ; Adventure action() function
 
-; IN:       D=ac, RE=pAcVar
+; IN:       D=ac, RE=pAcVar, R2 = stack pointer
 ; OUT:      D=1 if action failed, 0 otherwise
 ; TRASHED:  R7, R8, RC, RD, RF
 
 Do_Action
     STR  R2                         ; save 'ac' variable
+    LDI  LOW Sub_GetActionVariable
+    PLO  RF
+    LDI  HIGH Sub_GetActionVariable
+    PHI  RF                         ; RF = pointer to fast subroutine get_action_variable
+    LDN  R2                         ; D = ac
     SMI  52
     BL   DAPrintMessage
     SMI  50
@@ -1785,6 +1790,29 @@ DACheck54
 ;        }
 ;        else IA[get_action_variable(pAcVar)] = -1;
 ;    }
+
+;__________________________________________________________________________________________________
+; Adventure get_action_variable() function
+
+; IN:       P=F, RE=pAcVar
+; OUT:      P=3, D=value
+; TRASHED:  N/A
+
+GAV_Return
+    SEP  R3
+Sub_GetActionVariable
+    INC  RE
+    INC  RE
+GAV_Loop1
+    INC  RE
+    LDN  RE
+    BZ   GAV_FoundVar
+    INC  RE
+    BR   GAV_Loop1
+GAV_FoundVar
+    DEC  RE
+    LDN  RE
+    BR   GAV_Return
 
 ;__________________________________________________________________________________________________
 ; Read-only Data
