@@ -1216,7 +1216,7 @@ TULoop1
     PLO  R8                         ; R8.0 = i = C[cmd][0]
     BZ   TULoop1Next1
     LDN  R7
-    LBZ  TULoop1Done                ; if (NV[0] == 0 && i != 0) break;
+    BZ   TULoop1Done                ; if (NV[0] == 0 && i != 0) break;
     GLO  R8
 TULoop1Next1
     SEX  R7
@@ -1392,7 +1392,7 @@ CDLoop1
 CDLoop1Tail
     GHI  RF
     SMI  $01
-    LBNZ CDLoop1
+    BNZ  CDLoop1
     LDI  MX
     STR  R2
     GLO  RF
@@ -1733,7 +1733,7 @@ CLReturnFalse
 
 ; IN:       D=ac, RE=pAcVar, R2 = stack pointer
 ; OUT:      D=1 if action failed, 0 otherwise
-; TRASHED:  R7, R8, RC, RD, RF
+; TRASHED:  R1, R7, R8, RC, RD, RF
 
 Do_Action
     STR  R2                         ; save 'ac' variable
@@ -1769,27 +1769,510 @@ DAPrintMessage
     LDI  $00
     SEP  R5                         ; return false (action didn't fail)
 DACheck52
-    BNZ  DACheck53
-
+    LBNZ DACheck53
+    LDI  LOW Array_IA
+    PLO  R7
+    LDI  HIGH Array_IA
+    PHI  R7                         ; R7 = pointer to IA[0]
+    LDI  IL
+    PLO  R8                         ; R8.0 = IL
+    LDI  $00
+    PLO  RC
+DACheck52Loop
+    LDA  R7                         ; D = IA[i]
+    SMI  $FF
+    BNZ  DACheck52Next
+    INC  RC                         ; j++
+DACheck52Next
+    DEC  R8
+    GLO  R8
+    BNZ  DACheck52Loop
+    GLO  RC
+    SMI  MX
+    LBNF DACheck52TakeItem          ; BL
+    LDI  LOW CarryDrop2Msg
+    PLO  R8
+    LDI  HIGH CarryDrop2Msg
+    PHI  R8
+    SEP  R4                         ; print: "I can't. I'm carrying too much!"
+    DW   OutString
+    LDI  $01
+    SEP  R5                         ; return true
+DACheck52TakeItem
+    SEP  RF                         ; call get_action_variable()
+    ADI  LOW Array_IA
+    PLO  R7
+    LDI  HIGH Array_IA
+    ADCI $00
+    PHI  R7                         ; R7 = pointer to IA[get_action_variable(pAcVar)]
+    LDI  $FF
+    STR  R7
+DAReturnFalse1
+    LDI  $00
+    SEP  R5                         ; return false (action didn't fail)
 DACheck53
     SMI  $01
     BNZ  DACheck54
-
+    LDI  LOW Room
+    PLO  R8
+    LDI  HIGH Room
+    PHI  R8
+    SEP  RF                         ; call get_action_variable()
+    ADI  LOW Array_IA
+    PLO  R7
+    LDI  HIGH Array_IA
+    ADCI $00
+    PHI  R7                         ; R7 = pointer to IA[get_action_variable(pAcVar)]
+    LDN  R8
+    STR  R7                         ; if (ac == 53) IA[get_action_variable(pAcVar)] = room;
+    BR   DAReturnFalse1
 DACheck54
+    SMI  $01
+    BNZ  DACheck55
+    LDI  LOW Room
+    PLO  R8
+    LDI  HIGH Room
+    PHI  R8
+    SEP  RF                         ; call get_action_variable()
+    STR  R8                         ; if (ac == 54) room = get_action_variable(pAcVar);
+    BR   DAReturnFalse1
+DACheck55
+    SMI  $01
+    BNZ  DACheck56
+    BR   DAAction59                 ; if (ac == 55 || ac == 59) IA[get_action_variable(pAcVar)] = 0;
+DACheck56
+    SMI  $01
+    BNZ  DACheck57
+    LDI  LOW Darkflag
+    PLO  R7
+    LDI  HIGH Darkflag
+    PHI  R7
+    LDI  $01
+    STR  R7                         ; if (ac == 56) is_dark = true;
+    BR   DAReturnFalse1
+DACheck57
+    SMI  $01
+    BNZ  DACheck58
+    LDI  LOW Darkflag
+    PLO  R7
+    LDI  HIGH Darkflag
+    PHI  R7
+    LDI  $00
+    STR  R7                         ; if (ac == 57) is_dark = false;
+    BR   DAReturnFalse1
+DACheck58
+    SMI  $01
+    BNZ  DACheck59
+    LDI  LOW StateFlags
+    PLO  R7
+    LDI  HIGH StateFlags
+    PHI  R7
+    LDI  $01
+    PHI  R8                         ; R8.1 = shift register byte
+    SEP  RF                         ; call get_action_variable()
+    SMI  8
+    BGE  DACheck58Loop
+    INC  R7                         ; R7 points to StateFlags+1
+    ADI  8
+DACheck58Loop
+    BZ   DACheck58LoopDone
+    PLO  R8                         ; R8.0 is number of bits remaining to shift
+    GHI  R8
+    SHL                             ; shift one bit left
+    PHI  R8
+    DEC  R8
+    GLO  R8
+    BR   DACheck58Loop
+DACheck58LoopDone
+    GHI  R8                         ; R8 is byte to OR with StateFlags
+    SEX  R7
+    OR                              ; if (ac == 58) state_flags |= 1 << get_action_variable(pAcVar);
+    STR  R7
+    BR   DAReturnFalse1
+DACheck59
+    SMI  $01
+    BNZ  DACheck60
+DAAction59
+    SEP  RF                         ; call get_action_variable()
+    ADI  LOW Array_IA
+    PLO  R7
+    LDI  HIGH Array_IA
+    ADCI $00
+    PHI  R7                         ; R7 = pointer to IA[get_action_variable(pAcVar)]
+    LDI  $00
+    STR  R7                         ; if (ac == 55 || ac == 59) IA[get_action_variable(pAcVar)] = 0;
+    BR   DAReturnFalse1
+DACheck60
+    SMI  $01
+    BNZ  DACheck61
+    LDI  LOW StateFlags
+    PLO  R7
+    LDI  HIGH StateFlags
+    PHI  R7
+    LDI  $01
+    PHI  R8                         ; R8.1 = shift register byte
+    SEP  RF                         ; call get_action_variable()
+    SMI  8
+    BGE  DACheck60Loop
+    INC  R7                         ; R7 points to StateFlags+1
+    ADI  8
+DACheck60Loop
+    BZ   DACheck60LoopDone
+    PLO  R8                         ; R8.0 is number of bits remaining to shift
+    GHI  R8
+    SHL                             ; shift one bit left
+    PHI  R8
+    DEC  R8
+    GLO  R8
+    BR   DACheck60Loop
+DACheck60LoopDone
+    GHI  R8                         ; R8 is byte to XOR with StateFlags
+    SEX  R7
+    XOR                             ; if (ac == 60) state_flags ^= 1 << get_action_variable(pAcVar);
+    STR  R7
+    BR   DAReturnFalse1
+DACheck61
+    SMI  $01
+    BNZ  DACheck62                  ; if (ac == 61)
+    LDI  LOW Darkflag
+    PLO  R7
+    LDI  HIGH Darkflag
+    PHI  R7
+    LDI  $00
+    STR  R7                         ; is_dark = false;
+    INC  R7
+    LDI  RL-1
+    STR  R7                         ; room = RL-1;
+    LDI  LOW Action1Msg
+    PLO  R8
+    LDI  HIGH Action1Msg
+    PHI  R8
+    SEP  R4                         ; print: "I'm dead..."
+    DW   OutString
+    LBR  DADoLook                   ; look()
+DACheck62
+    SMI  $01
+    BNZ  DACheck63
+    SEP  RF                         ; call get_action_variable()
+    ADI  LOW Array_IA
+    PLO  R7
+    LDI  HIGH Array_IA
+    ADCI $00
+    PHI  R7                         ; R7 = pointer to IA[get_action_variable(pAcVar)]
+    SEP  RF                         ; call get_action_variable()
+    STR  R7                         ; if (ac == 62) { i = get_action_variable(pAcVar); IA[i] = (get_action_variable(pAcVar)); }
+    BR   DAReturnFalse1
+DACheck63
+    SMI  $01
+    LBNZ DACheck64
+    LDI  LOW Action2Msg
+    PLO  R8
+    LDI  HIGH Action2Msg
+    PHI  R8
+    SEP  R4                         ; print "The game is now over.\nAnother game? "
+    DW   OutString
+    SEP  R4
+    DW   Do_YesNo                   ; D = 0 if No, 1 if Yes
+    SDI  LOW Endflag
+    PLO  RC
+    LDI  HIGH Endflag
+    SMBI $00
+    PHI  RC
+    LDI  $01
+    STR  RC                         ; set Loadflag or Endflag to 1
+    LBR  DAReturnFalse2
+DACheck64
+    SMI  $01
+    BNZ  DACheck65
+    LBR  DADoLook                   ; if (ac == 64) look();
+DACheck65
+    SMI  $01
+    BNZ  DACheck66
+    PHI  RC                         ; RC.1 = count of treasures
+    LDI  LOW Table_IAS
+    PLO  R7
+    LDI  HIGH Table_IAS
+    PHI  R7
+    LDI  LOW Array_IA
+    PLO  R8
+    LDI  HIGH Array_IA
+    PHI  R8
+    LDI  IL
+    PLO  RC                         ; RC.0 = item loop counter
+DAAction65Loop
+    LDA  R7
+    PHI  RD
+    LDA  R7
+    PLO  RD                         ; RD = pointer to IAS[i][0]
+    LDA  R8                         ; D = IA[i]
+    SMI  TR                         ; TR = Treasure Room
+    BNZ  DAAction65LoopTail
+    LDN  RD
+    SMI  '*'
+    BNZ  DAAction65LoopTail
+    GHI  RC
+    ADI  $01
+    PHI  RC                         ; j++
+DAAction65LoopTail
+    DEC  RC
+    GLO  RC
+    BNZ  DAAction65Loop
+    LDI  LOW (Action3Msg+12)
+    PLO  R8
+    LDI  HIGH (Action3Msg+12)
+    PHI  R8
+    GHI  RC
+    SEP  R4
+    DW   Print2Digit                ; convert # of treasures to 2-digit number
+    LDI  LOW (Action3Msg+64)
+    PLO  R8
+    LDI  HIGH (Action3Msg+64)
+    PHI  R8
+    GHI  RC
+    ADI  LOW ScoreTable
+    PLO  RD
+    LDI  HIGH ScoreTable
+    ADCI $00
+    PHI  RD
+    LDN  RD
+    SEP  R4
+    DW   Print2Digit                ; convert # of treasures to 2-digit number
+    LDI  LOW Action3Msg
+    PLO  R8
+    LDI  HIGH Action3Msg
+    PHI  R8
+    SEP  R4
+    DW   OutString                  ; print "I've stored XX treasures.  On a scale of 0 to 99, that rates a XX."
+    GHI  RC
+    SMI  TT
+    BNZ  DAReturnFalse2             ; continue if not a perfect score
+    LDI  LOW Action4Msg
+    PLO  R8
+    LDI  HIGH Action4Msg
+    PHI  R8
+    SEP  R4
+    DW   OutString                  ; print "Congratulations! You scored a Perfect Game!\r\nThe game is now over.\r\nAnother game? "
+    SEP  R4
+    DW   Do_YesNo                   ; D = 0 if No, 1 if Yes
+    SDI  LOW Endflag
+    PLO  RC
+    LDI  HIGH Endflag
+    SMBI $00
+    PHI  RC
+    LDI  $01
+    STR  RC                         ; set Loadflag or Endflag to 1
+DAReturnFalse2
+    LDI  $00
+    SEP  R5                         ; return false (action didn't fail)
+DACheck66
+    SMI  $01
+    BNZ  DACheck67
+    PLO  RC                         ; RC.0 = line length
+    PHI  RC                         ; RC.1 = not empty flag
+    LDI  LOW Action5Msg
+    PLO  R8
+    LDI  HIGH Action5Msg
+    PHI  R8
+    SEP  R4
+    DW   OutString                  ; print "I'm carrying:\n"
+    LDI  LOW Table_IAS
+    PLO  R1
+    LDI  HIGH Table_IAS
+    PHI  R1
+    LDI  $00
+    PLO  RD                         ; RD.0 = item index
+DAAction66Loop1
+    GLO  RD
+    ADI  LOW Array_IA
+    PLO  R7
+    LDI  HIGH Array_IA
+    ADCI $00
+    PHI  R7                         ; R7 = pointer to IA[i]
+    LDA  R1
+    PHI  R8
+    LDA  R1
+    PLO  R8                         ; R8 = pointer to IAS[i][0]
+    LDA  R7                         ; D = IA[i]
+    SMI  $FF
+    BNZ  DAAction66Loop1Tail        ; skip this item if not in our inventory
+    GHI  RC
+    ADI  $01
+    PHI  RC                         ; not empty flag is true
+    GLO  RC
+    PHI  RD                         ; temporarily store current line length
+    ; figure out how long this item description is
+DAAction66Loop1_1
+    LDA  R8
+    BZ   DAAction66Loop1_1Done
+    SMI  '/'
+    BZ   DAAction66Loop1_1Done
+    INC  RC                         ; increment line length
+    BR   DAAction66Loop1_1
+DAAction66Loop1_1Done
+    LDI  LOW B96OUT
+    PLO  R7
+    LDI  HIGH B96OUT
+    PHI  R7                         ; R7 = pointer to character output routine
+    GLO  RC                         ; RC is current line length + item description length
+    ADI  3
+    SMI  MAXLINE
+    BL   DAAction66SkipLinefeed
+    LDI  $00
+    PHI  RD                         ; linelen = 0
+    LDI  $0D
+    SEP  R7
+    LDI  $0A
+    SEP  R7                         ; print "\r\n"
+DAAction66SkipLinefeed
+    GHI  RD
+    PLO  RC                         ; restore original line length value
+    DEC  R1
+    DEC  R1
+    LDA  R1
+    PHI  R8
+    LDA  R1
+    PLO  R8                         ; R8 = pointer to IAS[i][0] (again)
+DAAction66Loop1_2                   ; print the item description
+    LDA  R8
+    BZ   DAAction66Loop1_2Done
+    SMI  '/'
+    BZ   DAAction66Loop1_2Done
+    INC  RC                         ; increment line length
+    ADI  '/'
+    SEP  R7                         ; print one character
+    BR   DAAction66Loop1_2
+DAAction66Loop1_2Done
+    LDI  '.'
+    SEP  R7
+    LDI  ' '
+    SEP  R7                         ; print ". "
+    INC  RC
+    INC  RC                         ; linelen += 2
+DAAction66Loop1Tail
+    INC  RD
+    GLO  RD
+    SMI  IL
+    BNZ  DAAction66Loop1
+    GHI  RC
+    BNZ  DAAction66NotEmpty
+    LDI  LOW Action6Msg
+    PLO  R8
+    LDI  HIGH Action6Msg
+    PHI  R8
+    SEP  R4
+    DW   OutString                  ; print "Nothing!\n"
+DAAction66NotEmpty
+    BR   DAReturnFalse2
+DACheck67
+    SMI  $01
+    LBNZ DACheck68
+    LDI  LOW (StateFlags+1)
+    PLO  R7
+    LDI  HIGH (StateFlags+1)
+    PHI  R7
+    LDN  R7
+    ORI  $01
+    STR  R7                         ; if (ac == 67) state_flags |= 1;
+    BR   DAReturnFalse3
+DACheck68
+    SMI  $01
+    BNZ  DACheck69
+    LDI  LOW (StateFlags+1)
+    PLO  R7
+    LDI  HIGH (StateFlags+1)
+    PHI  R7
+    LDN  R7
+    XRI  $01
+    STR  R7                         ; if (ac == 68) state_flags ^= 1;
+    BR   DAReturnFalse3
+DACheck69
+    SMI  $01
+    BNZ  DACheck70
+    LDI  LOW (Array_IA+9)
+    PLO  R7
+    LDI  HIGH (Array_IA+9)
+    PHI  R7
+    LDI  $FF
+    STR  R7
+    LDI  LOW LampOil
+    PLO  R7
+    LDI  HIGH LampOil
+    PHI  R7
+    LDI  LI
+    STR  R7                         ; if (ac == 69) { lamp_oil = LT; IA[9] = -1; }
+    BR   DAReturnFalse3
+DACheck70
+    SMI  $01
+    BNZ  DACheck71
+    SEP  R4                         ; if (ac == 70) clrscr();
+    DW   ClearScreen
+    BR   DAReturnFalse3
+DACheck71
+    SMI  $01
+    BNZ  DACheck72
+    LDI  LOW Action7Msg
+    PLO  R8
+    LDI  HIGH Action7Msg
+    PHI  R8
+    SEP  R4
+    DW   OutString                  ; print "Sorry, but saving the game is currently not supported."
+    BR   DAReturnFalse3
+DACheck72
+    SMI  $01
+DADebug1
+    BNZ  DADebug1                   ; deadlock here if invalid 'ac' was found
+    SEP  RF                         ; j = get_action_variable()
+    ADI  LOW Array_IA
+    PLO  R7
+    LDI  HIGH Array_IA
+    ADCI $00
+    PHI  R7                         ; R7 = pointer to IA[j]
+    SEP  RF                         ; p = get_action_variable()
+    ADI  LOW Array_IA
+    PLO  R8
+    LDI  HIGH Array_IA
+    ADCI $00
+    PHI  R8                         ; R8 = pointer to IA[p]
+    LDN  R7
+    PLO  RC                         ; RC.0 = i = IA[j]
+    LDN  R8
+    STR  R7                         ; IA[j] = IA[p]
+    GLO  RC
+    STR  R8                         ; IA[p] = i
+
+DAReturnFalse3
     LDI  $00
     SEP  R5                         ; return false (action didn't fail)
 
-;    if (ac == 52)
-;    {
-;        j = 0;
-;        for (i=1; i<IL; i++) if (IA[i] == -1) j++;
-;        if (j >= MX)
-;        {
-;            printf("I can't. I'm carrying too much!\n");
-;            return true;
-;        }
-;        else IA[get_action_variable(pAcVar)] = -1;
-;    }
+DADoLook
+    GLO  R9                         ; push R9, RA, and RB on the stack
+    STXD
+    GHI  R9
+    STXD
+    GLO  RA
+    STXD
+    GHI  RA
+    STXD
+    GLO  RB
+    STXD
+    GHI  RB
+    STXD
+    SEP  R4                         ; look()
+    DW   Do_Look
+    INC  R2
+    LDA  R2
+    PHI  RB
+    LDA  R2
+    PLO  RB
+    LDA  R2
+    PHI  RA
+    LDA  R2
+    PLO  RA
+    LDA  R2
+    PHI  R9
+    LDN  R2
+    PLO  R9
+    BR   DAReturnFalse3
 
 ;__________________________________________________________________________________________________
 ; Adventure get_action_variable() function
@@ -1815,9 +2298,59 @@ GAV_FoundVar
     BR   GAV_Return
 
 ;__________________________________________________________________________________________________
+; Adventure yes_no() function
+
+; IN:       N/A
+; OUT:      D=1 if YES, 0 if NO
+; TRASHED:  R7, R8, RF
+
+Do_YesNo
+    ; wait for key press
+    LDI  HIGH B96IN
+    PHI  R7
+    LDI  LOW B96IN
+    PLO  R7
+    SEP  R7                         ; RF.1 is new key
+    ; load R7 to point to serial output routine in case I need to print. this saves code space
+    LDI  HIGH B96OUT
+    PHI  R7
+    LDI  LOW B96OUT
+    PLO  R7
+    ; make character be uppercase
+    LDI  $DF
+    STR  R2
+    GHI  RF
+    AND
+    ; check for Y and N
+    SMI  'N'
+    BZ   YN_No
+    SMI  'Y'-'N'
+    BZ   YN_Yes
+    BR   Do_YesNo
+YN_No
+    GHI  RF
+    SEP  R7
+    LDI  $0D
+    SEP  R7
+    LDI  $0A
+    SEP  R7                         ; print 'n\r\n'
+    LDI  $00
+    SEP  R5                         ; return 0
+YN_Yes
+    GHI  RF
+    SEP  R7
+    LDI  $0D
+    SEP  R7
+    LDI  $0A
+    SEP  R7                         ; print 'y\r\n'
+    LDI  $01
+    SEP  R5                         ; return 1
+
+;__________________________________________________________________________________________________
 ; Read-only Data
 
 SerialError     BYTE        "Unsupported serial settings. Must be 9600 baud.\r\n"
+ScoreTable      DB          0, 7, 15, 22, 30, 38, 45, 53, 60, 68, 76, 83, 91, 99
 KnightRider     DB          $00, $00, $80, $80, $C0, $C0, $E0, $60, $70, $30, $38, $18, $1C, $0C, $0E, $06, $07, $03, $03, $01, $01, $00, $00, $01, $01, $03, $03, $07, $06, $0E, $0C, $1C, $18, $38, $30, $70, $60, $E0, $C0, $C0, $80, $80, $00, $00
 ClsMsg          DB          $1B, $5B, $32, $4A, $1B, $48, $00
 StartingMsg     BYTE        " W E L C O M E   T O \n A D V E N T U R E - 1+ \r\n\n\n\n\n"
@@ -1856,6 +2389,13 @@ CarryDrop4Msg   BYTE        "I don't see it here.\r\n", 0
 CarryDrop5Msg   BYTE        "OK, dropped.\r\n", 0
 CarryDrop6Msg   BYTE        "I'm not carrying it!\r\n", 0
 CarryDrop7Msg   BYTE        "It's beyond my power to do that.\r\n", 0
+Action1Msg      BYTE        "I'm dead...\r\n", 0
+Action2Msg      BYTE        "The game is now over.\r\nAnother game? ",0
+Action3Msg      BYTE        "I've stored 00 treasures.  On a scale\r\nof 0 to 99, that rates a 00.\r\n", 0
+Action4Msg      BYTE        "Congratulations! You scored a Perfect Game!\r\nThe game is now over.\r\nAnother game? ",0
+Action5Msg      BYTE        "I'm carrying:\r\n", 0
+Action6Msg      BYTE        "Nothing!\r\n", 0
+Action7Msg      BYTE        "Sorry, but saving the game is currently not supported.\r\n", 0
 
                 INCL        "adventureland_data.asm"
 
