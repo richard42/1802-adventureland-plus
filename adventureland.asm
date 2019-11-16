@@ -430,13 +430,21 @@ SerialNotSupported
     SEP R4
     DW  MON_OUTSTR
 
-Exit    
+Exit
+    LDI HIGH BAUD
+    PHI R7
+    LDI LOW BAUD
+    PLO R7
+    LDA R7
+    PHI RE
+    LDN R7
+    PLO RE
     LDI $8B
     PHI R0
     LDI $DF
     PLO R0
     SEX R0
-    SEP R0                          ; BACK TO THE MONITOR PROGRAM WE GO
+    SEP R0                          ; jump back to the monitor program
 
 SerialOK
     ; beginning of main() function
@@ -1354,7 +1362,7 @@ TUDone
 
 ; IN:       N/A
 ; OUT:      N/A
-; TRASHED:  R7, R8, R9, RA, RF
+; TRASHED:  R7, R8, R9, RA, RB, RF
 
 Do_CarryDrop
     LDI  LOW Array_NV
@@ -1408,6 +1416,8 @@ CDLoop1Tail
 CDNotTake
     LDI  IL
     PLO  RF                         ; RF.0 = item counter
+    LDI  $00
+    PHI  RF                         ; RF.1 = found_object
     GHI  RA                         ; D = NV[1]
     SHL
     SHL
@@ -1462,67 +1472,74 @@ CDLoop2Tail
     GLO  RF
     BNZ  CDLoop2
 CDLoop2Done
+    GHI  RF                         ; D = found_object
+    BNZ  CDLoop2Done2
     LDI  LOW CarryDrop7Msg
     PLO  R8
     LDI  HIGH CarryDrop7Msg
     PHI  R8
-    SEP  R4                         ; print: "It's beyond my power to do that."
-    DW   OutString
-    SEP  R5
+    BR   CDPrintAndReturn           ; print: "It's beyond my power to do that."
+CDLoop2Done2
+    GLO  RA                         ; D = NV[0]
+    SMI  10
+    BNZ  CDLoop2Done3
+    LDI  LOW CarryDrop4Msg
+    PLO  R8
+    LDI  HIGH CarryDrop4Msg
+    PHI  R8
+    BR   CDPrintAndReturn           ; print: "I don't see it here."
+CDLoop2Done3
+    LDI  LOW CarryDrop6Msg
+    PLO  R8
+    LDI  HIGH CarryDrop6Msg
+    PHI  R8
+    BR   CDPrintAndReturn           ; print: "I'm not carrying it!"
 
 CDLoop2_FoundObject
-    ; we found the object!
+    ; we found a matching object!
+    LDI  $01
+    PHI  RF                         ; RF.1 = found_object
     SEX  R2
     GLO  RF
     STR  R2
     LDI  IL
     SM                              ; D = j (item index)
     ADI  LOW Array_IA
-    PLO  R9
+    PLO  RB
     LDI  HIGH Array_IA
     ADCI $00
-    PHI  R9                         ; R9 = pointer to IA[j]
+    PHI  RB                         ; RB = pointer to IA[j]
     LDI  LOW Room
     PLO  R8
     LDI  HIGH Room
     PHI  R8                         ; R8 = pointer to 'room'
+    SEX  R8
     GLO  RA                         ; D = NV[0]
     SMI  10
     BNZ  CDDropItem
 CDTakeItem
-    SEX  R8
-    LDN  R9
+    LDN  RB
     SM
-    BNZ  CDItemNotHere
+    BNZ  CDLoop2_2NoMatch2          ; go back and look for another item with the same name; maybe it's here instead of this one
     LDI  $FF
-    STR  R9                         ; IA[j] = -1;
+    STR  RB                         ; IA[j] = -1;
     LDI  LOW CarryDrop3Msg
     PLO  R8
     LDI  HIGH CarryDrop3Msg
     PHI  R8
     BR   CDPrintAndReturn           ; print: "OK, taken."
-CDItemNotHere
-    LDI  LOW CarryDrop4Msg
-    PLO  R8
-    LDI  HIGH CarryDrop4Msg
-    PHI  R8
-    BR   CDPrintAndReturn           ; print: "I don't see it here."
+
 CDDropItem
-    LDN  R9
+    LDN  RB
     SMI  $FF
-    BNZ  CDItemNotHeld              ; not in my inventory
+    BNZ  CDLoop2_2NoMatch2          ; not in my inventory; go back and look for another item with the same name
     LDN  R8
-    STR  R9                         ; IA[j] = room;
+    STR  RB                         ; IA[j] = room;
     LDI  LOW CarryDrop5Msg
     PLO  R8
     LDI  HIGH CarryDrop5Msg
-    PHI  R8
-    BR   CDPrintAndReturn           ; print: "OK, dropped."
-CDItemNotHeld
-    LDI  LOW CarryDrop6Msg
-    PLO  R8
-    LDI  HIGH CarryDrop6Msg
-    PHI  R8                         ; print: "I'm not carrying it!"
+    PHI  R8                          ; print: "OK, dropped."
+
 CDPrintAndReturn
     SEP  R4
     DW   OutString
@@ -1594,7 +1611,7 @@ CLLoopCheck1
     LBR  CLReturnFalse
 CLLoopCheck2
     SMI  $01
-    BNZ  CLLoopCheck3
+    LBNZ CLLoopCheck3
     LDN  RB
     SM
     LBZ  CLLoop1Tail                ; if (k == 2) allowed = (IA[ll] == room);
@@ -2066,7 +2083,7 @@ DAReturnFalse2
     SEP  R5                         ; return false (action didn't fail)
 DACheck66
     SMI  $01
-    BNZ  DACheck67
+    LBNZ DACheck67
     PLO  RC                         ; RC.0 = line length
     PHI  RC                         ; RC.1 = not empty flag
     LDI  LOW Action5Msg
@@ -2154,7 +2171,7 @@ DAAction66Loop1Tail
     SMI  IL
     BNZ  DAAction66Loop1
     GHI  RC
-    BNZ  DAAction66NotEmpty
+    LBNZ DAAction66NotEmpty
     LDI  LOW Action6Msg
     PLO  R8
     LDI  HIGH Action6Msg
@@ -2162,7 +2179,7 @@ DAAction66Loop1Tail
     SEP  R4
     DW   OutString                  ; print "Nothing!\n"
 DAAction66NotEmpty
-    BR   DAReturnFalse2
+    BR   DAReturnFalse3
 DACheck67
     SMI  $01
     LBNZ DACheck68
