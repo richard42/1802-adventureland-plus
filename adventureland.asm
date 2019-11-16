@@ -20,7 +20,7 @@ RF      EQU 15
 ;__________________________________________________________________________________________________
 ; Macros for the MCSMP20J monitor program
 
-STACK   EQU 7FBFH
+STACK   EQU 7F00H
 CALL    EQU 8ADBH
 RETURN  EQU 8AEDH
 
@@ -273,7 +273,7 @@ OutStrDone
 
 Print2Digit
     PHI  R7                         ; save number to print
-    LDI  $30                        ; ASCII 0
+    LDI  $00
     PLO  R7
     GHI  R7
 P2D_Tens
@@ -285,7 +285,10 @@ P2D_TensDone
     ADI  10                         ; D is now number of singles
     PHI  R7
     GLO  R7
-    STR  R8                         ; set the tens digit
+    LSNZ                            ; if there are no tens, 
+    LDI  ' '-'0'                    ; use space as filler char.
+    ADI  '0'
+    STR  R8                         ; store the tens digit
     INC  R8
     LDI  $30                        ; ASCII 0
     PLO  R7
@@ -2374,7 +2377,7 @@ StartingMsg     BYTE        " W E L C O M E   T O \n A D V E N T U R E - 1+ \r\n
                 BYTE        "The object of your adventure is to find treasures and return them\r\n"
                 BYTE        "to the proper place for you to accumulate points.  I'm your clone.  Give me\r\n"
                 BYTE        "commands that consist of a verb & noun, i.e. GO EAST, TAKE KEY, CLIMB TREE,\r\n"
-                BYTE        "SAVE GAME, TAKE INVENTORY, FIND AXE, etc.\r\n\n"
+                BYTE        "SAVE GAME, TAKE INVENTORY, FIND AXE, QUIT, etc.\r\n\n"
                 BYTE        "You'll need some special items to do some things, but I'm sure that you'll be\r\n"
                 BYTE        "a good adventurer and figure these things out (which is most of the fun of\r\n"
                 BYTE        "this game).\r\n\n"
@@ -2409,7 +2412,7 @@ CarryDrop7Msg   BYTE        "It's beyond my power to do that.\r\n", 0
 Action1Msg      BYTE        "I'm dead...\r\n", 0
 Action2Msg      BYTE        "The game is now over.\r\nAnother game? ",0
 Action3Msg      BYTE        "I've stored 00 treasures.  On a scale\r\nof 0 to 99, that rates a 00.\r\n", 0
-Action4Msg      BYTE        "Congratulations! You scored a Perfect Game!\r\nThe game is now over.\r\nAnother game? ",0
+Action4Msg      BYTE        "Congratulations! You scored a Perfect Game!\r\nYou are one smart adventurer!\r\nKick back and grab a cold one, you've earned it.\r\n\nThe game is now over.\r\nAnother game? ",0
 Action5Msg      BYTE        "I'm carrying:\r\n", 0
 Action6Msg      BYTE        "Nothing!\r\n", 0
 Action7Msg      BYTE        "Sorry, but saving the game is currently not supported.\r\n", 0
