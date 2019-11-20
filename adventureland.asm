@@ -20,7 +20,7 @@ RF      EQU 15
 ;__________________________________________________________________________________________________
 ; Macros for the MCSMP20J monitor program
 
-STACK   EQU 7F00H
+STACK   EQU 7FBFH
 CALL    EQU 8ADBH
 RETURN  EQU 8AEDH
 
@@ -434,17 +434,9 @@ SerialNotSupported
     DW  MON_OUTSTR
 
 Exit
-    LDI HIGH BAUD
-    PHI R7
-    LDI LOW BAUD
-    PLO R7
-    LDA R7
-    PHI RE
-    LDN R7
-    PLO RE
     LDI $8B
     PHI R0
-    LDI $DF
+    LDI $5E
     PLO R0
     SEX R0
     SEP R0                          ; jump back to the monitor program
