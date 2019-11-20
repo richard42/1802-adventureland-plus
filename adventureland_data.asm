@@ -79,9 +79,9 @@ Array_C     DB  $00, $4B, $08, $01, $13, $06, $08, $00, $0A, $00, $00, $00, $75,
             DB  $25, $14, $05, $04, $10, $02, $0E, $06, $00, $00, $00, $00, $06, $00, $00, $00
             DB  $18, $0B, $0B, $01, $03, $00, $0B, $00, $00, $00, $00, $00, $1E, $3A, $35, $00
             DB  $27, $14, $10, $02, $0E, $01, $10, $00, $11, $00, $00, $00, $37, $35, $40, $00
-            DB  $12, $25, $24, $01, $22, $05, $24, $00, $00, $00, $00, $00, $35, $00, $00, $00
+            DB  $12, $25, $24, $01, $22, $05, $24, $00, $00, $00, $00, $00, $35, $82, $00, $00
             DB  $06, $00, $13, $04, $24, $01, $00, $00, $00, $00, $00, $00, $21, $3D, $00, $00
-            DB  $12, $25, $24, $01, $38, $00, $2D, $00, $24, $00, $00, $00, $35, $35, $37, $81
+            DB  $12, $25, $24, $01, $22, $02, $38, $00, $2D, $00, $24, $00, $35, $35, $37, $81
             DB  $0A, $25, $24, $02, $24, $00, $00, $00, $00, $00, $00, $00, $20, $34, $00, $00
             DB  $16, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $22, $00, $00, $00
             DB  $1A, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $41, $3F, $00, $00
@@ -257,7 +257,7 @@ RSS32_Msg   BYTE    " ", 0
 RSS33_Msg   BYTE    "large misty room with strange letters over the exits.", 0
 
 
-; String table MSS has length 80
+; String table MSS has length 81
 Table_MSS   DW  MSS00_Msg, MSS01_Msg, MSS02_Msg, MSS03_Msg, MSS04_Msg, MSS05_Msg, MSS06_Msg, MSS07_Msg, MSS08_Msg, MSS09_Msg
             DW  MSS10_Msg, MSS11_Msg, MSS12_Msg, MSS13_Msg, MSS14_Msg, MSS15_Msg, MSS16_Msg, MSS17_Msg, MSS18_Msg, MSS19_Msg
             DW  MSS20_Msg, MSS21_Msg, MSS22_Msg, MSS23_Msg, MSS24_Msg, MSS25_Msg, MSS26_Msg, MSS27_Msg, MSS28_Msg, MSS29_Msg
@@ -266,6 +266,7 @@ Table_MSS   DW  MSS00_Msg, MSS01_Msg, MSS02_Msg, MSS03_Msg, MSS04_Msg, MSS05_Msg
             DW  MSS50_Msg, MSS51_Msg, MSS52_Msg, MSS53_Msg, MSS54_Msg, MSS55_Msg, MSS56_Msg, MSS57_Msg, MSS58_Msg, MSS59_Msg
             DW  MSS60_Msg, MSS61_Msg, MSS62_Msg, MSS63_Msg, MSS64_Msg, MSS65_Msg, MSS66_Msg, MSS67_Msg, MSS68_Msg, MSS69_Msg
             DW  MSS70_Msg, MSS71_Msg, MSS72_Msg, MSS73_Msg, MSS74_Msg, MSS75_Msg, MSS76_Msg, MSS77_Msg, MSS78_Msg, MSS79_Msg
+            DW  MSS80_Msg
 MSS00_Msg   BYTE    " ", 0
 MSS01_Msg   BYTE    "Nothing happens...", 0
 MSS02_Msg   BYTE    "Focusing intently on the intricate patterns of the web, I am surprised to\r\nsee the words: CHOP IT DOWN!", 0
@@ -346,6 +347,7 @@ MSS76_Msg   BYTE    "I don't see any place to go swimming around here.", 0
 MSS77_Msg   BYTE    "I hold the empty bladder near the bubbling swamp and pull it open, sucking\r\nthe gas into the bladder.", 0
 MSS78_Msg   BYTE    "I manage to coax a few of the bees into the empty bottle without getting stung!", 0
 MSS79_Msg   BYTE    "I heave the bricks towards the lava, into which they fall, forming a makeshift\r\ndam, and stopping the lava flow.", 0
+MSS80_Msg   BYTE    "OK, dropped.\r\n", 0
 
 ; String table IAS has length 61
 Table_IAS   DW  IAS00_Msg, IAS01_Msg, IAS02_Msg, IAS03_Msg, IAS04_Msg, IAS05_Msg, IAS06_Msg, IAS07_Msg, IAS08_Msg, IAS09_Msg
