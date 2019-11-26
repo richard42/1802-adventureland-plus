@@ -2172,8 +2172,14 @@ DAAction66Loop1Tail
     LDI  HIGH Action6Msg
     PHI  R8
     SEP  R4
-    DW   OutString                  ; print "Nothing!\n"
+    DW   OutString                  ; print "Nothing!"
 DAAction66NotEmpty
+    LDI  LOW NewlineMsg
+    PLO  R8
+    LDI  HIGH NewlineMsg
+    PHI  R8
+    SEP  R4
+    DW   OutString                  ; print "\r\n"
     BR   DAReturnFalse3
 DACheck67
     SMI  $01
@@ -2376,7 +2382,8 @@ StartingMsg     BYTE        " W E L C O M E   T O \n A D V E N T U R E - 1+ \r\n
                 BYTE        "Note that going in the opposite direction won't always get you back to where\r\n"
                 BYTE        "you were.\r\n\n\n"
                 BYTE        "HAPPY ADVENTURING!!!\r\n\n\n\n\n"
-                BYTE        "************************** Press any key to continue **************************\r\n", 0
+                BYTE        "************************** Press any key to continue **************************"
+NewlineMsg      BYTE        "\r\n", 0
 LampEmptyMsg    BYTE        "Your lamp has run out of oil!\r\n", 0
 LampLow1Msg     BYTE        "Your lamp will run out of oil in ",0
 LampLow2Msg     BYTE        " turns!\r\n",0
@@ -2406,7 +2413,7 @@ Action2Msg      BYTE        "The game is now over.\r\nAnother game? ",0
 Action3Msg      BYTE        "I've stored 00 treasures.  On a scale\r\nof 0 to 99, that rates a 00.\r\n", 0
 Action4Msg      BYTE        "Congratulations! You scored a Perfect Game!\r\nYou are one smart adventurer!\r\nKick back and grab a cold one, you've earned it.\r\n\nThe game is now over.\r\nAnother game? ",0
 Action5Msg      BYTE        "I'm carrying:\r\n", 0
-Action6Msg      BYTE        "Nothing!\r\n", 0
+Action6Msg      BYTE        "Nothing!", 0
 Action7Msg      BYTE        "Sorry, but saving the game is currently not supported.\r\n", 0
 
                 INCL        "adventureland_data.asm"
