@@ -20,7 +20,7 @@ RF      EQU 15
 ;__________________________________________________________________________________________________
 ; Macros for the MCSMP20J monitor program
 
-STACK   EQU 7FBFH
+STACK   EQU 7F6FH
 CALL    EQU 8ADBH
 RETURN  EQU 8AEDH
 
@@ -32,6 +32,12 @@ RETURN  EQU 8AEDH
 BAUD    EQU 7FCDH
 
 MON_OUTSTR  EQU 8526H
+
+;__________________________________________________________________________________________________
+; Macros for saving/loading game state
+
+STATE_LOC   EQU     7F70H
+STATE_SIZE  EQU     65              ; IL + 4
 
 ;__________________________________________________________________________________________________
 ; Start of our Boot Loader
@@ -471,9 +477,9 @@ MainLoad
     ; reset all game state
     SEP  R4
     DW   GameReset
-    ; /////////////////////////////
-    ; fixme: add state loading code here
-    ; /////////////////////////////
+    ; load game if possible
+    SEP  R4
+    DW   Do_LoadGame
     ; clear screen
     SEP  R4
     DW   ClearScreen
@@ -2228,12 +2234,14 @@ DACheck70
 DACheck71
     SMI  $01
     BNZ  DACheck72
+    SEP  R4                         ; call SaveGame function
+    DW   Do_SaveGame
     LDI  LOW Action7Msg
     PLO  R8
     LDI  HIGH Action7Msg
     PHI  R8
     SEP  R4
-    DW   OutString                  ; print "Sorry, but saving the game is currently not supported."
+    DW   OutString                  ; print "Game state has been saved in upper memory."
     BR   DAReturnFalse3
 DACheck72
     SMI  $01
@@ -2365,6 +2373,169 @@ YN_Yes
     SEP  R5                         ; return 1
 
 ;__________________________________________________________________________________________________
+; SaveGame function to store game state in upper memory
+
+; IN:       N/A
+; OUT:      N/A
+; TRASHED:  R7, R8, RC
+
+Do_SaveGame
+    LDI  LOW Array_IA
+    PLO  R7
+    LDI  HIGH Array_IA
+    PHI  R7
+    LDI  LOW STATE_LOC
+    PLO  R8
+    LDI  HIGH STATE_LOC
+    PHI  R8
+    LDI  IL
+    PLO  RC
+SGLoop1                             ; store the IA array (item locations)
+    LDA  R7
+    STR  R8
+    INC  R8
+    DEC  RC
+    GLO  RC
+    BNZ  SGLoop1
+    INC  R7
+    INC  R7
+    INC  R7
+    INC  R7                         ; R7 points to DarkFlag
+    LDA  R7
+    STR  R8                         ; store DarkFlag
+    INC  R8
+    LDA  R7
+    STR  R8                         ; store Room
+    INC  R8
+    LDA  R7
+    STR  R8                         ; store LampOil
+    INC  R8
+    LDA  R7
+    STR  R8                         ; store StateFlags
+    INC  R8                         ; R8 points to 2 checksum values at end of buffer
+    LDI  $4B
+    STR  R8
+    INC  R8
+    SEX  R8
+    STXD                            ; set both checksum values to $4B and reset R8 pointer
+    GHI  R8
+    PHI  R7
+    GLO  R8
+    SMI  STATE_SIZE
+    PLO  R7                         ; R7 points to beginning of state buffer
+    LDI  STATE_SIZE
+    PLO  RC                         ; RC.0 is checksum byte counter
+SGLoop2
+    LDN  R7
+    ADD
+    STR  R8
+    INC  R8
+    LDA  R7
+    XOR
+    STXD
+    DEC  RC
+    GLO  RC
+    BNZ  SGLoop2
+    SEP  R5                         ; return
+
+;__________________________________________________________________________________________________
+; LoadGame function to restore game state from upper memory, if the user wishes
+
+; IN:       N/A
+; OUT:      N/A
+; TRASHED:  R7, R8, RC, RD, RF
+
+Do_LoadGame
+    LDI  LOW LoadQestion
+    PLO  R8
+    LDI  HIGH LoadQestion
+    PHI  R8
+    SEP  R4
+    DW   OutString                  ; print "Load saved game (Y or N)?"
+    SEP  R4
+    DW   Do_YesNo                   ; D = 0 if No, 1 if Yes
+    BNZ  LGNext1
+    SEP  R5                         ; return
+LGNext1
+    LDI  LOW STATE_LOC
+    PLO  R7
+    ADI  STATE_SIZE
+    PLO  R8
+    LDI  HIGH STATE_LOC
+    PHI  R7                         ; R7 points to state data buffer in upper RAM
+    PHI  R8                         ; R8 points to checksum bytes after data buffer
+    LDA  R8
+    PLO  RD                         ; RD.0 = sum value
+    LDN  R8
+    PHI  RD                         ; RD.1 = xor value
+    LDI  STATE_SIZE
+    PLO  RC                         ; RC is checksum counter
+    SEX  R7
+LGLoop1                             ; inverse calculate checksum values
+    GLO  RD
+    SM
+    PLO  RD
+    GHI  RD
+    XOR
+    PHI  RD
+    IRX
+    DEC  RC
+    GLO  RC
+    BNZ  LGLoop1
+    GLO  RD                         ; validate checksum
+    SMI  $4B
+    BNZ  LGLoadFail
+    GHI  RD
+    XRI  $4B
+    BZ   LGNext2
+LGLoadFail
+    LDI  LOW LoadFailedMsg
+    PLO  R8
+    LDI  HIGH LoadFailedMsg
+    PHI  R8
+    SEP  R4
+    DW   OutString                  ; print "Sorry, but no saved game data was found."
+    LDI  HIGH B96IN
+    PHI  R7
+    LDI  LOW B96IN
+    PLO  R7
+    SEP  R7                         ; wait for key press
+    SEP  R5                         ; return
+LGNext2
+    GLO  R7
+    SMI  STATE_SIZE
+    PLO  R7                         ; R7 is reset to start of state data buffer
+    LDI  LOW Array_IA
+    PLO  R8
+    LDI  HIGH Array_IA
+    PHI  R8                         ; R8 points to start of IA array
+    LDI  IL
+    PLO  RC
+LGLoop2                             ; store the IA array (item locations)
+    LDA  R7
+    STR  R8
+    INC  R8
+    DEC  RC
+    GLO  RC
+    BNZ  LGLoop2
+    INC  R8
+    INC  R8
+    INC  R8
+    INC  R8                         ; R8 points to DarkFlag
+    LDA  R7
+    STR  R8                         ; store DarkFlag
+    INC  R8
+    LDA  R7
+    STR  R8                         ; store Room
+    INC  R8
+    LDA  R7
+    STR  R8                         ; store LampOil
+    INC  R8
+    LDA  R7
+    STR  R8                         ; store StateFlags
+    SEP  R5                         ; return
+
+;__________________________________________________________________________________________________
 ; Read-only Data
 
 SerialError     BYTE        "Unsupported serial settings. Must be 9600 baud.\r\n"
@@ -2384,6 +2555,8 @@ StartingMsg     BYTE        " W E L C O M E   T O \n A D V E N T U R E - 1+ \r\n
                 BYTE        "HAPPY ADVENTURING!!!\r\n\n\n\n\n"
                 BYTE        "************************** Press any key to continue **************************"
 NewlineMsg      BYTE        "\r\n", 0
+LoadQestion     BYTE        "\r\nLoad saved game (Y or N)? ", 0
+LoadFailedMsg   BYTE        "Sorry, but no saved game data was found.\r\nPress a key to continue...\r\n", 0
 LampEmptyMsg    BYTE        "Your lamp has run out of oil!\r\n", 0
 LampLow1Msg     BYTE        "Your lamp will run out of oil in ",0
 LampLow2Msg     BYTE        " turns!\r\n",0
@@ -2414,7 +2587,7 @@ Action3Msg      BYTE        "I've stored 00 treasures.  On a scale\r\nof 0 to 99
 Action4Msg      BYTE        "Congratulations! You scored a Perfect Game!\r\nYou are one smart adventurer!\r\nKick back and grab a cold one, you've earned it.\r\n\nThe game is now over.\r\nAnother game? ",0
 Action5Msg      BYTE        "I'm carrying:\r\n", 0
 Action6Msg      BYTE        "Nothing!", 0
-Action7Msg      BYTE        "Sorry, but saving the game is currently not supported.\r\n", 0
+Action7Msg      BYTE        "Game state has been saved in upper memory.\r\n", 0
 
                 INCL        "adventureland_data.asm"
 
