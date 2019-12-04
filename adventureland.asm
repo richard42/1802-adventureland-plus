@@ -1,86 +1,22 @@
 ;__________________________________________________________________________________________________
-; Macros for the register names
-R0      EQU 0
-R1      EQU 1
-R2      EQU 2
-R3      EQU 3
-R4      EQU 4
-R5      EQU 5
-R6      EQU 6
-R7      EQU 7
-R8      EQU 8
-R9      EQU 9
-RA      EQU 10
-RB      EQU 11
-RC      EQU 12
-RD      EQU 13
-RE      EQU 14
-RF      EQU 15
+; Serial I/O hooks
 
-;__________________________________________________________________________________________________
-; Macros for the MCSMP20J monitor program
-
-STACK   EQU 7F6FH
-CALL    EQU 8ADBH
-RETURN  EQU 8AEDH
-
-;NOTE: REGISTER RE MUST BE LOADED WITH THE BAUD RATE INFO PRIOR TO
-;USING ANY INPUT OR OUTPUT CALLS
-;BAUD RATE INFO IS STORED AT 7FCD AND 7FCE
-;M(7FCD) GOES INTO RE.1
-;M(7FCE) GOES INTO RE.0
-BAUD    EQU 7FCDH
-
-MON_OUTSTR  EQU 8526H
-
-;__________________________________________________________________________________________________
-; Macros for saving/loading game state
-
-STATE_LOC   EQU     7F70H
-STATE_SIZE  EQU     65              ; IL + 4
-
-;__________________________________________________________________________________________________
-; Start of our Boot Loader
-; (On entry, R0 is our program counter)
-
-    CPU 1802
-    ORG 0010H
-
-    ; SETUP R2 (Stack)
-    LDI HIGH STACK
-    PHI R2
-    LDI LOW STACK
-    PLO R2  ;STACK = 7FBFH
-    SEX R2  ;X = 2
-
-    ; SETUP R4 (CALL PC)
-    LDI HIGH CALL
-    PHI R4
-    LDI LOW CALL
-    PLO R4  ;R4 = PC FOR CALL SUBROUTINE
-
-    ; SETUP R5 (RETURN PC)
-    LDI HIGH RETURN
-    PHI R5
-    LDI LOW RETURN
-    PLO R5  ;R5 = PC FOR RETURN SUBROUTINE
-
-    ;SETUP R3 AS OUR NEW PC
-    LDI HIGH START
-    PHI R3
-    LDI LOW START
-    PLO R3
-    SEP R3  ;CHANGE PC FROM R0 TO R3
-
-; When calling a subroutine:
-; - accumulator value D is passed through
-; - R6 is preserved but not passed through
-; - RF.1 is trashed.
-; When in a subroutine, R6=Caller
-
-;__________________________________________________________________________________________________
 ; Customized serial input routine
+; IN:       P=7
+; OUT:      P=3, RF.1 = received character
+; TRASHED:  R8
+SerialInput
+    LBR  0000
 
+; Customized serial output routine
+; IN:       P=7, D = character to transmit, R2 is stack pointer
+; OUT:      P=3
+; TRASHED:  RF
+SerialOutput
+    LBR  0000
+
+;__________________________________________________________________________________________________
+; Serial Input: 9600 baud, inverted RS232 logic
 ; IN:       P=7
 ; OUT:      P=3, RF.1 = received character
 ; TRASHED:  R8
@@ -166,9 +102,7 @@ B96IN4
     BR  B96IN_Return
 
 ;__________________________________________________________________________________________________
-; Customized serial output routine
-; 9600 baud, inverted RS232 logic
-
+; Serial Output: 9600 baud, inverted RS232 logic
 ; IN:       P=7, D = character to transmit, R2 is stack pointer
 ; OUT:      P=3
 ; TRASHED:  RF
@@ -256,9 +190,9 @@ DNE961
 ; TRASHED:  R7, R8, RF
 
 OutString
-    LDI  HIGH B96OUT
+    LDI  HIGH SerialOutput
     PHI  R7
-    LDI  LOW B96OUT
+    LDI  LOW SerialOutput
     PLO  R7
 
 OutStrLoop1
@@ -415,7 +349,7 @@ GRLoop1
 ;__________________________________________________________________________________________________
 ; Main program starting point
 
-START
+GameStart
     ; First, check that the serial port setup is supported
     LDI HIGH BAUD
     PHI R7
@@ -448,6 +382,24 @@ Exit
     SEP R0                          ; jump back to the monitor program
 
 SerialOK
+    ; set up our serial i/o pointers to use 9600 baud non-inverted
+    LDI  HIGH SerialInput+1
+    PHI  R8
+    LDI  LOW SerialInput+1
+    PLO  R8
+    LDI  HIGH B96IN
+    STR  R8
+    INC  R8
+    LDI  LOW B96IN
+    STR  R8
+    INC  R8
+    INC  R8
+    LDI  HIGH B96OUT
+    STR  R8
+    INC  R8
+    LDI  LOW B96OUT
+    STR  R8
+    
     ; beginning of main() function
     ; clear screen
     SEP  R4
@@ -462,9 +414,9 @@ SerialOK
     DW   OutString
 
     ; wait for key press
-    LDI HIGH B96IN
+    LDI HIGH SerialInput
     PHI R7
-    LDI LOW B96IN
+    LDI LOW SerialInput
     PLO R7
     SEP R7
     
@@ -612,15 +564,15 @@ Do_GetInput
     PLO  R9                         ; R9 is pointer to input line
 GILoop1
     ; wait for key press
-    LDI  HIGH B96IN
+    LDI  HIGH SerialInput
     PHI  R7
-    LDI  LOW B96IN
+    LDI  LOW SerialInput
     PLO  R7
     SEP  R7
     ; load R7 to point to serial output routine in case I need to print. this saves code space
-    LDI  HIGH B96OUT
+    LDI  HIGH SerialOutput
     PHI  R7
-    LDI  LOW B96OUT
+    LDI  LOW SerialOutput
     PLO  R7
     ; handle backspace
     GHI  RF
@@ -2127,9 +2079,9 @@ DAAction66Loop1_1
     INC  RC                         ; increment line length
     BR   DAAction66Loop1_1
 DAAction66Loop1_1Done
-    LDI  LOW B96OUT
+    LDI  LOW SerialOutput
     PLO  R7
-    LDI  HIGH B96OUT
+    LDI  HIGH SerialOutput
     PHI  R7                         ; R7 = pointer to character output routine
     GLO  RC                         ; RC is current line length + item description length
     ADI  3
@@ -2332,15 +2284,15 @@ GAV_FoundVar
 
 Do_YesNo
     ; wait for key press
-    LDI  HIGH B96IN
+    LDI  HIGH SerialInput
     PHI  R7
-    LDI  LOW B96IN
+    LDI  LOW SerialInput
     PLO  R7
     SEP  R7                         ; RF.1 is new key
     ; load R7 to point to serial output routine in case I need to print. this saves code space
-    LDI  HIGH B96OUT
+    LDI  HIGH SerialOutput
     PHI  R7
-    LDI  LOW B96OUT
+    LDI  LOW SerialOutput
     PLO  R7
     ; make character be uppercase
     LDI  $DF
@@ -2495,9 +2447,9 @@ LGLoadFail
     PHI  R8
     SEP  R4
     DW   OutString                  ; print "Sorry, but no saved game data was found."
-    LDI  HIGH B96IN
+    LDI  HIGH SerialInput
     PHI  R7
-    LDI  LOW B96IN
+    LDI  LOW SerialInput
     PLO  R7
     SEP  R7                         ; wait for key press
     SEP  R5                         ; return
@@ -2610,6 +2562,4 @@ Rand_VarB       DB          220
 Rand_VarC       DB          64
 
 PrintNumber     DB          0,0,0   ; temporary location for storing 2-digit number to print
-
-                END
 
