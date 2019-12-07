@@ -64,5 +64,12 @@ if __name__ == "__main__":
             fOut.write(strDataByte + ", ")
         dataIdx += 1
     fOut.close()
+    # Step 5: assemble game loader
+    cmd = "%s game_rom_loader.asm -l adv_rom.prn -o adv_rom.hex -b adv_rom.bin" % a18Path
+    print(cmd)
+    numErrors = os.system(cmd)
+    if numErrors > 0:
+        print("Assembly of 'game_rom_loader.asm' failed.")
+        sys.exit(1)
 
 
