@@ -392,7 +392,7 @@ IAS31_Msg   BYTE    "Bladder (swollen with swamp gas)/BLA/", 0
 IAS32_Msg   BYTE    "Bricked up window", 0
 IAS33_Msg   BYTE    "Sign: IN SOME CASES MUD IS GOOD, IN OTHERS...", 0
 IAS34_Msg   BYTE    "Stream of lava", 0
-IAS35_Msg   BYTE    "Bricked up window with a hole blown out of the center, leading to a narrow\r\nledge", 0
+IAS35_Msg   BYTE    "Bricked up window with a hole blown out of the center,\r\nleading to a narrow ledge", 0
 IAS36_Msg   BYTE    "Loose fire bricks", 0
 IAS37_Msg   BYTE    "*GOLD CROWN*/CRO/", 0
 IAS38_Msg   BYTE    "*MAGIC MIRROR*/MIR/", 0

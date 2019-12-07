@@ -1,22 +1,5 @@
 ;__________________________________________________________________________________________________
-; Serial I/O hooks
-
-; Customized serial input routine
-; IN:       P=7
-; OUT:      P=3, RF.1 = received character
-; TRASHED:  R8
-SerialInput
-    LBR  0000
-
-; Customized serial output routine
-; IN:       P=7, D = character to transmit, R2 is stack pointer
-; OUT:      P=3
-; TRASHED:  RF
-SerialOutput
-    LBR  0000
-
-;__________________________________________________________________________________________________
-; Serial Input: 9600 baud, inverted RS232 logic
+; Serial Input: 9600 baud, normal RS232 logic
 ; IN:       P=7
 ; OUT:      P=3, RF.1 = received character
 ; TRASHED:  R8
@@ -36,32 +19,32 @@ B96StopBitLoop              ; Wait for the stop bit
     LDI $FF                 ; Initialize input character in RF.1 to $FF
     PHI RF
 
-DrawLights
+B96DrawLights
     LDA R8                  ; load next bit pattern in LED animation
     STR R2                  ; put it on the stack
-    B3  FoundStartBit
+    B3  B96FoundStartBit
     OUT 4                   ; output to LEDs
     DEC R2                  ; restore stack pointer to original value
     GLO R8                  ; load the low byte of the current bit pattern pointer
     SMI LOW KnightRider+44  ; is it at the end of the animation sequence?
-    B3  FoundStartBit
+    B3  B96FoundStartBit
     BNZ B96WaitStartBit     ; if not, go burn CPU cycles and wait for the start bit
     
     LDI LOW Rand_VarX       ; we have to reset the pointer, so begin by instead
     PLO R8
     LDI HIGH Rand_VarX      ; loading a pointer to the psuedo-random generator's X value
-    B3 FoundStartBit
+    B3 B96FoundStartBit
     PHI R8
     LDN R8
     ADI $01                 ; and incrementing this value in memory, to make the generator's
     STR R8                  ; values non-deterministic
-    B3 FoundStartBit
+    B3 B96FoundStartBit
     
     LDI LOW KnightRider     ; now re-load the bit pattern pointer
     PLO R8
     LDI HIGH KnightRider
     PHI R8
-    B3  FoundStartBit
+    B3  B96FoundStartBit
 
 B96WaitStartBit
     LDI $00         ; animation inner loop counter
@@ -69,27 +52,27 @@ B96WaitStartBit
 B96StartBitLoop
     NOP
     NOP
-    B3  FoundStartBit
+    B3  B96FoundStartBit
     SMI $01
     NOP
     NOP
-    B3  FoundStartBit
+    B3  B96FoundStartBit
     BNZ B96StartBitLoop
-    BR  DrawLights
+    BR  B96DrawLights
 
-FoundStartBit
+B96FoundStartBit
     LDI  $01        ; Set up D and DF, which takes about a quarter of a bit duration
     SHR
-    BR   SkipDelay
+    BR   B96SkipDelay
     
-StartDelay
+B96StartDelay
     LDI $02
 B96DelayLoop
     SMI $01
     BNZ B96DelayLoop
     ; When done with delay, D=0 and DF=1
     
-SkipDelay           ; read current bit
+B96SkipDelay        ; read current bit
     B3  B96IN4
     SKP             ; if BIT=0 (EF3 PIN HIGH), leave DF=1
 B96IN4
@@ -97,12 +80,98 @@ B96IN4
     GHI RF          ; load incoming byte
     SHRC            ; shift new bit into MSB, and oldest bit into DF
     PHI RF
-    LBDF StartDelay
+    LBDF B96StartDelay
     
     BR  B96IN_Return
 
 ;__________________________________________________________________________________________________
-; Serial Output: 9600 baud, inverted RS232 logic
+; Serial Input: 9600 baud, inverted RS232 logic
+; IN:       P=7
+; OUT:      P=3, RF.1 = received character
+; TRASHED:  R8
+
+Bi96IN_Return
+    SEP R3
+Bi96IN
+    ; Load the starting point for the LED animation
+    LDI HIGH KnightRider
+    PHI R8
+    LDI LOW KnightRider
+    PLO R8
+
+Bi96StopBitLoop              ; Wait for the stop bit
+    BN3 Bi96StopBitLoop
+
+    LDI $FF                 ; Initialize input character in RF.1 to $FF
+    PHI RF
+
+Bi96DrawLights
+    LDA R8                  ; load next bit pattern in LED animation
+    STR R2                  ; put it on the stack
+    BN3 Bi96FoundStartBit
+    OUT 4                   ; output to LEDs
+    DEC R2                  ; restore stack pointer to original value
+    GLO R8                  ; load the low byte of the current bit pattern pointer
+    SMI LOW KnightRider+44  ; is it at the end of the animation sequence?
+    BN3 Bi96FoundStartBit
+    BNZ Bi96WaitStartBit    ; if not, go burn CPU cycles and wait for the start bit
+    
+    LDI LOW Rand_VarX       ; we have to reset the pointer, so begin by instead
+    PLO R8
+    LDI HIGH Rand_VarX      ; loading a pointer to the psuedo-random generator's X value
+    BN3 Bi96FoundStartBit
+    PHI R8
+    LDN R8
+    ADI $01                 ; and incrementing this value in memory, to make the generator's
+    STR R8                  ; values non-deterministic
+    BN3 Bi96FoundStartBit
+    
+    LDI LOW KnightRider     ; now re-load the bit pattern pointer
+    PLO R8
+    LDI HIGH KnightRider
+    PHI R8
+    BN3 Bi96FoundStartBit
+
+Bi96WaitStartBit
+    LDI $00         ; animation inner loop counter
+
+Bi96StartBitLoop
+    NOP
+    NOP
+    BN3 Bi96FoundStartBit
+    SMI $01
+    NOP
+    NOP
+    BN3 Bi96FoundStartBit
+    BNZ Bi96StartBitLoop
+    BR  Bi96DrawLights
+
+Bi96FoundStartBit
+    LDI  $01        ; Set up D and DF, which takes about a quarter of a bit duration
+    SHR
+    BR   Bi96SkipDelay
+    
+Bi96StartDelay
+    LDI $02
+Bi96DelayLoop
+    SMI $01
+    BNZ Bi96DelayLoop
+    ; When done with delay, D=0 and DF=1
+    
+Bi96SkipDelay       ; read current bit
+    BN3 Bi96IN4
+    SKP             ; if BIT=0 (EF3 PIN HIGH), leave DF=1
+Bi96IN4
+    SHR             ; if BIT=1 (EF3 PIN LOW), set DF=0
+    GHI RF          ; load incoming byte
+    SHRC            ; shift new bit into MSB, and oldest bit into DF
+    PHI RF
+    LBDF Bi96StartDelay
+    
+    BR  Bi96IN_Return
+
+;__________________________________________________________________________________________________
+; Serial Output: 9600 baud, normal RS232 logic
 ; IN:       P=7, D = character to transmit, R2 is stack pointer
 ; OUT:      P=3
 ; TRASHED:  RF
@@ -119,7 +188,7 @@ B96OUT
     LDI 08H         ; RF.0 is data bit counter
     PLO RF
 
-STBIT               ; Send Start Bit (Space)
+STBIT96             ; Send Start Bit (Space)
     SEQ             ;  2
     NOP             ;  5
     NOP             ;  8
@@ -128,12 +197,12 @@ STBIT               ; Send Start Bit (Space)
     PHI RF          ; 14
     PHI RF          ; 16
     NOP             ; 19 
-    BDF STBIT1      ; 21 First bit = 1?
-    BR  QHI         ; 23 bit = 0, output Space
-STBIT1
-    BR  QLO         ; 23 bit = 1, output Mark
+    BDF STBIT96_1   ; 21 First bit = 1?
+    BR  QHI96       ; 23 bit = 0, output Space
+STBIT96_1
+    BR  QLO96       ; 23 bit = 1, output Mark
 
-QHI1
+QHI96_1
     DEC RF
     GLO RF
     BZ  DONE96      ;AT 8.5 INSTRUCTIONS EITHER DONE OR REQ
@@ -142,14 +211,14 @@ QHI1
     NOP
     NOP
 
-QHI
+QHI96
     SEQ             ; Q ON
     GHI RF
     SHRC            ; PUT NEXT BIT IN DF
     PHI RF
-    LBNF    QHI1    ; 5.5 TURN Q OFF AFTER 6 MORE INSTRUCTION TIMES
+    LBNF    QHI96_1 ; 5.5 TURN Q OFF AFTER 6 MORE INSTRUCTION TIMES
 
-QLO1
+QLO96_1
     DEC RF
     GLO RF
     BZ  DONE96      ; AT 8.5 INSTRUCTIONS EITHER DONE OR SEQ
@@ -158,12 +227,12 @@ QLO1
     NOP
     NOP
 
-QLO
+QLO96
     REQ             ;Q OFF
     GHI RF
     SHRC            ;PUT NEXT BIT IN DF
     PHI RF
-    LBDF QLO1       ;5.5 TURN Q ON AFTER 6 MORE INSTRUCTION TIMES
+    LBDF QLO96_1    ;5.5 TURN Q ON AFTER 6 MORE INSTRUCTION TIMES
 
     DEC RF
     GLO RF
@@ -171,7 +240,7 @@ QLO
 
 ;DELAY
     NOP
-    LBR QHI
+    LBR QHI96
 
 DONE96              ;FINISH LAST BIT TIMING
     NOP
@@ -181,6 +250,219 @@ DNE961
     REQ             ; Send stop bit: Q=0
 
     BR B96OUT_Return
+
+;__________________________________________________________________________________________________
+; Serial I/O hooks
+
+; Customized serial input routine
+; IN:       P=7
+; OUT:      P=3, RF.1 = received character
+; TRASHED:  R8
+SerialInput
+    LBR  0000
+
+; Customized serial output routine
+; IN:       P=7, D = character to transmit, R2 is stack pointer
+; OUT:      P=3
+; TRASHED:  RF
+SerialOutput
+    LBR  0000
+
+;__________________________________________________________________________________________________
+; Serial Input: 4800 or lower baud, normal RS232 logic
+; IN:       P=7
+; OUT:      P=3, RF.1 = received character
+; TRASHED:  R8
+
+B48IN_Return
+    SEP R3
+B48IN
+    GHI RD                          ; GET RD.1
+    STR R2                          ; PUSH RD.1 ON THE STACK
+    DEC R2
+    GLO RD                          ; GET RD.0
+    STR R2
+    DEC R2                          ; PUSH RD.0 ON THE STACK
+    LDI 08H                         ; LOAD D WITH TOTAL BIT COUNT
+    PLO RD                          ; LOAD RD.0 WITH BIT COUNT
+B48IBaud
+    LDI 00H
+    PHI RD                          ; LOAD RD.1 WITH Baud rate counter
+
+    ; Load the starting point for the LED animation
+    LDI HIGH KnightRider
+    PHI R8
+    LDI LOW KnightRider
+    PLO R8
+
+B48StopBitLoop                      ; Wait for the stop bit
+    B3  B48StopBitLoop
+
+B48DrawLights
+    LDA R8                          ; load next bit pattern in LED animation
+    STR R2                          ; put it on the stack
+    OUT 4                           ; output to LEDs
+    DEC R2                          ; restore stack pointer to original value
+B48CheckStart1
+    B3  B48FoundStartBit
+    GLO R8                          ; load the low byte of the current bit pattern pointer
+    SMI LOW KnightRider+44          ; is it at the end of the animation sequence?
+    BNZ B48WaitStartBit             ; if not, go burn CPU cycles and wait for the start bit
+
+    LDI LOW Rand_VarX               ; we have to reset the pointer, so begin by instead
+    PLO R8
+    LDI HIGH Rand_VarX              ; loading a pointer to the psuedo-random generator's X value
+    PHI R8
+    LDN R8
+    ADI $01                         ; and incrementing this value in memory, to make the generator's
+    STR R8                          ; values non-deterministic
+B48CheckStart2
+    B3 B48FoundStartBit
+
+    LDI LOW KnightRider             ; now re-load the bit pattern pointer
+    PLO R8
+    LDI HIGH KnightRider
+    PHI R8
+
+B48WaitStartBit
+    LDI $00         ; animation inner loop counter
+
+B48StartBitLoop
+    SMI $01
+    NOP
+    NOP
+B48CheckStart3
+    B3  B48FoundStartBit
+    NOP
+    NOP
+    BNZ B48StartBitLoop
+    BR  B48DrawLights
+
+B48FoundStartBit
+    GHI RD
+    SHR
+    SHR
+    SMI 01H
+B48ILoop2                           ; WAIT .25 BIT TIME
+    SMI 01H
+    BNZ B48ILoop2
+
+    GHI RD
+B48ILoop3
+    SMI 01H
+    BNZ B48ILoop3                   ; WAIT 1 BIT TIME
+
+B48ILoop4
+    GHI RF                          ; GET INCOMING FORMING CHARACRTER SO FAR
+    B3  B48ILoop4Next1              ; CHECK INCOMING BIT VALUE
+    ORI 80H                         ; IF INCOMING BIT WAS A MARK THEN SET BIT 8 OF INCOMING CHARACTER VALUE
+    BR  B48ILoop4Next2
+B48ILoop4Next1
+    ANI 7FH                         ; CLEAR INCOMING BIT
+    SEX R2                          ; WASTE ONE MACHINE CYCLE
+B48ILoop4Next2
+    PHI RF                          ; SAVE INCOMING FORMING CHARACTER
+    DEC RD                          ; DECREMENT THE BIT COUNT VALUE
+    GLO RD                          ; GET CURRENT BIT COUNT VALUE
+    BZ  B48ILoop4Done               ; DONE IF BIT COUNT IS ZERO
+    GHI RF                          ; GET INCOMING FORMING CHARACTER
+    SHR                             ; SHIFT INCOMING FORMING CHARACTER ONE BIT RIGHT
+    PHI RF                          ; SAVE IT, INCOMING FORMING CHARACTER IS READY FOR THE NEXT BIT
+
+    ; WAIT UNTIL THIS BIT TIME IS DONE
+    GHI RD
+    NOP                             ; WASTE THREE MACHINE CYCLES
+    SMI 07H                         ; CORRECTION FOR BYTES USED
+B48ILoop4_1
+    SMI 01H
+    BNZ B48ILoop4_1
+    BR  B48ILoop4
+
+B48ILoop4Done
+    INC R2                          ; INCREMENT STACK POINTER
+    LDN R2                          ; LOAD D FROM STACK
+    PLO RD                          ; STORE IN RD.0
+    INC R2                          ; INCREMENT STACK POINTER
+    LDN R2                          ; LOAD D FROM STACK
+    PHI RD                          ; STORE IN RD.1 , STACK AND RD RESTORED
+
+    BR  B48IN_Return                ; RETURN
+
+;__________________________________________________________________________________________________
+; Serial Output: 4800 or lower baud, normal RS232 logic
+; IN:       P=7, D = character to transmit, R2 is stack pointer
+; OUT:      P=3
+; TRASHED:  RF
+
+B48OUT_Return
+    SEP R3
+B48OUT
+    PHI RF                          ; save output character in RF.1
+    STR R2
+    SEX R2
+    OUT 4                           ; set LEDs to output character
+    DEC R2
+
+    GHI RD                          ; GET RD.1
+    STXD                            ; PUSH RD.1 ON THE STACK
+B48OBaud
+    LDI 00H
+    PHI RD                          ; STORE BAUD COUNTER IN RD.1
+
+    LDI 80H                         ; LOAD D WITH 80H
+    PLO RF                          ; SAVE BIT COUNTER IN RF.0
+
+    GHI RD                          ; WAIT 1 BIT TIME MINUS 8 MACHINE CYCLES
+    SMI $02
+B48OStartBit
+    SEQ                             ; SET Q, OUTPUT START BIT , RS-232 MARK
+
+B48OLoop1
+    SMI 01H
+    BNZ B48OLoop1
+
+    GHI RF                          ; GET CHARACTER TO OUTPUT
+    SHR                             ; SHIFT CHARACTER ONE BIT RIGHT , DF EQUAL BIT TO OUTPUT
+    BDF B48ODataSpace               ; SKIP IF BIT TO SEND IS A RS-232 SPACE
+B48ODataMark
+    SEQ                             ; SET Q, BIT TO SEND IS A RS-232 MARK
+    BR  B48OLoop1Next1              ; SKIP
+B48ODataSpace
+    REQ                             ; RESET Q, BIT TO SEND IS A RS-232 SPACE
+    SEX R2                          ; WASTE TWO MACHINE CYCLES
+B48OLoop1Next1
+    PHI RF                          ; SAVE CHARACTER
+    GLO RF                          ; LOAD D WITH RF.0, GET BIT COUNTER
+    SHR                             ; SHIFT BIT COUNTER VALUE ONE BIT RIGHT
+    PLO RF                          ; SAVE NEW BIT COUNTER VALUE
+    BZ  B48OLoop1Done               ; DONE
+
+    GHI RD                          ; WAIT 1 BIT TIME
+    SMI 07H                         ; CORRECTION FOR BYTES USED
+    SEX R2                          ; WASTE TWO MACHINE CYCLES
+    NOP                             ; WASTE THREE MACHINE CYCLES
+    BR  B48OLoop1                   ; CONTINUE UNTIL DONE
+
+B48OLoop1Done
+    GHI RD                          ; FINISH THE DELAY OF X MACHINE CYCLES
+    SMI 04H
+B48OLoop2
+    SMI 01H
+    BNZ B48OLoop2
+B48OStopBit
+    REQ                             ; RESET Q , RESET THE RS-232 OUTPUT TO A RS-232 MARK
+                                    ; START SENDING A STOP BIT
+
+    GHI RD                          ; WAIT 1 BIT TIME
+B48OLoop3
+    SMI 01H
+    BPZ B48OLoop3
+
+    INC R2                          ; INCREMENT STACK POINTER
+    LDN R2                          ; LOAD D FROM STACK
+    PHI RD                          ; STORE IN RD.1, STACK AND RD RESTORED
+
+    BR  B48OUT_Return
 
 ;__________________________________________________________________________________________________
 ; String print routine
@@ -347,31 +629,7 @@ GRLoop1
     SEP  R5
 
 ;__________________________________________________________________________________________________
-; Main program starting point
-
-GameStart
-    ; First, check that the serial port setup is supported
-    LDI HIGH BAUD
-    PHI R7
-    LDI LOW BAUD
-    PLO R7
-    LDA R7
-    PHI RE
-    LDN R7
-    PLO RE
-    SMI $02
-    BNZ SerialNotSupported
-    GHI RE
-    SMI $81
-    BZ  SerialOK
-
-SerialNotSupported
-    LDI HIGH SerialError
-    PHI R7
-    LDI LOW SerialError
-    PLO R7
-    SEP R4
-    DW  MON_OUTSTR
+; Quit back to the monitor
 
 Exit
     LDI $8B
@@ -381,8 +639,22 @@ Exit
     SEX R0
     SEP R0                          ; jump back to the monitor program
 
-SerialOK
-    ; set up our serial i/o pointers to use 9600 baud non-inverted
+;__________________________________________________________________________________________________
+; Main program starting point
+
+GameStart
+    ; The first thing we need to do is to configure our Serial I/O routines to work with the current settings
+    LDI HIGH BAUD
+    PHI R7
+    LDI LOW BAUD
+    PLO R7
+    LDA R7
+    PHI RE
+    LDN R7
+    PLO RE
+    SMI $02
+    BNZ Is4800orLess
+    ; set up our serial i/o pointers to use 9600 baud normal logic
     LDI  HIGH SerialInput+1
     PHI  R8
     LDI  LOW SerialInput+1
@@ -399,7 +671,139 @@ SerialOK
     INC  R8
     LDI  LOW B96OUT
     STR  R8
-    
+    ; if RS232 logic level is inverted, set up serial input pointer to use 9600 baud inveted logic 
+    GHI  RE
+    ANI  $01
+    BNZ  BaudHandled
+    DEC  R8
+    DEC  R8
+    DEC  R8
+    LDI  LOW Bi96IN
+    STR  R8
+    DEC  R8
+    LDI  HIGH Bi96IN
+    STR  R8
+    BR   BaudHandled
+Is4800orLess
+    ; set up our serial i/o pointers to use 4800 baud normal logic
+    LDI  HIGH SerialInput+1
+    PHI  R8
+    LDI  LOW SerialInput+1
+    PLO  R8
+    LDI  HIGH B48IN
+    STR  R8
+    INC  R8
+    LDI  LOW B48IN
+    STR  R8
+    INC  R8
+    INC  R8
+    LDI  HIGH B48OUT
+    STR  R8
+    INC  R8
+    LDI  LOW B48OUT
+    STR  R8
+    ; use SMC (self-modifying code) to set the timers in 4800 baud output routine
+    LDI  HIGH B48OBaud+1
+    PHI  R8
+    LDI  LOW B48OBaud+1
+    PLO  R8
+    GLO  RE
+    STR  R8
+    ; use SMC to set the timers in 4800 baud input routine
+    LDI  HIGH B48IBaud+1
+    PHI  R8
+    LDI  LOW B48IBaud+1
+    PLO  R8
+    GLO  RE
+    STR  R8
+BaudHandled
+    GHI  RE
+    ANI  $01
+    LBNZ LogicHandled
+    ; use SMC to modify the 9600 baud output routine to use inverted logic
+    LDI  HIGH STBIT96
+    PHI  R8
+    LDI  LOW STBIT96
+    PLO  R8
+    LDI  $7A                        ; REQ
+    STR  R8
+    LDI  HIGH QHI96
+    PHI  R8
+    LDI  LOW QHI96
+    PLO  R8
+    LDI  $7A                        ; REQ
+    STR  R8
+    LDI  HIGH QLO96
+    PHI  R8
+    LDI  LOW QLO96
+    PLO  R8
+    LDI  $7B                        ; SEQ
+    STR  R8
+    LDI  HIGH DNE961
+    PHI  R8
+    LDI  LOW DNE961
+    PLO  R8
+    LDI  $7B                        ; SEQ
+    STR  R8
+    ; use SMC to modify the 4800 baud output routine to use inverted logic
+    LDI  HIGH B48OStartBit
+    PHI  R8
+    LDI  LOW B48OStartBit
+    PLO  R8
+    LDI  $7A                        ; REQ
+    STR  R8
+    LDI  HIGH B48ODataMark
+    PHI  R8
+    LDI  LOW B48ODataMark
+    PLO  R8
+    LDI  $7A                        ; REQ
+    STR  R8
+    LDI  HIGH B48ODataSpace
+    PHI  R8
+    LDI  LOW B48ODataSpace
+    PLO  R8
+    LDI  $7B                        ; SEQ
+    STR  R8
+    LDI  HIGH B48OStopBit
+    PHI  R8
+    LDI  LOW B48OStopBit
+    PLO  R8
+    LDI  $7B                        ; SEQ
+    STR  R8
+    ; use SMC to modify the 4800 baud input routine to use inverted logic
+    LDI  HIGH B48StopBitLoop
+    PHI  R8
+    LDI  LOW B48StopBitLoop
+    PLO  R8
+    LDI  $3E                        ; BN3
+    STR  R8
+    LDI  HIGH B48CheckStart1
+    PHI  R8
+    LDI  LOW B48CheckStart1
+    PLO  R8
+    LDI  $3E                        ; BN3
+    STR  R8
+    LDI  HIGH B48CheckStart2
+    PHI  R8
+    LDI  LOW B48CheckStart2
+    PLO  R8
+    LDI  $3E                        ; BN3
+    STR  R8
+    LDI  HIGH B48CheckStart3
+    PHI  R8
+    LDI  LOW B48CheckStart3
+    PLO  R8
+    LDI  $3E                        ; BN3
+    STR  R8
+    LDI  HIGH B48ILoop4+1
+    PHI  R8
+    LDI  LOW B48ILoop4+1
+    PLO  R8
+    LDI  $3E                        ; BN3
+    STR  R8
+LogicHandled
+
+Do_Main
     ; beginning of main() function
     ; clear screen
     SEP  R4
@@ -463,10 +867,10 @@ MainGetInput
     LDI  HIGH Endflag
     PHI  R9
     LDN  R9
-    BNZ  Exit                       ; quit if endflag != 0
+    LBNZ Exit                       ; quit if endflag != 0
     DEC  R9
     LDN  R9
-    BNZ  MainLoad                   ; loop back and re-load if loadflag != 0
+    LBNZ MainLoad                   ; loop back and re-load if loadflag != 0
     ; deal with lamp oil
     LDI  LOW (Array_IA+9)
     PLO  RA
@@ -546,6 +950,9 @@ MainLoopTail
 ; IN:       N/A
 ; OUT:      D = return value (1 if failed, 0 if command OK)
 ; TRASHED:  R7, R8, R9, RA, RB, RC, RD, RF
+
+; fixme remove
+  BLK $3A
 
 Do_GetInput
     ; print input prompt
@@ -645,6 +1052,10 @@ GIgetsDone
     LDN  R9
     BZ   Do_GetInput
     ; otherwise, start parsing. begin by skipping any leading spaces
+    LBR  GIParseLoop1
+    NOP
+    NOP
+    NOP
 GIParseLoop1
     LDA  R9
     BZ   GIParseLoop1Done
@@ -730,7 +1141,7 @@ GIParseLoop5_1
     LBNZ GIParseLoop5_1Next1
     INC  R8                         ; then skip it
     LBR  GIParseLoop5_1Next1        ; fixme remove
-    ORG $300                        ; fixme remove
+    ORG $500                        ; fixme remove
 GIParseLoop5_1Next1
     ; comparestring()
     SEX  R8
@@ -2490,7 +2901,6 @@ LGLoop2                             ; store the IA array (item locations)
 ;__________________________________________________________________________________________________
 ; Read-only Data
 
-SerialError     BYTE        "Unsupported serial settings. Must be 9600 baud.\r\n"
 ScoreTable      DB          0, 7, 15, 22, 30, 38, 45, 53, 60, 68, 76, 83, 91, 99
 KnightRider     DB          $00, $00, $80, $80, $C0, $C0, $E0, $60, $70, $30, $38, $18, $1C, $0C, $0E, $06, $07, $03, $03, $01, $01, $00, $00, $01, $01, $03, $03, $07, $06, $0E, $0C, $1C, $18, $38, $30, $70, $60, $E0, $C0, $C0, $80, $80, $00, $00
 ClsMsg          DB          $1B, $5B, $32, $4A, $1B, $48, $00
