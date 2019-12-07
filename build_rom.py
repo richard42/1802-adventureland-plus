@@ -43,6 +43,7 @@ if __name__ == "__main__":
         sys.exit(1)
     # Step 4: read the compressed data and write out an A18 assembly file containing the compressed data
     ulzData = open("adv_core_ulz.bin", "r").read()
+    ulzData = ulzData[8:]                           # strip out the 4-byte magic word and 4-byte chunk size
     sizeComp = len(ulzData)
     fOut = open("adv_core_ulz.asm", "w")
     fOut.write(";__________________________________________________________________________________________________\n")

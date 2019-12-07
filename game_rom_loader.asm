@@ -68,14 +68,18 @@ LoaderStart
     PHI  R7
     LDI  LOW ULZDATA
     PLO  R7
-    LDI  HIGH ULZSIZE               ; defined in adv_core_ulz.asm
+    LDI  HIGH ULZDATA+ULZSIZE       ; defined in adv_core_ulz.asm
     PHI  R8
-    LDI  LOW ULZSIZE
+    LDI  LOW ULZDATA+ULZSIZE
     PLO  R8
     LDI  $00                        ; decompressed data should be stored at $0013
     PHI  R9
     LDI  $13
     PLO  R9
+    LDI  $43                        ; can't write past $4300
+    PHI  RA
+    LDI  $00
+    PLO  RA
     SEP  R4
     DW   Do_ULZ_Decompress          ; defined in decompress.asm
 

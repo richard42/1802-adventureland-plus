@@ -2,8 +2,9 @@
 ; Customized ULZ decompression routine
 
 ; IN:       R7 = pointer to ULZ-compressed data
-;           R8 = size of compressed data
+;           R8 = R7 + size of compressed data
 ;           R9 = pointer to output buffer where decompressed data will be stored
+;           RA = R9 + size of output buffer
 ; OUT:      D = return value (1 if failed, 0 if command OK)
 ; TRASHED:  R7, R8, R9, RA, RB, RC, RD, RF
 
