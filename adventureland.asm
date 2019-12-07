@@ -629,17 +629,6 @@ GRLoop1
     SEP  R5
 
 ;__________________________________________________________________________________________________
-; Quit back to the monitor
-
-Exit
-    LDI $8B
-    PHI R0
-    LDI $5E
-    PLO R0
-    SEX R0
-    SEP R0                          ; jump back to the monitor program
-
-;__________________________________________________________________________________________________
 ; Main program starting point
 
 GameStart
@@ -802,6 +791,15 @@ BaudHandled
     LDI  $3E                        ; BN3
     STR  R8
 LogicHandled
+    BR   Do_Main
+
+Exit
+    LDI $8B
+    PHI R0
+    LDI $5E
+    PLO R0
+    SEX R0
+    SEP R0                          ; jump back to the monitor program
 
 Do_Main
     ; beginning of main() function
@@ -867,10 +865,10 @@ MainGetInput
     LDI  HIGH Endflag
     PHI  R9
     LDN  R9
-    LBNZ Exit                       ; quit if endflag != 0
+    BNZ  Exit                       ; quit if endflag != 0
     DEC  R9
     LDN  R9
-    LBNZ MainLoad                   ; loop back and re-load if loadflag != 0
+    BNZ  MainLoad                   ; loop back and re-load if loadflag != 0
     ; deal with lamp oil
     LDI  LOW (Array_IA+9)
     PLO  RA
@@ -938,11 +936,11 @@ MainLoopTail
     LDI  HIGH Endflag
     PHI  R9
     LDN  R9
-    LBNZ  Exit                      ; if endflag != 0, quit
+    BNZ  Exit                      ; if endflag != 0, quit
     DEC  R9
     LDN  R9
-    LBNZ  MainLoad                  ; if loadflag != 0, loop back and re-load
-    LBR   MainGetInput              ; otherwise, get next command
+    BNZ  MainLoad                  ; if loadflag != 0, loop back and re-load
+    BR   MainGetInput              ; otherwise, get next command
 
 ;__________________________________________________________________________________________________
 ; Adventure get_input() function
@@ -950,9 +948,6 @@ MainLoopTail
 ; IN:       N/A
 ; OUT:      D = return value (1 if failed, 0 if command OK)
 ; TRASHED:  R7, R8, R9, RA, RB, RC, RD, RF
-
-; fixme remove
-  BLK $3A
 
 Do_GetInput
     ; print input prompt
@@ -1021,16 +1016,18 @@ GILoop1N2
     BZ   GICharOk
     GHI  RF
     SMI  $41
-    BL   GILoop1
+    BL   GIJumpLoop1
     GHI  RF
     SMI  $5B
     BL   GICharOk
     GHI  RF
     SMI  $61
-    BL   GILoop1
+    BL   GIJumpLoop1
     GHI  RF
     SMI  $7B
-    BGE  GILoop1
+    BL   GICharOk
+GIJumpLoop1
+    LBR  GILoop1
 GICharOk
     GHI  RF
     STR  R9                         ; add input character to our string
@@ -1039,7 +1036,7 @@ GICharOk
     SEP  R7                         ; echo character to serial output
     GLO  RA                         ; how long is the input line?
     SMI  79
-    BL   GILoop1                    ; if < 79 characters, go get another
+    BL   GIJumpLoop1                ; if < 79 characters, go get another
 GIgetsDone
     LDI  $00                        ; null-terminate input string
     STR  R9
@@ -1050,12 +1047,8 @@ GIgetsDone
     ; now we are back in the get_input() function.
     ; If the line is empty, go prompt for another command
     LDN  R9
-    BZ   Do_GetInput
+    LBZ  Do_GetInput
     ; otherwise, start parsing. begin by skipping any leading spaces
-    LBR  GIParseLoop1
-    NOP
-    NOP
-    NOP
 GIParseLoop1
     LDA  R9
     BZ   GIParseLoop1Done
@@ -1128,7 +1121,7 @@ GIParseLoop5
     LDI  $00
     STR  RC                         ; NV[i] = 0
     LDN  R9
-    LBZ  GIParseLoop5Tail
+    BZ   GIParseLoop5Tail
     LDI  $00
     PLO  RF                         ; RF.0 = j, for (j = 0; j < NL; j++)
 GIParseLoop5_1
@@ -1138,10 +1131,8 @@ GIParseLoop5_1
     PHI  R8                         ; R8 = s = NVS[i][j]
     LDN  R8
     SMI  '*'                        ; if first character of word is '*'
-    LBNZ GIParseLoop5_1Next1
+    BNZ  GIParseLoop5_1Next1
     INC  R8                         ; then skip it
-    LBR  GIParseLoop5_1Next1        ; fixme remove
-    ORG $500                        ; fixme remove
 GIParseLoop5_1Next1
     ; comparestring()
     SEX  R8
@@ -1204,7 +1195,7 @@ GIParseLoop5_1Next3
     INC  RF
     GLO  RF
     SMI  NL                         ; NL = 60
-    LBNF  GIParseLoop5_1            ; go check the next word in the table
+    BNF  GIParseLoop5_1            ; go check the next word in the table
 GIParseLoop5Tail
     INC  RC                         ; point to next element in NV array
     GLO  RB                         ; load pointer to second word in R9
@@ -1219,12 +1210,12 @@ GIParseLoop5Tail
     ADI  $1                         ; i++
     PHI  RF
     SMI  $2
-    LBNF GIParseLoop5               ; branch if less
+    BNF  GIParseLoop5               ; branch if less
     ; validate first word (verb)
     DEC  RC
     DEC  RC
     LDA  RC
-    BNZ  GIParseVerbOk
+    LBNZ GIParseVerbOk
     LDI  HIGH InputError1Msg
     PHI  R8
     LDI  LOW InputError1Msg
@@ -1274,6 +1265,103 @@ GIParseVerbOk
 GIParseAllGood
     LDI  $00
     SEP  R5                         ; return 0
+
+;__________________________________________________________________________________________________
+; LoadGame function to restore game state from upper memory, if the user wishes
+
+; IN:       N/A
+; OUT:      N/A
+; TRASHED:  R7, R8, RC, RD, RF
+
+Do_LoadGame
+    LDI  LOW LoadQestion
+    PLO  R8
+    LDI  HIGH LoadQestion
+    PHI  R8
+    SEP  R4
+    DW   OutString                  ; print "Load saved game (Y or N)?"
+    SEP  R4
+    DW   Do_YesNo                   ; D = 0 if No, 1 if Yes
+    BNZ  LGNext1
+    SEP  R5                         ; return
+LGNext1
+    LDI  LOW STATE_LOC
+    PLO  R7
+    ADI  STATE_SIZE
+    PLO  R8
+    LDI  HIGH STATE_LOC
+    PHI  R7                         ; R7 points to state data buffer in upper RAM
+    PHI  R8                         ; R8 points to checksum bytes after data buffer
+    LDA  R8
+    PLO  RD                         ; RD.0 = sum value
+    LDN  R8
+    PHI  RD                         ; RD.1 = xor value
+    LDI  STATE_SIZE
+    PLO  RC                         ; RC is checksum counter
+    SEX  R7
+LGLoop1                             ; inverse calculate checksum values
+    GLO  RD
+    SM
+    PLO  RD
+    GHI  RD
+    XOR
+    PHI  RD
+    IRX
+    DEC  RC
+    GLO  RC
+    BNZ  LGLoop1
+    GLO  RD                         ; validate checksum
+    SMI  $4B
+    BNZ  LGLoadFail
+    GHI  RD
+    XRI  $4B
+    BZ   LGNext2
+LGLoadFail
+    LDI  LOW LoadFailedMsg
+    PLO  R8
+    LDI  HIGH LoadFailedMsg
+    PHI  R8
+    SEP  R4
+    DW   OutString                  ; print "Sorry, but no saved game data was found."
+    LDI  HIGH SerialInput
+    PHI  R7
+    LDI  LOW SerialInput
+    PLO  R7
+    SEP  R7                         ; wait for key press
+    SEP  R5                         ; return
+LGNext2
+    GLO  R7
+    SMI  STATE_SIZE
+    PLO  R7                         ; R7 is reset to start of state data buffer
+    LDI  LOW Array_IA
+    PLO  R8
+    LDI  HIGH Array_IA
+    PHI  R8                         ; R8 points to start of IA array
+    LDI  IL
+    PLO  RC
+LGLoop2                             ; store the IA array (item locations)
+    LDA  R7
+    STR  R8
+    INC  R8
+    DEC  RC
+    GLO  RC
+    BNZ  LGLoop2
+    INC  R8
+    INC  R8
+    INC  R8
+    INC  R8                         ; R8 points to DarkFlag
+    LDA  R7
+    STR  R8                         ; store DarkFlag
+    INC  R8
+    LDA  R7
+    STR  R8                         ; store Room
+    INC  R8
+    LDA  R7
+    STR  R8                         ; store LampOil
+    INC  R8
+    LDA  R7
+    STR  R8                         ; store StateFlags
+    SEP  R5                         ; return
 
 ;__________________________________________________________________________________________________
 ; Adventure look() function
@@ -1351,7 +1439,7 @@ LKLoop1
     LBNZ LKLoop1Tail
     ; we have found an item in this room.  start by printing the item list header if necessary
     GHI  RB
-    LBNZ LKLoop1Next1
+    BNZ  LKLoop1Next1
     LDI  $01
     PHI  RB
     LDI  HIGH Look3Msg
@@ -1764,7 +1852,7 @@ CDLoop1
 CDLoop1Tail
     GHI  RF
     SMI  $01
-    BNZ  CDLoop1
+    LBNZ CDLoop1
     LDI  MX
     STR  R2
     GLO  RF
@@ -1971,21 +2059,21 @@ CLLoopCheck1
     BNZ  CLLoopCheck2
     LDN  RB
     SMI  $FF
-    LBZ  CLLoop1Tail                ; if (k == 1) allowed = (IA[ll] == -1);
-    LBR  CLReturnFalse
+    LBZ   CLLoop1Tail               ; if (k == 1) allowed = (IA[ll] == -1);
+    LBR   CLReturnFalse
 CLLoopCheck2
     SMI  $01
-    LBNZ CLLoopCheck3
+    LBNZ  CLLoopCheck3
     LDN  RB
     SM
-    LBZ  CLLoop1Tail                ; if (k == 2) allowed = (IA[ll] == room);
-    LBR  CLReturnFalse
+    BZ   CLLoop1Tail                ; if (k == 2) allowed = (IA[ll] == room);
+    BR   CLReturnFalse
 CLLoopCheck3
     SMI  $01
-    LBNZ CLLoopCheck4
+    BNZ  CLLoopCheck4
     LDN  RB
     SM
-    LBZ  CLLoop1Tail
+    BZ   CLLoop1Tail
     LDN  RB
     SMI  $FF
     BZ   CLLoop1Tail                ; if (k == 3) allowed = (IA[ll] == room || IA[ll] == -1);
@@ -2170,7 +2258,7 @@ DACheck52Next
     BNZ  DACheck52Loop
     GLO  RC
     SMI  MX
-    LBNF DACheck52TakeItem          ; BL
+    BL   DACheck52TakeItem
     LDI  LOW CarryDrop2Msg
     PLO  R8
     LDI  HIGH CarryDrop2Msg
@@ -2361,7 +2449,7 @@ DACheck63
     PHI  RC
     LDI  $01
     STR  RC                         ; set Loadflag or Endflag to 1
-    LBR  DAReturnFalse2
+    BR   DAReturnFalse2
 DACheck64
     SMI  $01
     BNZ  DACheck65
@@ -2552,7 +2640,7 @@ DAAction66NotEmpty
     BR   DAReturnFalse3
 DACheck67
     SMI  $01
-    LBNZ DACheck68
+    BNZ  DACheck68
     LDI  LOW (StateFlags+1)
     PLO  R7
     LDI  HIGH (StateFlags+1)
@@ -2799,103 +2887,6 @@ SGLoop2
     DEC  RC
     GLO  RC
     BNZ  SGLoop2
-    SEP  R5                         ; return
-
-;__________________________________________________________________________________________________
-; LoadGame function to restore game state from upper memory, if the user wishes
-
-; IN:       N/A
-; OUT:      N/A
-; TRASHED:  R7, R8, RC, RD, RF
-
-Do_LoadGame
-    LDI  LOW LoadQestion
-    PLO  R8
-    LDI  HIGH LoadQestion
-    PHI  R8
-    SEP  R4
-    DW   OutString                  ; print "Load saved game (Y or N)?"
-    SEP  R4
-    DW   Do_YesNo                   ; D = 0 if No, 1 if Yes
-    BNZ  LGNext1
-    SEP  R5                         ; return
-LGNext1
-    LDI  LOW STATE_LOC
-    PLO  R7
-    ADI  STATE_SIZE
-    PLO  R8
-    LDI  HIGH STATE_LOC
-    PHI  R7                         ; R7 points to state data buffer in upper RAM
-    PHI  R8                         ; R8 points to checksum bytes after data buffer
-    LDA  R8
-    PLO  RD                         ; RD.0 = sum value
-    LDN  R8
-    PHI  RD                         ; RD.1 = xor value
-    LDI  STATE_SIZE
-    PLO  RC                         ; RC is checksum counter
-    SEX  R7
-LGLoop1                             ; inverse calculate checksum values
-    GLO  RD
-    SM
-    PLO  RD
-    GHI  RD
-    XOR
-    PHI  RD
-    IRX
-    DEC  RC
-    GLO  RC
-    BNZ  LGLoop1
-    GLO  RD                         ; validate checksum
-    SMI  $4B
-    BNZ  LGLoadFail
-    GHI  RD
-    XRI  $4B
-    BZ   LGNext2
-LGLoadFail
-    LDI  LOW LoadFailedMsg
-    PLO  R8
-    LDI  HIGH LoadFailedMsg
-    PHI  R8
-    SEP  R4
-    DW   OutString                  ; print "Sorry, but no saved game data was found."
-    LDI  HIGH SerialInput
-    PHI  R7
-    LDI  LOW SerialInput
-    PLO  R7
-    SEP  R7                         ; wait for key press
-    SEP  R5                         ; return
-LGNext2
-    GLO  R7
-    SMI  STATE_SIZE
-    PLO  R7                         ; R7 is reset to start of state data buffer
-    LDI  LOW Array_IA
-    PLO  R8
-    LDI  HIGH Array_IA
-    PHI  R8                         ; R8 points to start of IA array
-    LDI  IL
-    PLO  RC
-LGLoop2                             ; store the IA array (item locations)
-    LDA  R7
-    STR  R8
-    INC  R8
-    DEC  RC
-    GLO  RC
-    BNZ  LGLoop2
-    INC  R8
-    INC  R8
-    INC  R8
-    INC  R8                         ; R8 points to DarkFlag
-    LDA  R7
-    STR  R8                         ; store DarkFlag
-    INC  R8
-    LDA  R7
-    STR  R8                         ; store Room
-    INC  R8
-    LDA  R7
-    STR  R8                         ; store LampOil
-    INC  R8
-    LDA  R7
-    STR  R8                         ; store StateFlags
     SEP  R5                         ; return
 
 ;__________________________________________________________________________________________________
