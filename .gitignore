@@ -1,4 +1,6 @@
+*~
 *.hex
+*.bin
 *.prn
-*.sh
+*_ulz.*
 convert_data
