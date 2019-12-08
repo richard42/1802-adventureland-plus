@@ -1,6 +1,8 @@
 *~
 *.hex
-*.bin
 *.prn
 *_ulz.*
 convert_data
+adv_core_ulz.bin
+adventureland.bin
+adv_rom.bin
