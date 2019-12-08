@@ -8,8 +8,7 @@
 ; (On entry, R0 is our program counter)
 
     CPU         1802
-    ;ORG         D000H
-    ORG         4300H
+    ORG         $D000
 
     ; Setup code to initialize the stack and SCRT registers
     ; SETUP R2 (Stack)
