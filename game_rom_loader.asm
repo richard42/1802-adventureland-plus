@@ -87,6 +87,7 @@ LoaderStart
     BZ   DecompressOkay
     
     ; not okay
+    PHI  R1                         ; put error code in R1 so developer can see it in the monitor
     LDI	 HIGH ErrorMsg
     PHI	 R7
     LDI	 LOW ErrorMsg
