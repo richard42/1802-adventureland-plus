@@ -1,8 +1,8 @@
 #!/bin/bash
-rm *.prn
-rm *.hex
-rm adv_core_ulz.bin
-rm adventureland.bin
-rm adv_rom.bin
-rm adv_core_ulz.asm
+rm -f *.prn
+rm -f *.hex
+rm -f adv_core_ulz.bin
+rm -f adventureland.bin
+rm -f adv_rom.bin
+rm -f adv_core_ulz.asm
 
