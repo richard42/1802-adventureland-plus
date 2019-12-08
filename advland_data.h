@@ -23,6 +23,11 @@
 #define TR      3       /* treasure depository location */
 #define MAXLINE 79      /* max number of characters on one line */
 
+/* NOTE: This file is out of date for the 1802 Adventureland project and is for reference only.
+ *       The game data in the "adventureland_data.asm" file has been updated and is newer than
+ *       the data found here.
+ */
+
 /* C0%(151), C1%(151), C2%(151), C3%(151),
    C4%(151), C5%(151), C6%(151), C7%(151) action */
 const unsigned char C[CL][16] = {
