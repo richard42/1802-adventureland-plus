@@ -46,20 +46,20 @@
 
 LoaderStart
     ; set up baud rate register
-    LDI	 HIGH BAUD
-    PHI	 R7
-    LDI	 LOW BAUD
-    PLO	 R7
-    LDA	 R7
-    PHI	 RE
-    LDN	 R7
-    PLO	 RE
+    LDI  HIGH BAUD
+    PHI  R7
+    LDI  LOW BAUD
+    PLO  R7
+    LDA  R7
+    PHI  RE
+    LDN  R7
+    PLO  RE
 
     ; print Decompressing message
-    LDI	 HIGH StartingMsg
-    PHI	 R7
-    LDI	 LOW StartingMsg
-    PLO	 R7
+    LDI  HIGH StartingMsg
+    PHI  R7
+    LDI  LOW StartingMsg
+    PLO  R7
     SEP  R4
     DW   MON_OUTSTR
     
@@ -88,10 +88,10 @@ LoaderStart
     
     ; not okay
     PHI  R1                         ; put error code in R1 so developer can see it in the monitor
-    LDI	 HIGH ErrorMsg
-    PHI	 R7
-    LDI	 LOW ErrorMsg
-    PLO	 R7
+    LDI  HIGH ErrorMsg
+    PHI  R7
+    LDI  LOW ErrorMsg
+    PLO  R7
     SEP  R4
     DW   MON_OUTSTR
 Exit
