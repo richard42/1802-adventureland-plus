@@ -41,41 +41,24 @@ if __name__ == "__main__":
     if numErrors > 0:
         print("ULZ compression of 'adventureland.bin' failed.")
         sys.exit(1)
-    # Step 4: read the compressed data and write out an A18 assembly file containing the compressed data
+    # Step 4: read the compressed data and rewrite the header
     ulzData = open("adv_core_ulz.bin", "r").read()
     ulzData = ulzData[8:]                           # strip out the 4-byte magic word and 4-byte chunk size
     sizeComp = len(ulzData)
-    fOut = open("adv_core_ulz.asm", "w")
-    fOut.write(";__________________________________________________________________________________________________\n")
-    fOut.write("; Compressed adventureland program data\n\n")
-    fOut.write("GAMESTART   EQU %04XH\n" % addrGameStart)
-    fOut.write("ULZSIZE     EQU %04XH\n" % sizeComp)
-    fOut.write("ULZDATA\n")
-    dataIdx = 0
-    while dataIdx < sizeComp:
-        if (dataIdx & 15) == 0:
-            fOut.write("                DB          ")
-        strDataByte = "$%02X" % ord(ulzData[dataIdx])
-        if dataIdx == sizeComp - 1:
-            fOut.write(strDataByte + "\n\n")
-            break
-        if (dataIdx & 15) == 15:
-            fOut.write(strDataByte + "\n")
-        else:
-            fOut.write(strDataByte + ", ")
-        dataIdx += 1
-    fOut.close()
+    ulzData = chr(0xC0) + chr(0xCA) + chr(0x00) + chr(addrGameStart >> 8) + chr(addrGameStart & 255) + chr(sizeComp >> 8) + chr(sizeComp & 255) + ulzData
+    open("adv_core_ulz.bin", "w").write(ulzData)
     # Step 5: assemble game loader
-    cmd = "%s game_rom_loader.asm -l adv_rom.prn -b adv_rom.bin" % a18Path
+    cmd = "%s game_rom_loader.asm -l adv_rom_loader.prn -b adv_rom_loader.bin" % a18Path
     print(cmd)
     numErrors = os.system(cmd)
     if numErrors > 0:
         print("Assembly of 'game_rom_loader.asm' failed.")
         sys.exit(1)
-    # Step 6: read machine code of game loader, and insert into ROM image
-    binData = open("adv_rom.bin", "r").read()
-    gameLength = len(binData)
+    # Step 6: read machine code of game loader, and insert it and the compressed data into ROM image
+    loaderBin = open("adv_rom_loader.bin", "r").read()
+    loaderLength = len(loaderBin)
+    ulzLength = len(ulzData)
     romData = open("mcsmp20r_base.bin", "r").read()
-    romData = romData[:0x5000] + binData + romData[0x5000+gameLength:]
+    romData = romData[:0x4A00] + loaderBin + romData[0x4A00+loaderLength:0x5000] + ulzData + romData[0x5000+ulzLength:]
     open("mcsmp20r_final.bin", "w").write(romData)
 
