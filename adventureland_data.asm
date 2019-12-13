@@ -359,13 +359,13 @@ Table_IAS   DW  IAS00_Msg, IAS01_Msg, IAS02_Msg, IAS03_Msg, IAS04_Msg, IAS05_Msg
             DW  IAS60_Msg
 IAS00_Msg   BYTE    " ", 0
 IAS01_Msg   BYTE    "Dark hole", 0
-IAS02_Msg   BYTE    27,"[1;33m*POT OF RUBIES*",27,"[0m/RUB/", 0
+IAS02_Msg   BYTE    "*",27,"[1;33mPOT OF RUBIES",27,"[0m*/RUB/", 0
 IAS03_Msg   BYTE    "Spider web with writing on it.", 0
 IAS04_Msg   BYTE    "Hollow ",27,"[1mstump",27,"[0m and remains of a felled tree.", 0
 IAS05_Msg   BYTE    "Cypress tree", 0
 IAS06_Msg   BYTE    "Water", 0
 IAS07_Msg   BYTE    "Evil smelling mud/MUD/", 0
-IAS08_Msg   BYTE    27,"[1;33m*GOLDEN FISH*",27,"[0m/FIS/", 0
+IAS08_Msg   BYTE    "*",27,"[1;33mGOLDEN FISH",27,"[0m*/FIS/", 0
 IAS09_Msg   BYTE    "Brass lamp (lit)/LAM/", 0
 IAS10_Msg   BYTE    "Old fashoned brass lamp/LAM/", 0
 IAS11_Msg   BYTE    "Axe (rusty, with a magic word: BUNYON on it)/AXE/", 0
@@ -376,17 +376,17 @@ IAS15_Msg   BYTE    "Sign: LEAVE TREASURE HERE (say 'SCORE')", 0
 IAS16_Msg   BYTE    "Door (locked)", 0
 IAS17_Msg   BYTE    "Door (open, with a ",27,"[1mhallway",27,"[0m beyond)", 0
 IAS18_Msg   BYTE    "Swamp gas", 0
-IAS19_Msg   BYTE    27,"[1;33m*GOLDEN NET*",27,"[0m/NET/", 0
+IAS19_Msg   BYTE    "*",27,"[1;33mGOLDEN NET",27,"[0m*/NET/", 0
 IAS20_Msg   BYTE    "Chigger bites", 0
 IAS21_Msg   BYTE    "Infected chigger bites", 0
 IAS22_Msg   BYTE    "Floating patch of oily slime", 0
-IAS23_Msg   BYTE    27,"[1;33m*ROYAL HONEY*",27,"[0m/HON/", 0
+IAS23_Msg   BYTE    "*",27,"[1;33mROYAL HONEY",27,"[0m*/HON/", 0
 IAS24_Msg   BYTE    "Large african bees", 0
 IAS25_Msg   BYTE    "Thin black bear", 0
 IAS26_Msg   BYTE    "Bottle (with bees buzzing inside)/BOT/", 0
 IAS27_Msg   BYTE    "Large sleeping dragon", 0
 IAS28_Msg   BYTE    "Flint and steel/FLI/", 0
-IAS29_Msg   BYTE    27,"[1;33m*THICK PERSIAN RUG*",27,"[0m/RUG/", 0
+IAS29_Msg   BYTE    "*",27,"[1;33mTHICK PERSIAN RUG",27,"[0m*/RUG/", 0
 IAS30_Msg   BYTE    "Sign: MAGIC WORD IS AWAY. LOOK LA -(rest of sign is missing)", 0
 IAS31_Msg   BYTE    "Bladder (swollen with swamp gas)/BLA/", 0
 IAS32_Msg   BYTE    "Bricked up window", 0
@@ -394,26 +394,26 @@ IAS33_Msg   BYTE    "Sign: IN SOME CASES MUD IS GOOD, IN OTHERS...", 0
 IAS34_Msg   BYTE    "Stream of lava", 0
 IAS35_Msg   BYTE    "Bricked up window with a hole blown out of the center,\r\nleading to a narrow ",27,"[1;37mledge",27,"[0m", 0
 IAS36_Msg   BYTE    "Loose fire bricks", 0
-IAS37_Msg   BYTE    27,"[1;33m*GOLD CROWN*",27,"[0m/CRO/", 0
-IAS38_Msg   BYTE    27,"[1;33m*MAGIC MIRROR*",27,"[0m/MIR/", 0
+IAS37_Msg   BYTE    "*",27,"[1;33mGOLD CROWN",27,"[0m*/CRO/", 0
+IAS38_Msg   BYTE    "*",27,"[1;33mMAGIC MIRROR",27,"[0m*/MIR/", 0
 IAS39_Msg   BYTE    "Thin black bear (asleep)", 0
 IAS40_Msg   BYTE    "Empty wine bladder/BLA/", 0
 IAS41_Msg   BYTE    "Shards of broken glass", 0
 IAS42_Msg   BYTE    "Chiggers/CHI/", 0
 IAS43_Msg   BYTE    "Thin black bear (dead)", 0
-IAS44_Msg   BYTE    27,"[1;33m*DRAGON EGGS*",27,"[0m (very rare)/EGG/", 0
+IAS44_Msg   BYTE    "*",27,"[1;33mDRAGON EGGS",27,"[0m* (very rare)/EGG/", 0
 IAS45_Msg   BYTE    "Makeshift dam, consisting of a pile of bricks, holding back the lava.", 0
-IAS46_Msg   BYTE    27,"[1;33m*JEWELED FRUIT*",27,"[0m/FRU/", 0
-IAS47_Msg   BYTE    27,"[1;33m*SMALL STATUE OF A BLUE OX*",27,"[0m/OX/", 0
-IAS48_Msg   BYTE    27,"[1;33m*DIAMOND RING*",27,"[0m/RIN/", 0
-IAS49_Msg   BYTE    27,"[1;33m*DIAMOND BRACELET*",27,"[0m/BRA/", 0
+IAS46_Msg   BYTE    "*",27,"[1;33mJEWELED FRUIT",27,"[0m*/FRU/", 0
+IAS47_Msg   BYTE    "*",27,"[1;33mSMALL STATUE OF A BLUE OX",27,"[0m*/OX/", 0
+IAS48_Msg   BYTE    "*",27,"[1;33mDIAMOND RING",27,"[0m*/RIN/", 0
+IAS49_Msg   BYTE    "*",27,"[1;33mDIAMOND BRACELET",27,"[0m*/BRA/", 0
 IAS50_Msg   BYTE    "Elaborate carvings on rock which form the message: ALADDIN WAS HERE", 0
 IAS51_Msg   BYTE    "Sign: LIMBO.  FIND RIGHT EXIT AND LIVE AGAIN!", 0
 IAS52_Msg   BYTE    "Smoking hole.  Pieces of dragon and gore.", 0
 IAS53_Msg   BYTE    "Sign: NO SWIMMING ALLOWED", 0
 IAS54_Msg   BYTE    "Arrow (pointing down)", 0
 IAS55_Msg   BYTE    "Dead golden fish/FIS/", 0
-IAS56_Msg   BYTE    27,"[1;33m*FIRESTONE*",27,"[0m (cold now)/FIR/", 0
+IAS56_Msg   BYTE    "*",27,"[1;33mFIRESTONE",27,"[0m* (cold now)/FIR/", 0
 IAS57_Msg   BYTE    "Sign: PAUL'S PLACE", 0
 IAS58_Msg   BYTE    "Trees", 0
 IAS59_Msg   BYTE    " ", 0
