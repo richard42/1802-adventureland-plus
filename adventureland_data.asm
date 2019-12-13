@@ -240,7 +240,7 @@ RSS15_Msg   BYTE    "maze of pits.", 0
 RSS16_Msg   BYTE    "maze of pits.", 0
 RSS17_Msg   BYTE    "maze of pits.", 0
 RSS18_Msg   BYTE    "bottom of a chasm.  Above me there are 2 ledges. One has a bricked up\r\nwindow.", 0
-RSS19_Msg   BYTE    "*I'm on a narrow ledge over a chasm. Across the chasm is a throne room.", 0
+RSS19_Msg   BYTE    "*I'm on a narrow ledge over a chasm. Across the chasm is a ",27,"[1mthrone",27,"[0m room.", 0
 RSS20_Msg   BYTE    "royal chamber.", 0
 RSS21_Msg   BYTE    "*I'm on a narrow ledge by the throne room.\r\nAcross the chasm is another ledge.", 0
 RSS22_Msg   BYTE    "throne room.", 0
@@ -303,13 +303,13 @@ MSS32_Msg   BYTE    "I gather up an armload of bricks, straining under the load.
 MSS33_Msg   BYTE    "With all my strength, I jump heroically off the ledge, but I'm carrying too\r\nmuch weight and don't make it across, falling into the chasm.", 0
 MSS34_Msg   BYTE    "To exit the game, say -QUIT-", 0
 MSS35_Msg   BYTE    "The mirror slips out of my hands, hits the floor, and shatters into a million\r\npieces.", 0
-MSS36_Msg   BYTE    "The mirror slips out of my hands but miraculously lands softly on the rug.\r\nIt then begins to glow, and a message appears:", 0
+MSS36_Msg   BYTE    "The mirror slips out of my hands but miraculously lands softly on the rug.\r\nIt then begins to glow, and a message appears: ", 27,"[1mDRAGON STINGS",27,"[0m", 0
 MSS37_Msg   BYTE    "You lost *ALL* treasures.", 0
 MSS38_Msg   BYTE    "I'm not carrying the axe. Try 'TAKE INVENTORY'!", 0
 MSS39_Msg   BYTE    "The axe ricochets wildly off of the dragon's thick hide.\r\nThe dragon does not even wake up.", 0
 MSS40_Msg   BYTE    "The caked-on mud has become dry and fallen off of my arm.", 0
 MSS41_Msg   BYTE    "As I scream, the bear turns to look at me with a started expression on its\r\nface. As the bear twists, it loses its balance and falls off the ledge!", 0
-MSS42_Msg   BYTE    "*DRAGON STINGS* The message fades after a few seconds. I don't understand what\r\nthis means, but I hope you do!", 0
+MSS42_Msg   BYTE    "The message fades after a few seconds. I don't understand what\r\nthis means, but I hope you do!", 0
 MSS43_Msg   BYTE    "The bees swarm around the dragon, which wakes up to their incessant buzzing,\r\nand flies away...", 0
 MSS44_Msg   BYTE    "The magical oil has attracted a magical lamp, which appears in your hands. The\r\nlamp is now full of oil and burning with a blue flame.", 0
 MSS45_Msg   BYTE    "Argh! I've been bitten by chiggers! I hate these things. This cannot be good.", 0
@@ -332,7 +332,7 @@ MSS61_Msg   BYTE    "PLEASE LEAVE IT ALONE!", 0
 MSS62_Msg   BYTE    "I don't think it's a good idea to throw that.", 0
 MSS63_Msg   BYTE    "Medicine is good for bites.", 0
 MSS64_Msg   BYTE    "Sorry, but I can't find it anywhere around here.", 0
-MSS65_Msg   BYTE    "Treasures have a * in their name.  Say 'SCORE'", 0
+MSS65_Msg   BYTE    "Treasures have a ",27,"[1;33m*",27,"[0m in their name.  Say 'SCORE'", 0
 MSS66_Msg   BYTE    "BLOW IT UP", 0
 MSS67_Msg   BYTE    "The golden fish wriggles out of your hands and slips back into the lake.", 0
 MSS68_Msg   BYTE    "Ewww. The smooth goo stinks to high heaven. But rubbing it into the chigger\r\nbites feels good.", 0
@@ -359,13 +359,13 @@ Table_IAS   DW  IAS00_Msg, IAS01_Msg, IAS02_Msg, IAS03_Msg, IAS04_Msg, IAS05_Msg
             DW  IAS60_Msg
 IAS00_Msg   BYTE    " ", 0
 IAS01_Msg   BYTE    "Dark hole", 0
-IAS02_Msg   BYTE    "*POT OF RUBIES*/RUB/", 0
+IAS02_Msg   BYTE    27,"[1;33m*POT OF RUBIES*",27,"[0m/RUB/", 0
 IAS03_Msg   BYTE    "Spider web with writing on it.", 0
-IAS04_Msg   BYTE    "Hollow stump and remains of a felled tree.", 0
+IAS04_Msg   BYTE    "Hollow ",27,"[1mstump",27,"[0m and remains of a felled tree.", 0
 IAS05_Msg   BYTE    "Cypress tree", 0
 IAS06_Msg   BYTE    "Water", 0
 IAS07_Msg   BYTE    "Evil smelling mud/MUD/", 0
-IAS08_Msg   BYTE    "*GOLDEN FISH*/FIS/", 0
+IAS08_Msg   BYTE    27,"[1;33m*GOLDEN FISH*",27,"[0m/FIS/", 0
 IAS09_Msg   BYTE    "Brass lamp (lit)/LAM/", 0
 IAS10_Msg   BYTE    "Old fashoned brass lamp/LAM/", 0
 IAS11_Msg   BYTE    "Axe (rusty, with a magic word: BUNYON on it)/AXE/", 0
@@ -374,46 +374,46 @@ IAS13_Msg   BYTE    "Empty bottle/BOT/", 0
 IAS14_Msg   BYTE    "Ring of skeleton keys/KEY/", 0
 IAS15_Msg   BYTE    "Sign: LEAVE TREASURE HERE (say 'SCORE')", 0
 IAS16_Msg   BYTE    "Door (locked)", 0
-IAS17_Msg   BYTE    "Door (open, with a hallway beyond)", 0
+IAS17_Msg   BYTE    "Door (open, with a ",27,"[1mhallway",27,"[0m beyond)", 0
 IAS18_Msg   BYTE    "Swamp gas", 0
-IAS19_Msg   BYTE    "*GOLDEN NET*/NET/", 0
+IAS19_Msg   BYTE    27,"[1;33m*GOLDEN NET*",27,"[0m/NET/", 0
 IAS20_Msg   BYTE    "Chigger bites", 0
 IAS21_Msg   BYTE    "Infected chigger bites", 0
 IAS22_Msg   BYTE    "Floating patch of oily slime", 0
-IAS23_Msg   BYTE    "*ROYAL HONEY*/HON/", 0
+IAS23_Msg   BYTE    27,"[1;33m*ROYAL HONEY*",27,"[0m/HON/", 0
 IAS24_Msg   BYTE    "Large african bees", 0
 IAS25_Msg   BYTE    "Thin black bear", 0
 IAS26_Msg   BYTE    "Bottle (with bees buzzing inside)/BOT/", 0
 IAS27_Msg   BYTE    "Large sleeping dragon", 0
 IAS28_Msg   BYTE    "Flint and steel/FLI/", 0
-IAS29_Msg   BYTE    "*THICK PERSIAN RUG*/RUG/", 0
+IAS29_Msg   BYTE    27,"[1;33m*THICK PERSIAN RUG*",27,"[0m/RUG/", 0
 IAS30_Msg   BYTE    "Sign: MAGIC WORD IS AWAY. LOOK LA -(rest of sign is missing)", 0
 IAS31_Msg   BYTE    "Bladder (swollen with swamp gas)/BLA/", 0
 IAS32_Msg   BYTE    "Bricked up window", 0
 IAS33_Msg   BYTE    "Sign: IN SOME CASES MUD IS GOOD, IN OTHERS...", 0
 IAS34_Msg   BYTE    "Stream of lava", 0
-IAS35_Msg   BYTE    "Bricked up window with a hole blown out of the center,\r\nleading to a narrow ledge", 0
+IAS35_Msg   BYTE    "Bricked up window with a hole blown out of the center,\r\nleading to a narrow ",27,"[1;37mledge",27,"[0m", 0
 IAS36_Msg   BYTE    "Loose fire bricks", 0
-IAS37_Msg   BYTE    "*GOLD CROWN*/CRO/", 0
-IAS38_Msg   BYTE    "*MAGIC MIRROR*/MIR/", 0
+IAS37_Msg   BYTE    27,"[1;33m*GOLD CROWN*",27,"[0m/CRO/", 0
+IAS38_Msg   BYTE    27,"[1;33m*MAGIC MIRROR*",27,"[0m/MIR/", 0
 IAS39_Msg   BYTE    "Thin black bear (asleep)", 0
 IAS40_Msg   BYTE    "Empty wine bladder/BLA/", 0
 IAS41_Msg   BYTE    "Shards of broken glass", 0
 IAS42_Msg   BYTE    "Chiggers/CHI/", 0
 IAS43_Msg   BYTE    "Thin black bear (dead)", 0
-IAS44_Msg   BYTE    "*DRAGON EGGS* (very rare)/EGG/", 0
+IAS44_Msg   BYTE    27,"[1;33m*DRAGON EGGS*",27,"[0m (very rare)/EGG/", 0
 IAS45_Msg   BYTE    "Makeshift dam, consisting of a pile of bricks, holding back the lava.", 0
-IAS46_Msg   BYTE    "*JEWELED FRUIT*/FRU/", 0
-IAS47_Msg   BYTE    "*SMALL STATUE OF A BLUE OX*/OX/", 0
-IAS48_Msg   BYTE    "*DIAMOND RING*/RIN/", 0
-IAS49_Msg   BYTE    "*DIAMOND BRACELET*/BRA/", 0
+IAS46_Msg   BYTE    27,"[1;33m*JEWELED FRUIT*",27,"[0m/FRU/", 0
+IAS47_Msg   BYTE    27,"[1;33m*SMALL STATUE OF A BLUE OX*",27,"[0m/OX/", 0
+IAS48_Msg   BYTE    27,"[1;33m*DIAMOND RING*",27,"[0m/RIN/", 0
+IAS49_Msg   BYTE    27,"[1;33m*DIAMOND BRACELET*",27,"[0m/BRA/", 0
 IAS50_Msg   BYTE    "Elaborate carvings on rock which form the message: ALADDIN WAS HERE", 0
 IAS51_Msg   BYTE    "Sign: LIMBO.  FIND RIGHT EXIT AND LIVE AGAIN!", 0
 IAS52_Msg   BYTE    "Smoking hole.  Pieces of dragon and gore.", 0
 IAS53_Msg   BYTE    "Sign: NO SWIMMING ALLOWED", 0
 IAS54_Msg   BYTE    "Arrow (pointing down)", 0
 IAS55_Msg   BYTE    "Dead golden fish/FIS/", 0
-IAS56_Msg   BYTE    "*FIRESTONE* (cold now)/FIR/", 0
+IAS56_Msg   BYTE    27,"[1;33m*FIRESTONE*",27,"[0m (cold now)/FIR/", 0
 IAS57_Msg   BYTE    "Sign: PAUL'S PLACE", 0
 IAS58_Msg   BYTE    "Trees", 0
 IAS59_Msg   BYTE    " ", 0
