@@ -4,11 +4,11 @@
     INCL        "macros.asm"
 
 ;__________________________________________________________________________________________________
-; The game loader starts at address D000 in the ROM image
+; The game loader starts at address CA00 in the ROM image
 ; (On entry, R0 is our program counter)
 
     CPU         1802
-    ORG         $D000
+    ORG         $CA00
 
     ; Setup code to initialize the stack and SCRT registers
     ; SETUP R2 (Stack)
@@ -63,19 +63,24 @@ LoaderStart
     DW   MON_OUTSTR
     
     ; decompress Adventureland program into RAM
-    LDI  HIGH ULZDATA               ; defined in adv_core_ulz.asm
+    LDI  $D0
     PHI  R7
-    LDI  LOW ULZDATA
-    PLO  R7
-    LDI  HIGH ULZDATA+ULZSIZE       ; defined in adv_core_ulz.asm
+    LDI  $05
+    PLO  R7                         ; R7 points to the size of the compressed block
+    LDA  R7
     PHI  R8
-    LDI  LOW ULZDATA+ULZSIZE
+    LDA  R7                         ; now R7 points to the start of the compressed data
+    PLO  R8                         ; R8 holds the compressed data size
+    ADI  $07
     PLO  R8
+    GHI  R8
+    ADCI $D0
+    PHI  R8                         ; R8 points to one byte past the end of the compressed data
     LDI  $00                        ; decompressed data should be stored at $0013
     PHI  R9
     LDI  $13
     PLO  R9
-    LDI  $43                        ; can't write past $4300
+    LDI  $45                        ; can't write past $4500
     PHI  RA
     LDI  $00
     PLO  RA
@@ -103,6 +108,10 @@ Exit
 
     ; write LBR instruction at 0010 to jump into the game program
 DecompressOkay
+    LDI  $D0                        ; defined in adv_core_ulz.asm
+    PHI  R7
+    LDI  $03
+    PLO  R7                         ; R7 points to the size of the starting address of the game
     LDI  $00
     PHI  R8
     LDI  $10
@@ -110,10 +119,10 @@ DecompressOkay
     LDI  $C0
     STR  R8
     INC  R8
-    LDI  HIGH GAMESTART             ; defined in adv_core_ulz.asm
+    LDA  R7                         ; high byte of game start addresss
     STR  R8
     INC  R8
-    LDI  LOW GAMESTART
+    LDA  R7                         ; low byte of game start address
     STR  R8
 
     ; Jump to start the game
@@ -129,11 +138,6 @@ DecompressOkay
 
 StartingMsg     BYTE        "\r\nDecompressing...", 0
 ErrorMsg        BYTE        "\r\nDecompression failed, jumping back to monitor.\r\n", 0
-
-;__________________________________________________________________________________________________
-; Compressed Adventureland program
-
-    INCL        "adv_core_ulz.asm"
 
     END
 
