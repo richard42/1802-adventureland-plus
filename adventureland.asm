@@ -2896,7 +2896,7 @@ ScoreTable      DB          0, 7, 15, 22, 30, 38, 45, 53, 60, 68, 76, 83, 91, 99
 KnightRider     DB          $00, $00, $80, $80, $C0, $C0, $E0, $60, $70, $30, $38, $18, $1C, $0C, $0E, $06, $07, $03, $03, $01, $01, $00, $00, $01, $01, $03, $03, $07, $06, $0E, $0C, $1C, $18, $38, $30, $70, $60, $E0, $C0, $C0, $80, $80, $00, $00
 ClsMsg          DB          $1B, $5B, $32, $4A, $1B, $48, $00
 StartingMsg     BYTE        27,"[1;37m W E L C O M E   T O \n A D V E N T U R E + \n ",27,"[44m(v1.0 2019-12-08)",27,"[0m\r\n\n\n\n\n"
-                BYTE        "The object of your adventure is to find treasures and return them\r\n"
+                BYTE        "The object of your adventure is to find ",27,"[1;33mtreasures",27,"[0m and return them\r\n"
                 BYTE        "to the proper place for you to accumulate points.  I'm your clone.  Give me\r\n"
                 BYTE        "commands that consist of a verb & noun, i.e. GO EAST, TAKE KEY, CLIMB TREE,\r\n"
                 BYTE        "SAVE GAME, TAKE INVENTORY, FIND AXE, QUIT, etc.\r\n\n"
@@ -2929,18 +2929,18 @@ Turn5Msg        BYTE        27,"[1;31mI don't understand your command.",27,"[0m\
 Turn6Msg        BYTE        27,"[1;31mI can't do that yet.",27,"[0m\r\n", 0
 CarryDrop1Msg   BYTE        "What?\r\n", 0
 CarryDrop2Msg   BYTE        27,"[1;31mI can't. I'm carrying too much!",27,"[0m\r\n", 0
-CarryDrop3Msg   BYTE        "OK, taken.\r\n", 0
+CarryDrop3Msg   BYTE        27,"[1mOK, taken.",27,"[0m\r\n", 0
 CarryDrop4Msg   BYTE        27,"[1;31mI don't see it here.",27,"[0m\r\n", 0
-CarryDrop5Msg   BYTE        "OK, dropped.\r\n", 0
+CarryDrop5Msg   BYTE        27,"[1mOK, dropped.",27,"[0m\r\n", 0
 CarryDrop6Msg   BYTE        27,"[1;31mI'm not carrying it!",27,"[0m\r\n", 0
 CarryDrop7Msg   BYTE        27,"[1;31mIt's beyond my power to do that.",27,"[0m\r\n", 0
 Action1Msg      BYTE        27,"[1;31mI'm dead...",27,"[0m\r\n", 0
 Action2Msg      BYTE        "The game is now over.\r\nAnother game? ",0
 Action3Msg      BYTE        "I've stored 00 treasures.  On a scale\r\nof 0 to 99, that rates a 00.\r\n", 0
-Action4Msg      BYTE        "Congratulations! You scored a Perfect Game!\r\nYou are one smart adventurer!\r\nKick back and grab a cold one, you've earned it.\r\n\nThe game is now over.\r\nAnother game? ",0
+Action4Msg      BYTE        27,"[1mCongratulations! You scored a Perfect Game!\r\nYou are one smart adventurer!\r\nKick back and grab a cold one, you've earned it.",27,"[0m\r\n\nThe game is now over.\r\nAnother game? ",0
 Action5Msg      BYTE        27,"[1;34mI'm carrying:",27,"[0m\r\n", 0
 Action6Msg      BYTE        "Nothing!", 0
-Action7Msg      BYTE        "Game state has been saved in upper memory.\r\n", 0
+Action7Msg      BYTE        27,"[1mGame state has been saved in upper memory.",27,"[0m\r\n", 0
 
                 INCL        "adventureland_data.asm"
 
