@@ -245,7 +245,7 @@ RSS20_Msg   BYTE    "royal chamber.", 0
 RSS21_Msg   BYTE    "*I'm on a narrow ledge by the throne room.\r\nAcross the chasm is another ledge.", 0
 RSS22_Msg   BYTE    "throne room.", 0
 RSS23_Msg   BYTE    "sunny meadow.", 0
-RSS24_Msg   BYTE    "*I think I'm in real trouble.  Here's a guy with a pitchfork!", 0
+RSS24_Msg   BYTE    "*",27,"[1mI think I'm in real trouble.  Here's a guy with a pitchfork!",27,"[0m", 0
 RSS25_Msg   BYTE    "hidden grove.", 0
 RSS26_Msg   BYTE    "quick-sand bog.", 0
 RSS27_Msg   BYTE    "memory RAM of an IBM-PC.  I took a wrong turn!", 0
@@ -269,84 +269,84 @@ Table_MSS   DW  MSS00_Msg, MSS01_Msg, MSS02_Msg, MSS03_Msg, MSS04_Msg, MSS05_Msg
             DW  MSS80_Msg
 MSS00_Msg   BYTE    " ", 0
 MSS01_Msg   BYTE    "Nothing happens...", 0
-MSS02_Msg   BYTE    "Focusing intently on the intricate patterns of the web, I am surprised to\r\nsee the words: ",27,"[1mCHOP IT DOWN!",27,"[0m", 0
-MSS03_Msg   BYTE    "Gulp gulp gulp. I didn't realize how thirsty I was!", 0
-MSS04_Msg   BYTE    "The dragon snorts and rumbles, smelling something offensive. It grimaces and\r\nopens its eyes, looking straight at me, then charges!", 0
-MSS05_Msg   BYTE    "I hurl the axe at the door and the spinning blade crashes into the lock,\r\nshattering it. The door swings open.", 0
-MSS06_Msg   BYTE    "I pull on the handle but it's no use; the door is secured with a padlock.", 0
-MSS07_Msg   BYTE    "I saw a flash of light as the treetop crashed to the ground. Something was\r\nlost in the branches.", 0
-MSS08_Msg   BYTE    "I swing the axe over and over. Chop! Chop! Chop! After a few minutes the giant\r\ntree heaves over. TIMBER...", 0
-MSS09_Msg   BYTE    "One quick puff extinguishes the lamp.", 0
-MSS10_Msg   BYTE    "The lamp pops on and bathes the room in a soft warm glow.", 0
-MSS11_Msg   BYTE    "As I'm gathering up the web, the spider darts over and bites my hand!", 0
+MSS02_Msg   BYTE    27,"[1mFocusing intently on the intricate patterns of the web, I am surprised to\r\nsee the words: ",27,"[36mCHOP IT DOWN!",27,"[0m", 0
+MSS03_Msg   BYTE    27,"[1mGulp gulp gulp. I didn't realize how thirsty I was!",27,"[0m", 0
+MSS04_Msg   BYTE    27,"[1mThe dragon snorts and rumbles, smelling something offensive. It grimaces and\r\nopens its eyes, looking straight at me, then charges!",27,"[0m", 0
+MSS05_Msg   BYTE    27,"[1mI hurl the axe at the door and the spinning blade crashes into the lock,\r\nshattering it. The door swings open.",27,"[0m", 0
+MSS06_Msg   BYTE    27,"[1mI pull on the handle but it's no use; the door is secured with a padlock.",27,"[0m", 0
+MSS07_Msg   BYTE    27,"[1mI saw a flash of light as the treetop crashed to the ground. Something was\r\nlost in the branches.",27,"[0m", 0
+MSS08_Msg   BYTE    27,"[1mI swing the axe over and over. Chop! Chop! Chop! After a few minutes the giant\r\ntree heaves over. TIMBER...",27,"[0m", 0
+MSS09_Msg   BYTE    27,"[1mOne quick puff extinguishes the lamp.",27,"[0m", 0
+MSS10_Msg   BYTE    27,"[1mThe lamp pops on and bathes the room in a soft warm glow.",27,"[0m", 0
+MSS11_Msg   BYTE    27,"[1mAs I'm gathering up the web, the spider darts over and bites my hand!",27,"[0m", 0
 MSS12_Msg   BYTE    27,"[1;31mMy chigger bites are now infected.",27,"[0m", 0
 MSS13_Msg   BYTE    27,"[1;31mThe chigger bites have rotted my whole body.",27,"[0m", 0
-MSS14_Msg   BYTE    "The bear lumbers over to the honey, voraciously slurps it all up,\r\nthen falls asleep.", 0
-MSS15_Msg   BYTE    "The bees buzz loudly and swarm angrily around me, then begin to sting me\r\nall over...", 0
-MSS16_Msg   BYTE    "I don't have any container to put it in!", 0
-MSS17_Msg   BYTE    "I just noticed that the buzzing has stopped. The bees have all suffocated\r\nin the bottle.", 0
-MSS18_Msg   BYTE    "I speak the magic word and begin to feel dizzy. The world spins around me\r\nand I close my eyes. After breathing slowly for a few seconds, I open\r\nmy eyes to find that I have been transported.", 0
-MSS19_Msg   BYTE    "I don't have anything that I can use to light the gas!", 0
-MSS20_Msg   BYTE    "The gas bladder explodes with a loud BANG! A cloud of dust slowly settles.", 0
-MSS21_Msg   BYTE    "The gas bladder explodes violently in my hands and knocks me backwards. I hit\r\nmy head on something.", 0
-MSS22_Msg   BYTE    "An eerie blue flame glows for a few seconds then goes out. That was neat\r\nbut didn't help you much.", 0
-MSS23_Msg   BYTE    "Fffffffff. The swamp gas all rushes out of the wine bladder.", 0
-MSS24_Msg   BYTE    "I don't think that's flammable.", 0
-MSS25_Msg   BYTE    "How do you want me to get across the chasm? Jump?!", 0
-MSS26_Msg   BYTE    "To be honest, I'm too scared of the bear to do that. I need to get him out of\r\nhere first.", 0
-MSS27_Msg   BYTE    "Don't waste *HONEY*.  Get mad instead.  Dam lava!", 0
-MSS28_Msg   BYTE    "The bees escape from the bottle, buzzing loudly. The bear hears them, looks\r\nangrily at me, and then charges to attack me!", 0
-MSS29_Msg   BYTE    "I pour out the bottle, its former contents soaking into the ground.", 0
+MSS14_Msg   BYTE    27,"[1mThe bear lumbers over to the honey, voraciously slurps it all up,\r\nthen falls asleep.",27,"[0m", 0
+MSS15_Msg   BYTE    27,"[1;31mThe bees buzz loudly and swarm angrily around me, then begin to sting me\r\nall over...",27,"[0m", 0
+MSS16_Msg   BYTE    27,"[1mI don't have any container to put it in!",27,"[0m", 0
+MSS17_Msg   BYTE    27,"[1mI just noticed that the buzzing has stopped. The bees have all suffocated\r\nin the bottle.",27,"[0m", 0
+MSS18_Msg   BYTE    27,"[1mI speak the ",27,"[35mmagic",27,"[37m word and begin to feel dizzy. The world spins around me\r\nand I close my eyes. After breathing slowly for a few seconds, I open\r\nmy eyes to find that I have been transported.",27,"[0m", 0
+MSS19_Msg   BYTE    27,"[1mI don't have anything that I can use to light the gas!",27,"[0m", 0
+MSS20_Msg   BYTE    27,"[1mThe gas bladder explodes with a loud BANG! A cloud of dust slowly settles.",27,"[0m", 0
+MSS21_Msg   BYTE    27,"[1;31mThe gas bladder explodes violently in my hands and knocks me backwards. I hit\r\nmy head on something.",27,"[0m", 0
+MSS22_Msg   BYTE    27,"[1mAn eerie blue flame glows for a few seconds then goes out. That was neat\r\nbut didn't help you much.",27,"[0m", 0
+MSS23_Msg   BYTE    27,"[1mFffffffff. The swamp gas all rushes out of the wine bladder.",27,"[0m", 0
+MSS24_Msg   BYTE    27,"[1mI don't think that's flammable.",27,"[0m", 0
+MSS25_Msg   BYTE    27,"[1mHow do you want me to get across the chasm? Jump?!",27,"[0m", 0
+MSS26_Msg   BYTE    27,"[1mTo be honest, I'm too scared of the bear to do that. I need to get him out of\r\nhere first.",27,"[0m", 0
+MSS27_Msg   BYTE    27,"[1mDon't waste ",27,"[33m*HONEY*",27,"[37m.  Get mad instead.  Dam ",27,"[31mlava",27,"[37m!",27,"[0m", 0
+MSS28_Msg   BYTE    27,"[1mThe bees escape from the bottle, buzzing loudly. The bear hears them, looks\r\nangrily at me, and then ",27,"[31mcharges to attack me",27,"[37m!",27,"[0m", 0
+MSS29_Msg   BYTE    27,"[1mI pour out the bottle, its former contents soaking into the ground.",27,"[0m", 0
 MSS30_Msg   BYTE    27,"[36mUsing only one word, tell me at what object you would like me to throw the axe.",27,"[0m", 0
-MSS31_Msg   BYTE    "I send the axe spinning towards the bear, but he dodges to the side, and then\r\nI hear a CRASH! Oh no, something broke.", 0
-MSS32_Msg   BYTE    "I gather up an armload of bricks, straining under the load. They are heavy!", 0
-MSS33_Msg   BYTE    "With all my strength, I jump heroically off the ledge, but I'm carrying too\r\nmuch weight and don't make it across, falling into the chasm.", 0
+MSS31_Msg   BYTE    27,"[1mI send the axe spinning towards the bear, but he dodges to the side, and then\r\nI hear a CRASH! Oh no, something broke.",27,"[0m", 0
+MSS32_Msg   BYTE    27,"[1mI gather up an armload of bricks, straining under the load. They are heavy!",27,"[0m", 0
+MSS33_Msg   BYTE    27,"[1mWith all my strength, I jump heroically off the ledge, but I'm carrying too\r\nmuch weight and don't make it across, falling into the chasm.",27,"[0m", 0
 MSS34_Msg   BYTE    "To exit the game, say -",27,"[1mQUIT",27,"[0m-", 0
-MSS35_Msg   BYTE    "The mirror slips out of my hands, hits the floor, and shatters into a million\r\npieces.", 0
-MSS36_Msg   BYTE    "The mirror slips out of my hands but miraculously lands softly on the rug.\r\nIt then begins to glow, and a message appears: ", 27,"[1mDRAGON STINGS",27,"[0m", 0
-MSS37_Msg   BYTE    "You lost *ALL* treasures.", 0
-MSS38_Msg   BYTE    "I'm not carrying the axe. Try 'TAKE INVENTORY'!", 0
-MSS39_Msg   BYTE    "The axe ricochets wildly off of the dragon's thick hide.\r\nThe dragon does not even wake up.", 0
-MSS40_Msg   BYTE    "The caked-on mud has become dry and fallen off of my arm.", 0
-MSS41_Msg   BYTE    "As I scream, the bear turns to look at me with a started expression on its\r\nface. As the bear twists, it loses its balance and falls off the ledge!", 0
-MSS42_Msg   BYTE    "The message fades after a few seconds. I don't understand what\r\nthis means, but I hope you do!", 0
-MSS43_Msg   BYTE    "The bees swarm around the dragon, which wakes up to their incessant buzzing,\r\nand flies away...", 0
-MSS44_Msg   BYTE    "The magical oil has attracted a magical lamp, which appears in your hands. The\r\nlamp is now full of oil and burning with a blue flame.", 0
+MSS35_Msg   BYTE    27,"[1;31mThe mirror slips out of my hands, hits the floor, and shatters into a million\r\npieces.",27,"[0m", 0
+MSS36_Msg   BYTE    27,"[1mThe mirror slips out of my hands but miraculously lands softly on the rug.\r\nIt then begins to glow, and a message appears: ", 27,"[33mDRAGON STINGS",27,"[0m", 0
+MSS37_Msg   BYTE    27,"[1;31mYou lost *ALL* treasures.",27,"[0m", 0
+MSS38_Msg   BYTE    27,"[1mI'm not carrying the axe. Try 'TAKE INVENTORY'!",27,"[0m", 0
+MSS39_Msg   BYTE    27,"[1mThe axe ricochets wildly off of the dragon's thick hide.\r\nThe dragon does not even wake up.",27,"[0m", 0
+MSS40_Msg   BYTE    27,"[1mThe caked-on mud has become dry and fallen off of my arm.",27,"[0m", 0
+MSS41_Msg   BYTE    27,"[1mAs I scream, the bear turns to look at me with a started expression on its\r\nface. As the bear twists, it loses its balance and falls off the ledge!",27,"[0m", 0
+MSS42_Msg   BYTE    27,"[1mThe message fades after a few seconds. I don't understand what\r\nthis means, but I hope you do!",27,"[0m", 0
+MSS43_Msg   BYTE    27,"[1mThe bees swarm around the dragon, which wakes up to their incessant buzzing,\r\nand flies away...",27,"[0m", 0
+MSS44_Msg   BYTE    27,"[1mThe magical oil has attracted a ",27,"[33mmagical lamp",27,"[37m, which appears in your hands. The\r\nlamp is now full of oil and burning with a blue flame.",27,"[0m", 0
 MSS45_Msg   BYTE    27,"[1;31mArgh! I've been bitten by chiggers! I hate these things. This cannot be good.",27,"[0m", 0
-MSS46_Msg   BYTE    "It looks exactly like I'd expect it to look. Maybe I should go there?", 0
-MSS47_Msg   BYTE    "Maybe if I threw something?...", 0
+MSS46_Msg   BYTE    27,"[1mIt looks exactly like I'd expect it to look. Maybe I should go there?",27,"[0m", 0
+MSS47_Msg   BYTE    27,"[1mMaybe if I threw something?...",27,"[0m", 0
 MSS48_Msg   BYTE    27,"[1;31mThis poor fish is dry with no water around, and has now died. That's a bummer.",27,"[0m", 0
-MSS49_Msg   BYTE    "A glowing genie appears, ",27,"[1;33mdrops something shiny",27,"[0m, and then vanishes.", 0
-MSS50_Msg   BYTE    "A genie appears and says, \"boy, you're selfish!\" He takes something and then\r\nvanishes!", 0
-MSS51_Msg   BYTE    "NO!  It's too ",27,"[1;31mhot",27,"[0m.", 0
-MSS52_Msg   BYTE    "There's no way for me to climb up to the ledges from down here.", 0
-MSS53_Msg   BYTE    "Try the swamp.", 0
-MSS54_Msg   BYTE    "Don't use the verb 'say'. Just give me one word.", 0
-MSS55_Msg   BYTE    "Try:  LOOK,JUMP,SWIM,CLIMB,THROW,FIND,GO,TAKE,INVENTORY,SCORE,HELP.", 0
-MSS56_Msg   BYTE    "Only 3 things will wake the dragon. One of them is dangerous!", 0
+MSS49_Msg   BYTE    27,"[1mA glowing genie appears, ",27,"[33mdrops something shiny",27,"[37m, and then vanishes.",27,"[0m", 0
+MSS50_Msg   BYTE    27,"[1mA genie appears and says, ",34,27,"[31mboy, you're selfish!",27,"[37m\" He takes something and then\r\nvanishes!",27,"[0m", 0
+MSS51_Msg   BYTE    27,"[1mNO!  It's too ",27,"[31mhot",27,"[0m", 0
+MSS52_Msg   BYTE    27,"[1mThere's no way for me to climb up to the ledges from down here.",27,"[0m", 0
+MSS53_Msg   BYTE    27,"[1mTry the swamp.",27,"[0m", 0
+MSS54_Msg   BYTE    27,"[1mDon't use the verb 'say'. Just give me one word.",27,"[0m", 0
+MSS55_Msg   BYTE    27,"[1mTry:  LOOK,JUMP,SWIM,CLIMB,THROW,FIND,GO,TAKE,INVENTORY,SCORE,HELP.",27,"[0m", 0
+MSS56_Msg   BYTE    27,"[1mOnly 3 things will wake the dragon. One of them is ",27,"[31mdangerous",27,"37m!",27,"[0m", 0
 MSS57_Msg   BYTE    "If you need a hint on something, try '",27,"[1mHELP",27,"[0m'.", 0
-MSS58_Msg   BYTE    "Read the sign in the meadow!", 0
-MSS59_Msg   BYTE    "You may need magic words here.", 0
-MSS60_Msg   BYTE    "A loud, low voice rumbles from all around me, saying:", 0
-MSS61_Msg   BYTE    "PLEASE LEAVE IT ALONE!", 0
-MSS62_Msg   BYTE    "I don't think it's a good idea to throw that.", 0
-MSS63_Msg   BYTE    "Medicine is good for bites.", 0
-MSS64_Msg   BYTE    "Sorry, but I can't find it anywhere around here.", 0
+MSS58_Msg   BYTE    27,"[1mRead the sign in the meadow!",27,"[0m", 0
+MSS59_Msg   BYTE    27,"[1mYou may need ",27,"[35mmagic",27,"[37m words here.",27,"[0m", 0
+MSS60_Msg   BYTE    27,"[1mA loud, low voice rumbles from all around me, saying:",27,"[0m", 0
+MSS61_Msg   BYTE    27,"[1mPLEASE LEAVE IT ALONE!",27,"[0m", 0
+MSS62_Msg   BYTE    27,"[1mI don't think it's a good idea to throw that.",27,"[0m", 0
+MSS63_Msg   BYTE    27,"[1mMedicine is good for bites.",27,"[0m", 0
+MSS64_Msg   BYTE    27,"[1mSorry, but I can't find it anywhere around here.",27,"[0m", 0
 MSS65_Msg   BYTE    "Treasures have a ",27,"[1;33m*",27,"[0m in their name.  Say '",27,"[1mSCORE",27,"[0m'", 0
-MSS66_Msg   BYTE    "BLOW IT UP", 0
-MSS67_Msg   BYTE    "The ",27,"[1;33mgolden fish",27,"[0m wriggles out of your hands and slips back into the lake.", 0
-MSS68_Msg   BYTE    "Ewww. The smooth goo stinks to high heaven. But rubbing it into the chigger\r\nbites feels good.", 0
-MSS69_Msg   BYTE    "It tastes delicious! Yet I miss it now that it's gone. Maybe that wasn't such\r\na good idea.", 0
-MSS70_Msg   BYTE    "Argh! These chigger bites itch like mad! Scratching them feels good for a few\r\nseconds, but then they get even worse.", 0
-MSS71_Msg   BYTE    "The lamp is already lit.", 0
-MSS72_Msg   BYTE    "The thick persian rug unfurls itself and I hop on. Just by thinking the\r\nmagic word, it lifts me up and flies away...", 0
-MSS73_Msg   BYTE    "I swim out into the lake, but I'm carrying too much and begin sinking, so I\r\nswim back to shore.", 0
-MSS74_Msg   BYTE    "I'm not so sure that it's a good idea to attack the dragon.", 0
-MSS75_Msg   BYTE    "I'm not going in the ",27,"[31mlava",27,"[0m! You go in the ",27,"[31mlava",27,"[0m! That's way too hot.", 0
-MSS76_Msg   BYTE    "I don't see any place to go swimming around here.", 0
-MSS77_Msg   BYTE    "I hold the empty bladder near the bubbling swamp and pull it open, sucking\r\nthe gas into the bladder.", 0
-MSS78_Msg   BYTE    "I manage to coax a few of the bees into the empty bottle without getting stung!", 0
-MSS79_Msg   BYTE    "I heave the bricks towards the ",27,"[31mlava",27,"[0m, into which they fall, forming a makeshift\r\ndam, and stopping the ",27,"[31mlava",27,"[0m flow.", 0
+MSS66_Msg   BYTE    27,"[1mBLOW IT UP",27,"[0m", 0
+MSS67_Msg   BYTE    27,"[1mThe ",27,"[33mgolden fish",27,"[37m wriggles out of your hands and slips back into the lake.",27,"[0m", 0
+MSS68_Msg   BYTE    27,"[1mEwww. The smooth goo stinks to high heaven. But rubbing it into the chigger\r\nbites feels good.",27,"[0m", 0
+MSS69_Msg   BYTE    27,"[1mIt tastes delicious! Yet I miss it now that it's gone. Maybe that wasn't such\r\na good idea.",27,"[0m", 0
+MSS70_Msg   BYTE    27,"[1mArgh! These chigger bites itch like mad! Scratching them feels good for a few\r\nseconds, but then they get ",27,"[31meven worse",27,"[37m.",27,"[0m", 0
+MSS71_Msg   BYTE    27,"[1mThe lamp is already lit.",27,"[0m", 0
+MSS72_Msg   BYTE    27,"[1mThe thick persian rug unfurls itself and I hop on. Just by thinking the\r\n",27,"[35mmagic",27,"[37m word, it lifts me up and flies away...",27,"[0m", 0
+MSS73_Msg   BYTE    27,"[1mI swim out into the lake, but I'm carrying too much and ",27,"[31mbegin sinking",27,"[37m, so I\r\nswim back to shore.",27,"[0m", 0
+MSS74_Msg   BYTE    27,"[1mI'm not so sure that it's a good idea to attack the dragon.",27,"[0m", 0
+MSS75_Msg   BYTE    27,"[1mI'm not going in the ",27,"[31mlava",27,"[37m! You go in the ",27,"[31mlava",27,"[37m! That's way too hot.",27,"[0m", 0
+MSS76_Msg   BYTE    27,"[1mI don't see any place to go swimming around here.",27,"[0m", 0
+MSS77_Msg   BYTE    27,"[1mI hold the empty bladder near the bubbling swamp and pull it open, sucking\r\nthe gas into the bladder.",27,"[0m", 0
+MSS78_Msg   BYTE    27,"[1mI manage to coax a few of the bees into the empty bottle without getting stung!",27,"[0m", 0
+MSS79_Msg   BYTE    27,"[1mI heave the bricks towards the ",27,"[31mlava",27,"[37m, into which they fall, forming a makeshift\r\ndam, and stopping the ",27,"[31mlava",27,"[37m flow.", 0
 MSS80_Msg   BYTE    27,"[1mOK, dropped.",27,"[0m\r\n", 0
 
 ; String table IAS has length 61
@@ -366,9 +366,9 @@ IAS05_Msg   BYTE    "Cypress tree", 0
 IAS06_Msg   BYTE    "Water", 0
 IAS07_Msg   BYTE    "Evil smelling mud/MUD/", 0
 IAS08_Msg   BYTE    "*",27,"[1;33mGOLDEN FISH",27,"[0m*/FIS/", 0
-IAS09_Msg   BYTE    "Brass lamp (lit)/LAM/", 0
+IAS09_Msg   BYTE    "Brass lamp (",27,"[33mlit",27,"[0m)/LAM/", 0
 IAS10_Msg   BYTE    "Old fashoned brass lamp/LAM/", 0
-IAS11_Msg   BYTE    "Axe (rusty, with a magic word: ",27,"[1mBUNYON",27,"[0m on it)/AXE/", 0
+IAS11_Msg   BYTE    "Axe (rusty, with a ",27,"[35mmagic",27,"[37m word: ",27,"[1mBUNYON",27,"[0m on it)/AXE/", 0
 IAS12_Msg   BYTE    "Bottle (filled with water)/BOT/", 0
 IAS13_Msg   BYTE    "Empty bottle/BOT/", 0
 IAS14_Msg   BYTE    "Ring of skeleton keys/KEY/", 0
@@ -387,7 +387,7 @@ IAS26_Msg   BYTE    "Bottle (with bees buzzing inside)/BOT/", 0
 IAS27_Msg   BYTE    "Large sleeping dragon", 0
 IAS28_Msg   BYTE    "Flint and steel/FLI/", 0
 IAS29_Msg   BYTE    "*",27,"[1;33mTHICK PERSIAN RUG",27,"[0m*/RUG/", 0
-IAS30_Msg   BYTE    "Sign: MAGIC WORD IS ",27,"[1mAWAY",27,"[0m. LOOK LA -(rest of sign is missing)", 0
+IAS30_Msg   BYTE    "Sign: ",27,"[35mMAGIC",27,"[37m WORD IS ",27,"[1mAWAY",27,"[0m. LOOK LA -(rest of sign is missing)", 0
 IAS31_Msg   BYTE    "Bladder (swollen with swamp gas)/BLA/", 0
 IAS32_Msg   BYTE    "Bricked up window", 0
 IAS33_Msg   BYTE    "Sign: IN SOME CASES MUD IS GOOD, IN OTHERS...", 0

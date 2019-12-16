@@ -1228,12 +1228,12 @@ GIParseLoop5Tail
     PHI  R8
     SEP  R4
     DW   OutString                  ; print first word
-    LDI  '!'
-    SEP  R7
-    LDI  $0D
-    SEP  R7
-    LDI  $0A
-    SEP  R7                         ; print '!\r\n'
+    LDI  HIGH InputError2Msg
+    PHI  R8
+    LDI  LOW InputError2Msg
+    PLO  R8
+    SEP  R4
+    DW   OutString                  ; print '!\r\n'
     LDI  $01
     SEP  R5                         ; return 1
 GIParseVerbOk
@@ -1242,9 +1242,9 @@ GIParseVerbOk
     BZ   GIParseAllGood
     LDN  RC                         ; D is NV[1]
     BNZ  GIParseAllGood
-    LDI  HIGH InputError2Msg
+    LDI  HIGH InputError3Msg
     PHI  R8
-    LDI  LOW InputError2Msg
+    LDI  LOW InputError3Msg
     PLO  R8
     SEP  R4
     DW   OutString                  ; print "I don't know what a "
@@ -1254,9 +1254,9 @@ GIParseVerbOk
     PHI  R8
     SEP  R4
     DW   OutString                  ; print second word
-    LDI  HIGH InputError3Msg
+    LDI  HIGH InputError4Msg
     PHI  R8
-    LDI  LOW InputError3Msg
+    LDI  LOW InputError4Msg
     PLO  R8
     SEP  R4
     DW   OutString                  ; print " is!\n"
@@ -2486,16 +2486,16 @@ DAAction65LoopTail
     DEC  RC
     GLO  RC
     BNZ  DAAction65Loop
-    LDI  LOW (Action3Msg+12)
+    LDI  LOW (Action3Msg+21)
     PLO  R8
-    LDI  HIGH (Action3Msg+12)
+    LDI  HIGH (Action3Msg+21)
     PHI  R8
     GHI  RC
     SEP  R4
     DW   Print2Digit                ; convert # of treasures to 2-digit number
-    LDI  LOW (Action3Msg+64)
+    LDI  LOW (Action3Msg+78)
     PLO  R8
-    LDI  HIGH (Action3Msg+64)
+    LDI  HIGH (Action3Msg+78)
     PHI  R8
     GHI  RC
     ADI  LOW ScoreTable
@@ -2908,15 +2908,16 @@ StartingMsg     BYTE        27,"[1;37m W E L C O M E   T O \n A D V E N T U R E 
                 BYTE        "HAPPY ADVENTURING!!!\r\n\n\n\n\n"
                 BYTE        27,"[1m************************** Press any key to continue **************************",27,"[0m"
 NewlineMsg      BYTE        "\r\n", 0
-LoadQestion     BYTE        27,"[36m\r\nLoad saved game (Y or N)?",27,"[37m ", 0
-LoadFailedMsg   BYTE        "Sorry, but no saved game data was found.\r\nPress a key to continue...\r\n", 0
+LoadQestion     BYTE        27,"[36m\r\nLoad saved game (Y or N)?",27,"[0m ", 0
+LoadFailedMsg   BYTE        27,"[1mSorry, but no saved game data was found.\r\n",27,"[0;36mPress a key to continue...",27,"[0m\r\n", 0
 LampEmptyMsg    BYTE        27,"[1;31mYour lamp has run out of oil!",27,"[0m\r\n", 0
 LampLow1Msg     BYTE        27,"[1;31mYour lamp will run out of oil in ",0
 LampLow2Msg     BYTE        " turns!",27,"[0m\r\n",0
 InputPromptMsg  BYTE        "\r\n",27,"[36mTell me what to do? ",27,"[0m",0
-InputError1Msg  BYTE        "I don't know how to ",0
-InputError2Msg  BYTE        "I don't know what a ", 0
-InputError3Msg  BYTE        " is!\r\n", 0
+InputError1Msg  BYTE        27,"[1mI don't know how to ",0
+InputError2Msg  BYTE        "!",27,"[0m\r\n", 0
+InputError3Msg  BYTE        27,"[1mI don't know what a ", 0
+InputError4Msg  BYTE        " is!",27,"[0m\r\n", 0
 Look1Msg        BYTE        27,"[1;31mI can't see.  It's too dark!",27,"[0m\r\n", 0
 Look2Msg        BYTE        "I'm in a ", 0
 Look3Msg        BYTE        "\r\n\n",27,"[1;34mVisible Items Here:",27,"[0m\r\n", 0
@@ -2927,7 +2928,7 @@ Turn3Msg        BYTE        27,"[1;31mI can't go in that direction.",27,"[0m\r\n
 Turn4Msg        BYTE        27,"[1;31mI fell down and broke my neck.",27,"[0m\r\n", 0
 Turn5Msg        BYTE        27,"[1;31mI don't understand your command.",27,"[0m\r\n", 0
 Turn6Msg        BYTE        27,"[1;31mI can't do that yet.",27,"[0m\r\n", 0
-CarryDrop1Msg   BYTE        "What?\r\n", 0
+CarryDrop1Msg   BYTE        27,"[1mWhat?",27,"[0m\r\n", 0
 CarryDrop2Msg   BYTE        27,"[1;31mI can't. I'm carrying too much!",27,"[0m\r\n", 0
 CarryDrop3Msg   BYTE        27,"[1mOK, taken.",27,"[0m\r\n", 0
 CarryDrop4Msg   BYTE        27,"[1;31mI don't see it here.",27,"[0m\r\n", 0
@@ -2935,10 +2936,10 @@ CarryDrop5Msg   BYTE        27,"[1mOK, dropped.",27,"[0m\r\n", 0
 CarryDrop6Msg   BYTE        27,"[1;31mI'm not carrying it!",27,"[0m\r\n", 0
 CarryDrop7Msg   BYTE        27,"[1;31mIt's beyond my power to do that.",27,"[0m\r\n", 0
 Action1Msg      BYTE        27,"[1;31mI'm dead...",27,"[0m\r\n", 0
-Action2Msg      BYTE        "The game is now over.\r\nAnother game? ",0
-Action3Msg      BYTE        "I've stored 00 treasures.  On a scale\r\nof 0 to 99, that rates a 00.\r\n", 0
-Action4Msg      BYTE        27,"[1mCongratulations! You scored a Perfect Game!\r\nYou are one smart adventurer!\r\nKick back and grab a cold one, you've earned it.",27,"[0m\r\n\nThe game is now over.\r\nAnother game? ",0
-Action5Msg      BYTE        27,"[1;34mI'm carrying:",27,"[0m\r\n", 0
+Action2Msg      BYTE        27,"[1mThe game is now over.\r\n",27,"[0;36mAnother game? ",27,"[0m",0
+Action3Msg      BYTE        27,"[1mI've stored ",27,"[33m00 treasures",27,"[37m.  On a scale\r\nof 0 to 99, that rates a 00.",27,"[0m\r\n", 0
+Action4Msg      BYTE        27,"[1mCongratulations! You scored a Perfect Game!\r\nYou are one smart adventurer!\r\n",27,"[33mKick back and grab a cold one, you've earned it.",27,"[0m\r\n\nThe game is now over.\r\nAnother game? ",0
+Action5Msg      BYTE        27,"[1;34m\r\nI'm carrying:",27,"[0m\r\n", 0
 Action6Msg      BYTE        "Nothing!", 0
 Action7Msg      BYTE        27,"[1mGame state has been saved in upper memory.",27,"[0m\r\n", 0
 
