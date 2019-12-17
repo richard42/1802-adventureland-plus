@@ -2910,8 +2910,8 @@ StartingMsg     BYTE        27,"[1;37m W E L C O M E   T O \n A D V E N T U R E 
 NewlineMsg      BYTE        "\r\n", 0
 LoadQestion     BYTE        27,"[36m\r\nLoad saved game (Y or N)?",27,"[0m ", 0
 LoadFailedMsg   BYTE        27,"[1mSorry, but no saved game data was found.\r\n",27,"[0;36mPress a key to continue...",27,"[0m\r\n", 0
-LampEmptyMsg    BYTE        27,"[1;31mYour lamp has run out of oil!",27,"[0m\r\n", 0
-LampLow1Msg     BYTE        27,"[1;31mYour lamp will run out of oil in ",0
+LampEmptyMsg    BYTE        27,"[31mYour lamp has run out of oil!",27,"[0m\r\n", 0
+LampLow1Msg     BYTE        27,"[31mYour lamp will run out of oil in ",0
 LampLow2Msg     BYTE        " turns!",27,"[0m\r\n",0
 InputPromptMsg  BYTE        "\r\n",27,"[36mTell me what to do? ",27,"[0m",0
 InputError1Msg  BYTE        27,"[1mI don't know how to ",0
@@ -2924,17 +2924,17 @@ Look3Msg        BYTE        "\r\n\n",27,"[1;34mVisible Items Here:",27,"[0m\r\n"
 Look4Msg        BYTE        "\r\n",27,"[1;34mObvious Exits:",27,"[0m\r\n   ", 0
 Turn1Msg        BYTE        27,"[36mWhere do you want me to go? Give me a direction too.",27,"[0m\r\n", 0
 Turn2Msg        BYTE        27,"[1;31mWarning: it's dangerous to move in the dark!",27,"[0m\r\n", 0
-Turn3Msg        BYTE        27,"[1;31mI can't go in that direction.",27,"[0m\r\n", 0
+Turn3Msg        BYTE        27,"[31mI can't go in that direction.",27,"[0m\r\n", 0
 Turn4Msg        BYTE        27,"[1;31mI fell down and broke my neck.",27,"[0m\r\n", 0
-Turn5Msg        BYTE        27,"[1;31mI don't understand your command.",27,"[0m\r\n", 0
-Turn6Msg        BYTE        27,"[1;31mI can't do that yet.",27,"[0m\r\n", 0
+Turn5Msg        BYTE        27,"[31mI don't understand your command.",27,"[0m\r\n", 0
+Turn6Msg        BYTE        27,"[31mI can't do that yet.",27,"[0m\r\n", 0
 CarryDrop1Msg   BYTE        27,"[1mWhat?",27,"[0m\r\n", 0
-CarryDrop2Msg   BYTE        27,"[1;31mI can't. I'm carrying too much!",27,"[0m\r\n", 0
+CarryDrop2Msg   BYTE        27,"[31mI can't. I'm carrying too much!",27,"[0m\r\n", 0
 CarryDrop3Msg   BYTE        27,"[1mOK, taken.",27,"[0m\r\n", 0
-CarryDrop4Msg   BYTE        27,"[1;31mI don't see it here.",27,"[0m\r\n", 0
+CarryDrop4Msg   BYTE        27,"[31mI don't see it here.",27,"[0m\r\n", 0
 CarryDrop5Msg   BYTE        27,"[1mOK, dropped.",27,"[0m\r\n", 0
-CarryDrop6Msg   BYTE        27,"[1;31mI'm not carrying it!",27,"[0m\r\n", 0
-CarryDrop7Msg   BYTE        27,"[1;31mIt's beyond my power to do that.",27,"[0m\r\n", 0
+CarryDrop6Msg   BYTE        27,"[31mI'm not carrying it!",27,"[0m\r\n", 0
+CarryDrop7Msg   BYTE        27,"[31mIt's beyond my power to do that.",27,"[0m\r\n", 0
 Action1Msg      BYTE        27,"[1;31mI'm dead...",27,"[0m\r\n", 0
 Action2Msg      BYTE        27,"[1mThe game is now over.\r\n",27,"[0;36mAnother game? ",27,"[0m",0
 Action3Msg      BYTE        27,"[1mI've stored ",27,"[33m00 treasures",27,"[37m.  On a scale\r\nof 0 to 99, that rates a 00.",27,"[0m\r\n", 0
