@@ -20,7 +20,7 @@ Do_ULZ_Decompress
     LDI  LOW KnightRider
     PLO  R1
     ; R0.0 holds our animation loop counter
-    LDI  34
+    LDI  35
     PLO  R0
     ; set the first value to the LEDs
     LDA  R1
@@ -51,7 +51,7 @@ UDLoop1Go
     DEC  R0
     GLO  R0
     BNZ  UDLoop1ReadToken
-    LDI  34
+    LDI  35
     PLO  R0                         ; reset loop counter
     LDI  LOW KnightRiderEnd
     STR  R2
