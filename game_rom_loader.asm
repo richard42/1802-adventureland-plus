@@ -80,7 +80,7 @@ LoaderStart
     PHI  R9
     LDI  $13
     PLO  R9
-    LDI  $45                        ; can't write past $4500
+    LDI  $49                        ; can't write past $4900
     PHI  RA
     LDI  $00
     PLO  RA
