@@ -2895,7 +2895,7 @@ SGLoop2
 ScoreTable      DB          0, 7, 15, 22, 30, 38, 45, 53, 60, 68, 76, 83, 91, 99
 KnightRider     DB          $00, $00, $80, $80, $C0, $C0, $E0, $60, $70, $30, $38, $18, $1C, $0C, $0E, $06, $07, $03, $03, $01, $01, $00, $00, $01, $01, $03, $03, $07, $06, $0E, $0C, $1C, $18, $38, $30, $70, $60, $E0, $C0, $C0, $80, $80, $00, $00
 ClsMsg          DB          $1B, $5B, $32, $4A, $1B, $48, $00
-StartingMsg     BYTE        27,"[1;37m W E L C O M E   T O \n A D V E N T U R E + \n ",27,"[44m(v1.1 2019-12-20)",27,"[0m\r\n\n\n\n\n"
+StartingMsg     BYTE        27,"[1;37m W E L C O M E   T O \n A D V E N T U R E + \n ",27,"[44m(v1.1 2019-12-20)",27,"[0m\r\n\n\n"
                 BYTE        "The object of your adventure is to find ",27,"[1;33mtreasures",27,"[0m and return them\r\n"
                 BYTE        "to the proper place for you to accumulate points.  I'm your clone.  Give me\r\n"
                 BYTE        "commands that consist of a verb & noun, i.e. GO EAST, TAKE KEY, CLIMB TREE,\r\n"
@@ -2905,7 +2905,7 @@ StartingMsg     BYTE        27,"[1;37m W E L C O M E   T O \n A D V E N T U R E 
                 BYTE        "this game).\r\n\n"
                 BYTE        "Note that going in the opposite direction won't always get you back to where\r\n"
                 BYTE        "you were.\r\n\n\n"
-                BYTE        "HAPPY ADVENTURING!!!\r\n\n\n\n\n"
+                BYTE        "HAPPY ADVENTURING!!!\r\n\n\n"
                 BYTE        27,"[1m************************** Press any key to continue **************************",27,"[0m"
 NewlineMsg      BYTE        "\r\n", 0
 LoadQestion     BYTE        27,"[36m\r\nLoad saved game (Y or N)?",27,"[0m ", 0
