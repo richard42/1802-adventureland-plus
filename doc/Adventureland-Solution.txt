@@ -1,0 +1,271 @@
+                     Adventureland Walk-through
+               (version provided on PC-SIG disk #203)
+                     --------------------------
+                          by Morten Lohre
+                     (edb_morten@debet.nhh.no)
+
+
+INTRO
+-----
+
+This is a complete walk-through of Adventureland by Scott Adams. As such it
+contains spoilers, so do not read on if you would like to try Adventureland
+on your own.
+
+First, some advice and points of interest:
+
+* REMEMBER TO USE CAPITAL LETTERS.
+* If you die and go to Limbo, GO EAST to get to the forest (where you
+  started the game). Nothing will be changed, just start off where you died.
+* Save the progress of your game ('SAVE GAME'). Restoring is done by
+  quitting and starting a new game.
+* Not all locations are visited in this walk-through.
+* This is not nesserarily an optimal walk-through in terms of moves made,
+  but it scores 100 out of 100.
+
+
+MAP OF ADVENTURELAND
+--------------------
+
+* North=up, South=down, West=left, East=right.
+* Upper left corner marks 'UP' exit.
+* Lower right corner marks 'DOWN' exit.
+* Lines without arrow marks two-way travel.
+* Lines with arrow in one end marks one-way travel.
+* Block character in location frame indicates circular travel from location,
+  e.g. moving north from the forest will take you to the forest.
+* A star '*' and a location name indicates possible travel to named location
+  with other command than compass directions.
+
+
+  ┌───────┐
+┌>│  oak  │      ┌─────────────────────────────┐           N
+│ └───────┴┐     v                 ┌──────────┐│          W+E
+└─┬───────┐└>┌───▄───┐         ┌───┴───┐      ││           S
+┌─┤ limbo ├─>▐ forest├─────────┤ meadow├─────┐││
+│ └───┬───┴─┐│*oak   │         └───┬───┘     │││
+│     v     │└───▀───┘             │         │││
+│ ┌───────┐ │ ^  ^  ┌───────┐      │         │││
+└>│  hell │<┘ │  │  │cypress│      │         │││
+  └───────┘ ┌─┘  │  └───────┴┐     │         │││
+            │┌───┴───┐       └>┌───┴────┐    vv│
+            └┤ grove ├─────────┤ swamp  │  ┌───┴───┐
+             └───────┘         │*cypress▌<─┤ shore │
+                               │*stump  │  └───▀───┴┐
+                               └───▀────┘           └>┌───────┐
+                                   ^                  │  bog  │
+─────>┌────────────────────────────┘                  │*shore │
+^^    │    ^                                          └───────┘
+│└┬───┴───┐│
+└─┤ stump ├┘
+^ └───┬───┴┬───────┐
+└─────┘    │  root │
+           └───────┴┬───────┐
+                    │  hole │
+                    │*hall  │
+                    └───────┘<┐
+           ┌───────┐ ┌───────┐└┬───────┐ ┌───────┐
+           │ ledge2│<┤ throne│ │  hall │ │8-sided│
+           │*throne│ └───────┘ └───────┴┐└───┬───┘
+           │*ledge1│           ┌───────┐└┬───┴───┐
+           └───────┘ ┌───────┐ │  ram  ├─┤ cavern│
+           ┌───────┐ │ ledge1│ └───────┘ └───┬───┴┐
+           │chamber│<┤*ledge2│               │    │
+           │*ledge1│ └───────┘               │    │
+           └───────┴────────────────────┬────┴───┐│
+                                        │anteroom││
+                                        └────────┘│
+                  ┌───────────────────────────────┘
+                  │    (5)   (5)  (1)
+                  │ ┌───┴───┐ └┬───┴───┐
+                  └>│ maze 1├──┤ maze 2├─┐
+                    └───┬───┴┐ └───────┘ │
+                       (2)   └┐          │
+        ┌──────────┐   (6)    │          │
+        └┬───────┐ └┬───┴───┐ └┬───────┐ │
+         │ maze 3│<─┤ maze 4├──┤ maze 5│<┘
+         └───┬───┴┐ └───┬───┴┐ └───────┘
+             │    │    (1)   └┐
+             │    │           │
+             │    └──────────>└┬───▄───┐ 
+             │              (2)┤ maze 6├(1)
+             └────────────────>│*meadow│ 
+                               └───┬───┴┐
+                                  (1)   └┬───────┐
+                                         │ chasm │
+                                         └───────┘
+
+WALK-THROUGH
+------------
+
+GO EAST         (to meadow)     Let the sleeping dragon lie.
+GO EAST         (to shore)      Magic is written all over the axe.
+GET AXE
+GO DOWN         (to bog)        You have not paid much attention to
+                                your swimming classes, and are unable
+                                to swim while carrying objects.
+BUNYON                          As in real life, magic is the answer.
+SWIM            (to shore)      Hurry, no swimming allowed!
+GO WEST         (to swamp)      This is the home of the chiggers. They are
+                                sensitive to fumes, and get irritated
+                                by the oily slime also found in the
+                                swamp. So, if you don't carry the evil
+                                smelling mud, they'll bite you at random.
+                                This is annoying, especially since the
+                                dragon in the meadow doesn't like the smell 
+                                of mud. But, removing the oil also removes
+                                the danger of getting bitten.
+                                If you got bitten, GET MUD, then DROP MUD.
+GET OIL                         Woops! The oil was magic! Look what you've
+                                got! Added bonus: The chiggers won't
+                                bother you anymore.
+LAMP OFF                        Preserve oil for now.
+GO WEST         (to grove)      The axe ends up here everytime you use the
+                                magic word. The statue follows the axe if
+                                it is in the same location.
+GET AXE
+GET OX
+GET FRUIT
+GO EAST         (to swamp)
+CHOP TREE                       Timber! Something disappeared, but don't
+                                worry - you don't need it. If you want to
+                                know what it was, climb the tree before
+                                you chop it down.
+GO STUMP        (to stump)      Leave the treasures here.
+DROP OX                         1 treasure out of 13.
+DROP FRUIT                      2 treasures out of 13.
+GO DOWN         (to root)
+GET RUBIES
+GO UP           (to stump)
+DROP RUBIES                     3 treasures out of 13.
+GO DOWN         (to root)
+GO DOWN         (to hole)       A locked door! No keys! Is it wooden?
+THROW AXE
+DOOR
+LAMP ON                         It's dark further down.
+GO HALL         (to hall)
+GO DOWN         (to cavern)
+GO SOUTH        (to anteroom)
+GET BLADDER                     Sorry, it's empty.
+GO NORTH        (to cavern)
+GO DOWN         (to maze)
+GO DOWN         (to maze)
+GET FLINT
+GO WEST         (to maze)       Aladdin was here. Maybe we should rub the
+                                lamp... No, better wait.
+GO DOWN         (to maze)       The arrow is pointing you in the right
+                                direction.
+GET RUG                         A treasure!
+GO DOWN         (to chasm)
+GET NET                         And another one!
+                                Now, let's try the magic word.
+AWAY            (to maze)       Back in the maze. That was helpful.
+LAMP OFF                        Preserve the lamp. If you leave it on,
+                                it will burn all the oil. You can refill
+                                the lamp in the swamp, if you haven't 
+                                removed the oil in the beginning of the game.
+AWAY            (to meadow)     Carrying the rug and using the magic word
+                                once gets you to the maze. Use AWAY once
+                                more, and the rug flies you to the meadow.
+                                Remember that this is where the dragon is,
+                                and that he doesn't like the smell of mud.
+                                Drop any mud before you use AWAY from
+                                the maze.
+GO SOUTH        (to swamp)
+GO STUMP        (to stump)
+RUB LAMP                        Let's try some Ali Baba tricks. The first
+                                rub makes the ring appear.
+                                4 treasures out of 13.
+RUB LAMP                        The second presents you with a bracelet.
+                                A third rub will prevent you from finishing
+                                the game.
+                                5 treasures out of 13.
+DROP LAMP
+DROP RUG
+GET BOTTLE
+GO UP           (to swamp)
+GO NORTH        (to meadow)
+GO EAST         (to shore)
+GET FISH                        You need the net, and a bottle of water to
+                                get the fish.
+GO WEST         (to swamp)
+GET GAS                         Fill the bladder.
+GO STUMP        (to stump)
+DROP FISH                       6 treasures out of 13.
+DROP NET                        7 treasures out of 13.
+DROP BOTTLE
+GET LAMP
+GET RUG
+GO DOWN         (to root)
+GO DOWN         (to hole)
+LAMP ON
+GO HALL         (to hall)
+GO DOWN         (to cavern)
+GO SOUTH        (to anteroom)
+GO UP           (to chamber)
+DROP BLADDER
+LIGHT GAS                       Boom! Leave the bricks, as you cannot jump
+                                the chasm with them.
+DROP FLINT
+GO LEDGE        (to ledge)
+JUMP            (to ledge)      A better jumper than swimmer.
+YELL                            The bear doesn't like the sound of your
+                                voice. Now, where did the body fall?
+GET MIRROR
+GO THRONE       (to throne)
+GET CROWN
+GO WEST         (to ledge)
+JUMP            (to ledge)
+GO WEST         (to chamber)
+GET BRICKS
+AWAY            (to maze)       Nice shortcut.
+GO DOWN         (to chasm)      A dead bear!
+DROP BRICKS                     Dam lava!
+GET FIRESTONE                   It's cold now.
+AWAY            (to maze)
+LAMP OFF
+AWAY            (to meadow)
+GO SOUTH        (to swamp)
+GO STUMP        (to stump)
+DROP FIRESTONE                  8 treasures out of 13.
+DROP CROWN                      9 treasures out of 13.
+DROP RUG                        10 treasures out of 13.
+DROP MIRROR                     11 treasures out of 13.
+GET RUG                         10 treasures out of 13.
+GET BOTTLE
+GO UP           (to swamp)
+GET MUD                         The mud will not fall off as long as you
+                                carry the bottle filled with water.
+GO STUMP        (to stump)
+GO DOWN         (to root)
+GO DOWN         (to hole)
+LAMP ON
+GO HALL         (to hall)
+GO DOWN         (to cavern)
+GO NORTH        (to 8-sided room)
+DROP WATER                      The water is discarded to use the bottle
+                                as a container for the bees.
+GET BEES                        The bees does not have much air in the
+                                bottle, and has a chance of suffocating
+                                for each move maked. If they suffocate,
+                                you can always get new bees in the 8-sided
+                                room. The bees will not sting you as long
+                                as they're in the bottle.
+GET HONEY
+DROP MUD                        We don't need the mud any more. The dragon
+                will attack us if we keep it.
+AWAY            (to maze)
+AWAY            (to meadow)
+DROP BEES                       Neither you, nor the dragon likes bees.
+                                There's a chance that the bees sting you,
+                                but if they do, you'll just go to Limbo.
+                                GO EAST twice, and you're back in the meadow.
+GET EGGS
+GO SOUTH        (to swamp)
+GO STUMP        (to stump)
+DROP RUG                        11 treasures out of 13.
+DROP EGGS                       12 treasures out of 13.
+DROP HONEY                      13 treasures out of 13.
+SCORE                           You did it! Congratulations!
+
+-----------------------------end of file----------------------------------
