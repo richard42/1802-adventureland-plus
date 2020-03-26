@@ -3,12 +3,12 @@
 import os
 import sys
 
-TOOLDIR = "../../"
+TOOLDIR = "./tools"
 
 if __name__ == "__main__":
     # Initialize tool paths
-    a18Path = os.path.join(TOOLDIR, "A18", "a18")
-    ulzPath = os.path.join(TOOLDIR, "ulz", "ulz")
+    a18Path = os.path.join(TOOLDIR, "a18")
+    ulzPath = os.path.join(TOOLDIR, "ulz")
     # Step 1: assemble game core
     cmd = "%s game_rom_core.asm -l adventureland.prn -b adventureland.bin" % a18Path
     print(cmd)

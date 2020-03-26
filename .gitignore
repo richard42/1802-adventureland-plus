@@ -7,4 +7,5 @@ adventureland.bin
 adv_rom_loader.bin
 mcsmp20r_final.bin
 releases/*
-ulz/ulz
+tools/ulz
+tools/a18
