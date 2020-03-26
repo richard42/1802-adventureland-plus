@@ -1,0 +1,97 @@
+1802 Adventureland+ README
+--------------------------
+
+Are you ready to brave the dismal swamp, sleeping dragon, hungry bear, deadly
+insects, and other threats that await the interpid player in Adventureland+?
+If so, look no further for hours of puzzle solving fun as you attempt to
+prevail over this early Scott Adams gem by collecting all 13 treasures without
+losing everything in the process.
+
+This text adventure game is a port written in 1802 assembly language, based on
+the enhanced C version of Adventureland, called advland2019, as published in
+March 2019 on the Interactive Fiction archive:
+
+https://www.ifarchive.org/indexes/if-archive/scott-adams/games/
+
+The custom version of Adventureland+ also includes a decompressor and loader,
+which allows it to fit in the unused 12 kilobytes of EPROM space available in
+the 1802 Membership Card Serial Monitor Program Version 2.0, from Chuck Yakym.
+
+README Sections
+  1. Requirements and Pre-requisites for building 1802 Adventureland+
+  2. Building the Adventureland+ game
+  3. Other Documentation
+
+1. Requirements and Pre-requisites
+----------------------------------
+
+The following software packages are required in order to build the 1802
+Adventureland+ game:
+
+  - C/C++ compiler: GCC, Clang, Visual Studio, etc.
+  - Python 2.7 or 3.x
+  - A18, the 1802 cross-assembler
+    (available from: http://www.retrotechnology.com/memship/a18.html)
+
+2. Building the Adventureland+ game
+-----------------------------------------
+
+1. Install the development tools (C compiler and Python)
+2. Download the A18 cross-assembler from the link provided and use your
+   compiler to build it. Place the "a18" executable in the "tools" folder.
+3. Build the "ulz" compressor with the source code in the tools/ulz-encoder
+   folder, and copy the "ulz" executable into the "tools" folder
+4. To build the game in its uncompressed form, with the HEX output format,
+   run the "build_ram.sh" script.  The output file will be named:
+   "adventureland.hex" and the game can be started by jumping to address $0010
+   after loading the HEX file via the MCSMP serial monitor.
+5. To build a ROM image which contains the compressed game data and a special
+   boot loader, run the "build_rom.py" script. The output file will be named
+   "mcsmp20r_final.bin" and can be burned directly to a 32 kilobyte EPROM
+   device such as a 27C256 and installed into a Membership Card computer. The
+   monitor program included on this version of the ROM image contains an extra
+   key command for launching the game, which is activated by pressing "P".
+
+* Windows Build Instructions *
+
+The build scripts included with this software are designed to run on Unix-based
+computers running MacOS or Linux.  A few extra steps are needed to build this
+game under Windows. The BASH shell scripts, "build_ram.sh" and "build_clean.sh"
+can easily be converted to batch files by removing the first line, changing
+"rm -f" to "del", and changing the path to the "a18" assembler program.
+
+* Hardware Configurations *
+
+The Adventureland+ game and the base MCSMP ROM image were designed for 1802
+Membership Card computers with RAM starting at 0000, ROM starting at 8000, and
+the rev. J or newer front panel PCB.  The base ROM image is a special version
+of MCSMP20J.BIN which includes support for launching the game.
+
+In order to modify the game for systems with ROM in the low address space and
+RAM in the high space, change the addresses 0010H and 0013H in "game_ram.asm"
+and "game_rom_core.asm" to 8010H and 8013H respectively, and change address
+$CA00 in "game_rom_loader.asm" to $4A00. Also, replace the "mcsmp20r_base.bin"
+file with MCSMP20B.BIN.
+
+In order to modify the game for systems with the Rev I. or earlier version of
+the front panel PCB, all of the serial I/O routines, which occupy the first
+465 lines of "adventureland.asm" must be modified to invert the logical
+polarity of the output signal relative to that of the input signal. I believe
+that this can be accomplished by appropriately changing the conditional jump
+instructions found on lines 666 and 711 of adventureland.asm, as well as the
+polarity of the jump instructions in the 4800 baud and lower input routine,
+and its matching code modification routine at lines 767 through 791. However
+this task is left as an exercise for the reader.
+
+
+3. Other Documentation
+----------------------
+
+The doc/ folder contains the following additional documentation files:
+
+  Adventureland-Solution.pdf
+  Adventureland-Solution.txt
+
+These files contain the full solution to the Adventureland+ game.
+
+
