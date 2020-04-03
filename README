@@ -68,10 +68,21 @@ the rev. J or newer front panel PCB.  The base ROM image is a special version
 of MCSMP20J.BIN which includes support for launching the game.
 
 In order to modify the game for systems with ROM in the low address space and
-RAM in the high space, change the addresses 0010H and 0013H in "game_ram.asm"
-and "game_rom_core.asm" to 8010H and 8013H respectively, and change address
-$CA00 in "game_rom_loader.asm" to $4A00. Also, replace the "mcsmp20r_base.bin"
-file with MCSMP20B.BIN.
+RAM in the high space, do the following:
+
+1. Change the addresses 0010H and 0013H in "game_ram.asm" and
+   "game_rom_core.asm" to 8010H and 8013H respectively
+2. Change address $CA00 in "game_rom_loader.asm" to $4A00.
+3. Replace the "mcsmp20r_base.bin" file with MCSMP20B.BIN.
+4. In build_rom.py, change the line which begins with:
+     ulzData = chr(0xC0) + chr(0xCA) + chr(0x00)
+   to instead begin with:
+     ulzData = chr(0xC0) + chr(0x4A) + chr(0x00)
+5. In game_rom_loader.asm, in the line with the instruction "LDI  $D0"
+   immediately after the "DecompressOkay" label, change this instruction to:
+   "LDI  $50".  Four lines below this, change "LDI  $00" to "LDI  $80".
+   Finally, at the bottom of this function, change "LBR  $0010" to
+   "LBR  $8010"
 
 In order to modify the game for systems with the Rev I. or earlier version of
 the front panel PCB, all of the serial I/O routines, which occupy the first
