@@ -108,7 +108,7 @@ Exit
 
     ; write LBR instruction at 0010 to jump into the game program
 DecompressOkay
-    LDI  $D0                        ; defined in adv_core_ulz.asm
+    LDI  $D0                        ; starting address of the game in RAM is stored at address $D003 by build_rom.py
     PHI  R7
     LDI  $03
     PLO  R7                         ; R7 points to the size of the starting address of the game
