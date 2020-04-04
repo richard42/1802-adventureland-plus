@@ -2894,7 +2894,7 @@ SGLoop2
 
 ScoreTable      DB          0, 7, 15, 22, 30, 38, 45, 53, 60, 68, 76, 83, 91, 99
 KnightRider     DB          $00, $00, $80, $80, $C0, $C0, $E0, $60, $70, $30, $38, $18, $1C, $0C, $0E, $06, $07, $03, $03, $01, $01, $00, $00, $01, $01, $03, $03, $07, $06, $0E, $0C, $1C, $18, $38, $30, $70, $60, $E0, $C0, $C0, $80, $80, $00, $00
-ClsMsg          DB          $1B, $5B, $32, $4A, $1B, $48, $00
+ClsMsg          BYTE	    "{clrscr}{home}", 0
 StartingMsg     BYTE        "{bold}{white} W E L C O M E   T O \n A D V E N T U R E + \n {bgblue}(v1.1 2019-12-20){noattr}\r\n\n\n"
                 BYTE        "The object of your adventure is to find {bold}{yellow}treasures{noattr} and return them\r\n"
                 BYTE        "to the proper place for you to accumulate points.  I'm your clone.  Give me\r\n"
