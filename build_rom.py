@@ -9,6 +9,23 @@ if __name__ == "__main__":
     # Initialize tool paths
     a18Path = os.path.join(TOOLDIR, "a18")
     ulzPath = os.path.join(TOOLDIR, "ulz")
+    # Preprocess source files
+    term="ansi"
+    if len(sys.argv) >= 2:
+        term = sys.argv[1]
+    cmd = "sed -f xlate_%s.txt adventureland.asm.in > adventureland.asm" % term
+    print(cmd)
+    numErrors = os.system(cmd)
+    if numErrors > 0:
+        print("Preprocessing 'adventureland.asm.in' failed.")
+        sys.exit(1)
+    cmd = "sed -f xlate_%s.txt adventureland_data.asm.in > adventureland_data.asm" % term
+    print(cmd)
+    numErrors = os.system(cmd)
+    if numErrors > 0:
+        print("Preprocessing 'adventureland_data.asm.in' failed.")
+        sys.exit(1)
+
     # Step 1: assemble game core
     cmd = "%s game_rom_core.asm -l adventureland.prn -b adventureland.bin" % a18Path
     print(cmd)

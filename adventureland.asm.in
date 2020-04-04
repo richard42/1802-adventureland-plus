@@ -2895,8 +2895,8 @@ SGLoop2
 ScoreTable      DB          0, 7, 15, 22, 30, 38, 45, 53, 60, 68, 76, 83, 91, 99
 KnightRider     DB          $00, $00, $80, $80, $C0, $C0, $E0, $60, $70, $30, $38, $18, $1C, $0C, $0E, $06, $07, $03, $03, $01, $01, $00, $00, $01, $01, $03, $03, $07, $06, $0E, $0C, $1C, $18, $38, $30, $70, $60, $E0, $C0, $C0, $80, $80, $00, $00
 ClsMsg          DB          $1B, $5B, $32, $4A, $1B, $48, $00
-StartingMsg     BYTE        27,"[1;37m W E L C O M E   T O \n A D V E N T U R E + \n ",27,"[44m(v1.1 2019-12-20)",27,"[0m\r\n\n\n"
-                BYTE        "The object of your adventure is to find ",27,"[1;33mtreasures",27,"[0m and return them\r\n"
+StartingMsg     BYTE        "{bold}{white} W E L C O M E   T O \n A D V E N T U R E + \n {bgblue}(v1.1 2019-12-20){noattr}\r\n\n\n"
+                BYTE        "The object of your adventure is to find {bold}{yellow}treasures{noattr} and return them\r\n"
                 BYTE        "to the proper place for you to accumulate points.  I'm your clone.  Give me\r\n"
                 BYTE        "commands that consist of a verb & noun, i.e. GO EAST, TAKE KEY, CLIMB TREE,\r\n"
                 BYTE        "SAVE GAME, TAKE INVENTORY, FIND AXE, QUIT, etc.\r\n\n"
@@ -2906,42 +2906,42 @@ StartingMsg     BYTE        27,"[1;37m W E L C O M E   T O \n A D V E N T U R E 
                 BYTE        "Note that going in the opposite direction won't always get you back to where\r\n"
                 BYTE        "you were.\r\n\n\n"
                 BYTE        "HAPPY ADVENTURING!!!\r\n\n\n"
-                BYTE        27,"[1m************************** Press any key to continue **************************",27,"[0m"
+                BYTE        "{bold}************************** Press any key to continue **************************{noattr}"
 NewlineMsg      BYTE        "\r\n", 0
-LoadQestion     BYTE        27,"[36m\r\nLoad saved game (Y or N)?",27,"[0m ", 0
-LoadFailedMsg   BYTE        27,"[1mSorry, but no saved game data was found.\r\n",27,"[0;36mPress a key to continue...",27,"[0m\r\n", 0
-LampEmptyMsg    BYTE        27,"[31mYour lamp has run out of oil!",27,"[0m\r\n", 0
-LampLow1Msg     BYTE        27,"[31mYour lamp will run out of oil in ",0
-LampLow2Msg     BYTE        " turns!",27,"[0m\r\n",0
-InputPromptMsg  BYTE        "\r\n",27,"[36mTell me what to do? ",27,"[0m",0
-InputError1Msg  BYTE        27,"[1mI don't know how to ",0
-InputError2Msg  BYTE        "!",27,"[0m\r\n", 0
-InputError3Msg  BYTE        27,"[1mI don't know what a ", 0
-InputError4Msg  BYTE        " is!",27,"[0m\r\n", 0
-Look1Msg        BYTE        27,"[1;31mI can't see.  It's too dark!",27,"[0m\r\n", 0
+LoadQestion     BYTE        "{cyan}\r\nLoad saved game (Y or N)?{noattr} ", 0
+LoadFailedMsg   BYTE        "{bold}Sorry, but no saved game data was found.\r\n{noattr}{cyan}Press a key to continue...{noattr}\r\n", 0
+LampEmptyMsg    BYTE        "{red}Your lamp has run out of oil!{noattr}\r\n", 0
+LampLow1Msg     BYTE        "{red}Your lamp will run out of oil in ",0
+LampLow2Msg     BYTE        " turns!{noattr}\r\n",0
+InputPromptMsg  BYTE        "\r\n{cyan}Tell me what to do? {noattr}",0
+InputError1Msg  BYTE        "{bold}I don't know how to ",0
+InputError2Msg  BYTE        "!{noattr}\r\n", 0
+InputError3Msg  BYTE        "{bold}I don't know what a ", 0
+InputError4Msg  BYTE        " is!{noattr}\r\n", 0
+Look1Msg        BYTE        "{bold}{red}I can't see.  It's too dark!{noattr}\r\n", 0
 Look2Msg        BYTE        "I'm in a ", 0
-Look3Msg        BYTE        "\r\n\n",27,"[1;34mVisible Items Here:",27,"[0m\r\n", 0
-Look4Msg        BYTE        "\r\n",27,"[1;34mObvious Exits:",27,"[0m\r\n   ", 0
-Turn1Msg        BYTE        27,"[36mWhere do you want me to go? Give me a direction too.",27,"[0m\r\n", 0
-Turn2Msg        BYTE        27,"[1;31mWarning: it's dangerous to move in the dark!",27,"[0m\r\n", 0
-Turn3Msg        BYTE        27,"[31mI can't go in that direction.",27,"[0m\r\n", 0
-Turn4Msg        BYTE        27,"[1;31mI fell down and broke my neck.",27,"[0m\r\n", 0
-Turn5Msg        BYTE        27,"[31mI don't understand your command.",27,"[0m\r\n", 0
-Turn6Msg        BYTE        27,"[31mI can't do that yet.",27,"[0m\r\n", 0
-CarryDrop1Msg   BYTE        27,"[1mWhat?",27,"[0m\r\n", 0
-CarryDrop2Msg   BYTE        27,"[31mI can't. I'm carrying too much!",27,"[0m\r\n", 0
-CarryDrop3Msg   BYTE        27,"[1mOK, taken.",27,"[0m\r\n", 0
-CarryDrop4Msg   BYTE        27,"[31mI don't see it here.",27,"[0m\r\n", 0
-CarryDrop5Msg   BYTE        27,"[1mOK, dropped.",27,"[0m\r\n", 0
-CarryDrop6Msg   BYTE        27,"[31mI'm not carrying it!",27,"[0m\r\n", 0
-CarryDrop7Msg   BYTE        27,"[31mIt's beyond my power to do that.",27,"[0m\r\n", 0
-Action1Msg      BYTE        27,"[1;31mI'm dead...",27,"[0m\r\n", 0
-Action2Msg      BYTE        27,"[1mThe game is now over.\r\n",27,"[0;36mAnother game? ",27,"[0m",0
-Action3Msg      BYTE        27,"[1mI've stored ",27,"[33m00 treasures",27,"[37m.  On a scale\r\nof 0 to 99, that rates a 00.",27,"[0m\r\n", 0
-Action4Msg      BYTE        27,"[1mCongratulations! You scored a Perfect Game!\r\nYou are one smart adventurer!\r\n",27,"[33mKick back and grab a cold one, you've earned it.",27,"[0m\r\n\nThe game is now over.\r\nAnother game? ",0
-Action5Msg      BYTE        27,"[1;34m\r\nI'm carrying:",27,"[0m\r\n", 0
+Look3Msg        BYTE        "\r\n\n{bold}{blue}Visible Items Here:{noattr}\r\n", 0
+Look4Msg        BYTE        "\r\n{bold}{blue}Obvious Exits:{noattr}\r\n   ", 0
+Turn1Msg        BYTE        "{cyan}Where do you want me to go? Give me a direction too.{noattr}\r\n", 0
+Turn2Msg        BYTE        "{bold}{red}Warning: it's dangerous to move in the dark!{noattr}\r\n", 0
+Turn3Msg        BYTE        "{red}I can't go in that direction.{noattr}\r\n", 0
+Turn4Msg        BYTE        "{bold}{red}I fell down and broke my neck.{noattr}\r\n", 0
+Turn5Msg        BYTE        "{red}I don't understand your command.{noattr}\r\n", 0
+Turn6Msg        BYTE        "{red}I can't do that yet.{noattr}\r\n", 0
+CarryDrop1Msg   BYTE        "{bold}What?{noattr}\r\n", 0
+CarryDrop2Msg   BYTE        "{red}I can't. I'm carrying too much!{noattr}\r\n", 0
+CarryDrop3Msg   BYTE        "{bold}OK, taken.{noattr}\r\n", 0
+CarryDrop4Msg   BYTE        "{red}I don't see it here.{noattr}\r\n", 0
+CarryDrop5Msg   BYTE        "{bold}OK, dropped.{noattr}\r\n", 0
+CarryDrop6Msg   BYTE        "{red}I'm not carrying it!{noattr}\r\n", 0
+CarryDrop7Msg   BYTE        "{red}It's beyond my power to do that.{noattr}\r\n", 0
+Action1Msg      BYTE        "{bold}{red}I'm dead...{noattr}\r\n", 0
+Action2Msg      BYTE        "{bold}The game is now over.\r\n{noattr}{cyan}Another game? {noattr}",0
+Action3Msg      BYTE        "{bold}I've stored {yellow}00 treasures{white}.  On a scale\r\nof 0 to 99, that rates a 00.{noattr}\r\n", 0
+Action4Msg      BYTE        "{bold}Congratulations! You scored a Perfect Game!\r\nYou are one smart adventurer!\r\n{yellow}Kick back and grab a cold one, you've earned it.{noattr}\r\n\nThe game is now over.\r\nAnother game? ",0
+Action5Msg      BYTE        "{bold}{blue}\r\nI'm carrying:{noattr}\r\n", 0
 Action6Msg      BYTE        "Nothing!", 0
-Action7Msg      BYTE        27,"[1mGame state has been saved in upper memory.",27,"[0m\r\n", 0
+Action7Msg      BYTE        "{bold}Game state has been saved in upper memory.{noattr}\r\n", 0
 
                 INCL        "adventureland_data.asm"
 
