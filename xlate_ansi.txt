@@ -1,3 +1,5 @@
+s/{clrscr}/\",27,\"[2J/g
+s/{home}/\",27,\"[H/g
 s/{noattr}{cyan}/\",27,\"[0;36m/g
 s/{bold}{red}/\",27,\"[1;31m/g
 s/{bold}{green}/\",27,\"[1;32m/g
