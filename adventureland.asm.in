@@ -2486,16 +2486,16 @@ DAAction65LoopTail
     DEC  RC
     GLO  RC
     BNZ  DAAction65Loop
-    LDI  LOW (Action3Msg+21)
+    LDI  LOW (Action3_2Msg)
     PLO  R8
-    LDI  HIGH (Action3Msg+21)
+    LDI  HIGH (Action3_2Msg)
     PHI  R8
     GHI  RC
     SEP  R4
     DW   Print2Digit                ; convert # of treasures to 2-digit number
-    LDI  LOW (Action3Msg+78)
+    LDI  LOW (Action3_3Msg)
     PLO  R8
-    LDI  HIGH (Action3Msg+78)
+    LDI  HIGH (Action3_3Msg)
     PHI  R8
     GHI  RC
     ADI  LOW ScoreTable
@@ -2506,9 +2506,9 @@ DAAction65LoopTail
     LDN  RD
     SEP  R4
     DW   Print2Digit                ; convert # of treasures to 2-digit number
-    LDI  LOW Action3Msg
+    LDI  LOW Action3_1Msg
     PLO  R8
-    LDI  HIGH Action3Msg
+    LDI  HIGH Action3_1Msg
     PHI  R8
     SEP  R4
     DW   OutString                  ; print "I've stored XX treasures.  On a scale of 0 to 99, that rates a XX."
@@ -2937,7 +2937,9 @@ CarryDrop6Msg   BYTE        "{red}I'm not carrying it!{noattr}\r\n", 0
 CarryDrop7Msg   BYTE        "{red}It's beyond my power to do that.{noattr}\r\n", 0
 Action1Msg      BYTE        "{bold}{red}I'm dead...{noattr}\r\n", 0
 Action2Msg      BYTE        "{bold}The game is now over.\r\n{noattr}{cyan}Another game? {noattr}",0
-Action3Msg      BYTE        "{bold}I've stored {yellow}00 treasures{white}.  On a scale\r\nof 0 to 99, that rates a 00.{noattr}\r\n", 0
+Action3_1Msg    BYTE        "{bold}I've stored {yellow}"
+Action3_2Msg    BYTE        "00 treasures{white}.  On a scale\r\nof 0 to 99, that rates a "
+Action3_3Msg    BYTE        "00.{noattr}\r\n", 0
 Action4Msg      BYTE        "{bold}Congratulations! You scored a Perfect Game!\r\nYou are one smart adventurer!\r\n{yellow}Kick back and grab a cold one, you've earned it.{noattr}\r\n\nThe game is now over.\r\nAnother game? ",0
 Action5Msg      BYTE        "{bold}{blue}\r\nI'm carrying:{noattr}\r\n", 0
 Action6Msg      BYTE        "Nothing!", 0
