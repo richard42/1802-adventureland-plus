@@ -50,6 +50,7 @@ if __name__ == "__main__":
         print("Invalid game core binary: game start address %x is invalid" % addrGameStart)
         sys.exit(1)
     binData = binData[3:sizeProgram]
+    sizeProgram -= 3
     open("adventureland.bin", "w").write(binData)
     # Step 3: compress binary data
     cmd = "%s c9 adventureland.bin adv_core_ulz.bin" % ulzPath
@@ -78,7 +79,7 @@ if __name__ == "__main__":
     if sizeSplashData > 0x05ff:
         print("Error: ULZ-compressed splash screen is %i bytes. Maximum allowed is %i." % (sizeSplashData, 0x05ff))
         sys.exit(1)
-    # Step 5: assemble game loader, load the binary, and splice in the game starting address and compressed game data size
+    # Step 5: assemble game loader, load the binary, and splice in the game starting address and game data sizes
     cmd = "%s game_rom_loader.asm -l adv_rom_loader.prn -b adv_rom_loader.bin" % a18Path
     print(cmd)
     numErrors = os.system(cmd)
@@ -87,7 +88,7 @@ if __name__ == "__main__":
         sys.exit(1)
     loaderBin = open("adv_rom_loader.bin", "r").read()
     sizeLoader = len(loaderBin)
-    loaderBin = loaderBin[:-4] + chr(addrGameStart >> 8) + chr(addrGameStart & 255) + chr(sizeCoreData >> 8) + chr(sizeCoreData & 255)
+    loaderBin = loaderBin[:-6] + chr(addrGameStart >> 8) + chr(addrGameStart & 255) + chr(sizeCoreData >> 8) + chr(sizeCoreData & 255) + chr(sizeProgram & 255) + chr(sizeProgram >> 8)
     if sizeLoader + sizeCoreData > 0x3000:
         print("Error: ROM loader and compressed game data are too big (%i bytes). Maximum size is %i." % (sizeLoader + sizeCoreData, 0x3000))
         sys.exit(1)

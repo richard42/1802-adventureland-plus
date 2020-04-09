@@ -123,21 +123,23 @@ SplashOkay
     PLO  R7                         ; R7 points to the size of the compressed block
     LDA  R7
     PHI  R8
-    LDA  R7                         ; now R7 points to the start of the compressed data
+    LDA  R7                         ; now R7 points to the size of the uncompressed game data, little endian
     PLO  R8                         ; R8 holds the compressed data size
-    ADI  LOW (CompressedSize+2)
+    ADI  LOW (CompressedSize+4)
     PLO  R8
     GHI  R8
-    ADCI HIGH (CompressedSize+2)
+    ADCI HIGH (CompressedSize+4)
     PHI  R8                         ; R8 points to one byte past the end of the compressed data
-    LDI  $00                        ; decompressed data should be stored at $0013
+    LDI  $00
     PHI  R9
     LDI  $13
-    PLO  R9
-    LDI  $49                        ; can't write past $4900
-    PHI  RA
-    LDI  $00
+    PLO  R9                         ; R9 decompressed data should be stored at $0013
+    LDA  R7
+    ADI  $13
     PLO  RA
+    LDA  R7                         ; now R7 points to the start of the compressed data
+    ADCI $00
+    PHI  RA
     SEP  R4
     DW   Do_ULZ_Decompress          ; defined in decompress.asm
 
@@ -190,10 +192,11 @@ DecompressOkay
 StartingMsg     BYTE        "\r\nDecompressing...", 0
 ErrorMsg        BYTE        "\r\nDecompression failed, jumping back to monitor.\r\n", 0
 
-; These 2 fields must be at the end of the file
+; These 3 fields must be at the end of the file
 ; They will get replaced with the correct values by the build script
 GameStartAddr   DW          0
 CompressedSize  DW          0
+GameRamSize     DW          0
 
     END
 

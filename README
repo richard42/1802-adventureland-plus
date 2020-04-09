@@ -86,7 +86,7 @@ RAM in the high space, do the following:
      - change the instruction: "LDI  $00" to: "LDI  $80"
    - In the code block following the comment "decompress Adventureland program":
      - change the *first* instruction like "LDI  $00" to: "LDI  $80"
-     - change the instruction: "LDI  $49" to: "LDI  $C9"
+     - change the instruction: "ADCI $00" to: "ADCI $80"
    - In the code block following the "Exit" label:
      - change the instruction: "LDI  $8B" to: "LDI  $0B"
    - In the code block following the "DecompressOkay" label:
