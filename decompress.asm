@@ -20,7 +20,7 @@ Do_ULZ_Decompress
     LDI  LOW KnightRider
     PLO  R1
     ; R0.0 holds our animation loop counter
-    LDI  35
+    LDI  30
     PLO  R0
     ; set the first value to the LEDs
     LDA  R1
@@ -51,7 +51,7 @@ UDLoop1Go
     DEC  R0
     GLO  R0
     BNZ  UDLoop1ReadToken
-    LDI  35
+    LDI  30
     PLO  R0                         ; reset loop counter
     LDI  LOW KnightRiderEnd
     STR  R2
@@ -105,6 +105,21 @@ UDLoop1_1
     BNZ  UDLoop1_1
 
 UDLoop1SkipCopy
+    ; check if the output pointer has reached the expected end of the uncompressed data
+    GHI  R9
+    STR  R2
+    GHI  RA
+    SM
+    BNZ  UDLoop1StartMatch
+    GLO  R9
+    STR  R2
+    GLO  RA
+    SM
+    BNZ  UDLoop1StartMatch
+    BR   UDLoop1End
+
+UDLoop1StartMatch
+    ; calculate how much data to copy from the uncompressed (output) buffer
     LDI  $00
     PHI  RB                         ; RB.1 = 0
     GLO  RD
@@ -193,7 +208,7 @@ UDLoop1_2
     BNZ  UDLoop1_2
     
     ; Go back and check if we're finished, or get the next token
-    LBR  UDLoop1
+    BR   UDLoop1
 
 ;__________________________________________________________________________________________________
 ; CheckInput routine

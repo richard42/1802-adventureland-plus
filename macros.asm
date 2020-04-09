@@ -31,6 +31,7 @@ RETURN  EQU 8AEDH
 ;M(7FCE) GOES INTO RE.0
 BAUD    EQU 7FCDH
 
+MON_INPUT   EQU 8005H
 MON_OUTSTR  EQU 8526H
 
 ;__________________________________________________________________________________________________

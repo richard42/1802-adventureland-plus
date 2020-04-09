@@ -72,17 +72,36 @@ RAM in the high space, do the following:
 
 1. Change the addresses 0010H and 0013H in "game_ram.asm" and
    "game_rom_core.asm" to 8010H and 8013H respectively
-2. Change address $CA00 in "game_rom_loader.asm" to $4A00.
-3. Replace the "mcsmp20r_base.bin" file with MCSMP20B.BIN.
-4. In build_rom.py, change the line which begins with:
-     ulzData = chr(0xC0) + chr(0xCA) + chr(0x00)
-   to instead begin with:
-     ulzData = chr(0xC0) + chr(0x4A) + chr(0x00)
-5. In game_rom_loader.asm, in the line with the instruction "LDI  $D0"
-   immediately after the "DecompressOkay" label, change this instruction to:
-   "LDI  $50".  Four lines below this, change "LDI  $00" to "LDI  $80".
-   Finally, at the bottom of this function, change "LBR  $0010" to
-   "LBR  $8010"
+2. In "adventureland.asm.in":
+   - In the code block following the "Exit" label:
+     - change the instruction: "LDI  $8B" to: "LDI  $0B"
+3. In "game_rom_loader.asm":
+   - Near the top, change the directive "ORG $D000" to: "ORG $5000"
+   - In the code block following the comment "decompress Splash screen":
+     - change the instruction: "LDI  $CA" to: "LDI  $4A"
+     - change the instruction: "ADCI $CA" to: "ADCI $4A"
+     - change the *second* instruction like "LDI  $00" to: "LDI  $80"
+     - change the instruction: "ADCI $00" to: "ADCI $80"
+   - In the code block following the comment "print the splash screen":
+     - change the instruction: "LDI  $00" to: "LDI  $80"
+   - In the code block following the comment "decompress Adventureland program":
+     - change the *first* instruction like "LDI  $00" to: "LDI  $80"
+     - change the instruction: "LDI  $49" to: "LDI  $C9"
+   - In the code block following the "Exit" label:
+     - change the instruction: "LDI  $8B" to: "LDI  $0B"
+   - In the code block following the "DecompressOkay" label:
+     - Change the instruction: "LDI  $00" to: "LDI  $80"
+     - Change the instruction: "LBR  $0010" to: "LBR  $8010"
+4. In "macros.asm":
+     - Change the following macro values:
+       STACK       EQU $FF6F
+       CALL        EQU $0ADB
+       RETURN      EQU $0AED
+       BAUD        EQU $FFCD
+       MON_INPUT   EQU $0005
+       MON_OUTSTR  EQU $0526
+       STATE_LOC   EQU $FF70
+5. Replace the "mcsmp20r_base.bin" file with MCSMP20B.BIN.
 
 In order to modify the game for systems with the Rev I. or earlier version of
 the front panel PCB, all of the serial I/O routines, which occupy the first
