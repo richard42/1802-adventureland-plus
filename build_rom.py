@@ -53,25 +53,25 @@ if __name__ == "__main__":
     sizeProgram -= 3
     open("adventureland.bin", "w").write(binData)
     # Step 3: compress binary data
-    cmd = "%s c9 adventureland.bin adv_core_ulz.bin" % ulzPath
+    cmd = "%s c9 adventureland.bin adventureland.ulz" % ulzPath
     print(cmd)
     numErrors = os.system(cmd)
     if numErrors > 0:
         print("ULZ compression of 'adventureland.bin' failed.")
         sys.exit(1)
-    ulzCoreData = open("adv_core_ulz.bin", "r").read()
+    ulzCoreData = open("adventureland.ulz", "r").read()
     ulzCoreData = ulzCoreData[8:]                           # strip out the 4-byte magic word and 4-byte chunk size
     sizeCoreData = len(ulzCoreData)
     # Step 4: compress splash screen, load the compressed data, and prepend the data with the sizes
     nameSplashScreen = "splashscreen-%s.txt" % term
     sizeSplashScreen = os.stat(nameSplashScreen).st_size
-    cmd = "%s c9 %s splashscreen.bin" % (ulzPath, nameSplashScreen)
+    cmd = "%s c9 %s splashscreen.ulz" % (ulzPath, nameSplashScreen)
     print(cmd)
     numErrors = os.system(cmd)
     if numErrors > 0:
         print("ULZ compression of '%s' failed." % nameSplashScreen)
         sys.exit(1)
-    ulzSplashData = open("splashscreen.bin", "r").read()
+    ulzSplashData = open("splashscreen.ulz", "r").read()
     ulzSplashData = ulzSplashData[8:]                           # strip out the 4-byte magic word and 4-byte chunk size
     sizeSplashData = len(ulzSplashData)
     ulzSplashData = chr(sizeSplashData >> 8) + chr(sizeSplashData & 255) + chr(sizeSplashScreen & 255) + chr(sizeSplashScreen >> 8) + ulzSplashData
@@ -80,13 +80,13 @@ if __name__ == "__main__":
         print("Error: ULZ-compressed splash screen is %i bytes. Maximum allowed is %i." % (sizeSplashData, 0x05ff))
         sys.exit(1)
     # Step 5: assemble game loader, load the binary, and splice in the game starting address and game data sizes
-    cmd = "%s game_rom_loader.asm -l adv_rom_loader.prn -b adv_rom_loader.bin" % a18Path
+    cmd = "%s game_rom_loader.asm -l game_rom_loader.prn -b game_rom_loader.bin" % a18Path
     print(cmd)
     numErrors = os.system(cmd)
     if numErrors > 0:
         print("Assembly of 'game_rom_loader.asm' failed.")
         sys.exit(1)
-    loaderBin = open("adv_rom_loader.bin", "r").read()
+    loaderBin = open("game_rom_loader.bin", "r").read()
     sizeLoader = len(loaderBin)
     loaderBin = loaderBin[:-6] + chr(addrGameStart >> 8) + chr(addrGameStart & 255) + chr(sizeCoreData >> 8) + chr(sizeCoreData & 255) + chr(sizeProgram & 255) + chr(sizeProgram >> 8)
     if sizeLoader + sizeCoreData > 0x3000:

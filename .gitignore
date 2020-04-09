@@ -1,12 +1,12 @@
 *~
 *.hex
 *.prn
-*_ulz.*
+*.ulz
 adventureland_data.asm
 adventureland.asm
 convert_data
 adventureland.bin
-adv_rom_loader.bin
+game_rom_loader.bin
 mcsmp20r_final.bin
 releases/*
 tools/ulz
