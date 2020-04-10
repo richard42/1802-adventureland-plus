@@ -90,7 +90,7 @@ LoaderStart
 
     ; check for errors
     BZ   SplashOkay
-    BR   DecompressFailed
+    LBR  DecompressFailed
 
 SplashOkay
     ; null-terminate the splash screen string
@@ -104,10 +104,39 @@ SplashOkay
     SEP  R4
     DW   MON_OUTSTR
     
+    ; find the end of the first block of text
+FindTextEnd
+    INC  R7
+    LDN  R7
+    BNZ  FindTextEnd
+    ; did we just print everything that was decompressed?
+    LDI  $01
+    PLO  RA                         ; RA is our "print again" flag
+    GHI  R9
+    STR  R2
+    GHI  R7
+    SM
+    BNZ  KeyWait
+    GLO  R9
+    STR  R2
+    GLO  R7
+    SM
+    BNZ  KeyWait
+    DEC  RA                         ; we already printed everything
+
+KeyWait
     ; wait for a keypress
     SEP  R4
     DW   MON_INPUT
+    ; should we print another message?
+    GLO  RA
+    BZ   PrintDecompressing
+    ; Yes, print the instructions (following the splash screen) now
+    INC  R7
+    SEP  R4
+    DW   MON_OUTSTR
 
+PrintDecompressing
     ; print Decompressing message
     LDI  HIGH StartingMsg
     PHI  R7
@@ -189,7 +218,7 @@ DecompressOkay
 ;__________________________________________________________________________________________________
 ; Read-only Data
 
-StartingMsg     BYTE        "\r\nDecompressing...", 0
+StartingMsg     BYTE        "\r\n\nDecompressing...", 0
 ErrorMsg        BYTE        "\r\nDecompression failed, jumping back to monitor.\r\n", 0
 
 ; These 3 fields must be at the end of the file
