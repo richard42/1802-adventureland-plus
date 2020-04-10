@@ -1,6 +1,6 @@
 ;__________________________________________________________________________________________________
 ; Serial Input: 9600 baud, normal RS232 logic
-; IN:       P=7
+; IN:       P=7, X=2
 ; OUT:      P=3, RF.1 = received character
 ; TRASHED:  R8
 
@@ -20,40 +20,29 @@ B96StopBitLoop              ; Wait for the stop bit
     PHI RF
 
 B96DrawLights
+    B3  B96FoundStartBit
     LDA R8                  ; load next bit pattern in LED animation
     STR R2                  ; put it on the stack
     B3  B96FoundStartBit
     OUT 4                   ; output to LEDs
     DEC R2                  ; restore stack pointer to original value
+    B3  B96FoundStartBit
     GLO R8                  ; load the low byte of the current bit pattern pointer
     SMI LOW KnightRider+44  ; is it at the end of the animation sequence?
     B3  B96FoundStartBit
     BNZ B96WaitStartBit     ; if not, go burn CPU cycles and wait for the start bit
-    
-    LDI LOW Rand_VarX       ; we have to reset the pointer, so begin by instead
-    PLO R8
-    LDI HIGH Rand_VarX      ; loading a pointer to the psuedo-random generator's X value
-    B3 B96FoundStartBit
-    PHI R8
-    LDN R8
-    ADI $01                 ; and incrementing this value in memory, to make the generator's
-    STR R8                  ; values non-deterministic
-    B3 B96FoundStartBit
-    
     LDI LOW KnightRider     ; now re-load the bit pattern pointer
-    PLO R8
-    LDI HIGH KnightRider
-    PHI R8
     B3  B96FoundStartBit
-
+    PLO R8
 B96WaitStartBit
     LDI $00         ; animation inner loop counter
 
 B96StartBitLoop
     NOP
-    NOP
     B3  B96FoundStartBit
+    NOP
     SMI $01
+    B3  B96FoundStartBit
     NOP
     NOP
     B3  B96FoundStartBit
@@ -82,11 +71,23 @@ B96IN4
     PHI RF
     LBDF B96StartDelay
     
+    STR R2                  ; put new char on the stack
+    LDI LOW Rand_VarX       ; load a pointer to the psuedo-random generator's X value
+    PLO R8
+    LDI HIGH Rand_VarX
+    PHI R8
+    LDN R8                  ; get the X value
+    ADD                     ; and add the value of the input character, to make the generator's
+    STR R8                  ; values non-deterministic
+    
     BR  B96IN_Return
 
+    NOP                     ; padding
+    NOP
+    
 ;__________________________________________________________________________________________________
 ; Serial Input: 9600 baud, inverted RS232 logic
-; IN:       P=7
+; IN:       P=7, X=2
 ; OUT:      P=3, RF.1 = received character
 ; TRASHED:  R8
 
@@ -106,40 +107,30 @@ Bi96StopBitLoop              ; Wait for the stop bit
     PHI RF
 
 Bi96DrawLights
+    BN3 Bi96FoundStartBit
     LDA R8                  ; load next bit pattern in LED animation
     STR R2                  ; put it on the stack
     BN3 Bi96FoundStartBit
     OUT 4                   ; output to LEDs
     DEC R2                  ; restore stack pointer to original value
+    BN3 Bi96FoundStartBit
     GLO R8                  ; load the low byte of the current bit pattern pointer
     SMI LOW KnightRider+44  ; is it at the end of the animation sequence?
     BN3 Bi96FoundStartBit
     BNZ Bi96WaitStartBit    ; if not, go burn CPU cycles and wait for the start bit
-    
-    LDI LOW Rand_VarX       ; we have to reset the pointer, so begin by instead
-    PLO R8
-    LDI HIGH Rand_VarX      ; loading a pointer to the psuedo-random generator's X value
-    BN3 Bi96FoundStartBit
-    PHI R8
-    LDN R8
-    ADI $01                 ; and incrementing this value in memory, to make the generator's
-    STR R8                  ; values non-deterministic
-    BN3 Bi96FoundStartBit
-    
     LDI LOW KnightRider     ; now re-load the bit pattern pointer
-    PLO R8
-    LDI HIGH KnightRider
-    PHI R8
     BN3 Bi96FoundStartBit
+    PLO R8
 
 Bi96WaitStartBit
     LDI $00         ; animation inner loop counter
 
 Bi96StartBitLoop
     NOP
-    NOP
     BN3 Bi96FoundStartBit
+    NOP
     SMI $01
+    BN3 Bi96FoundStartBit
     NOP
     NOP
     BN3 Bi96FoundStartBit
@@ -168,6 +159,15 @@ Bi96IN4
     PHI RF
     LBDF Bi96StartDelay
     
+    STR R2                  ; put new char on the stack
+    LDI LOW Rand_VarX       ; load a pointer to the psuedo-random generator's X value
+    PLO R8
+    LDI HIGH Rand_VarX
+    PHI R8
+    LDN R8                  ; get the X value
+    ADD                     ; and add the value of the input character, to make the generator's
+    STR R8                  ; values non-deterministic
+
     BR  Bi96IN_Return
 
 ;__________________________________________________________________________________________________
