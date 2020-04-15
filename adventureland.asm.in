@@ -82,9 +82,6 @@ B96IN4
     
     BR  B96IN_Return
 
-    NOP                     ; padding
-    NOP
-    
 ;__________________________________________________________________________________________________
 ; Serial Input: 9600 baud, inverted RS232 logic
 ; IN:       P=7, X=2
@@ -803,10 +800,6 @@ Exit
 
 Do_Main
     ; beginning of main() function
-    ; clear screen
-    ;SEP  R4
-    ;DW   ClearScreen
-
     ; Print welcome message
     LDI  HIGH StartingMsg
     PHI  R8
@@ -814,32 +807,6 @@ Do_Main
     PLO  R8
     SEP  R4
     DW   OutString
-
-    ; wait for key press
-    ;LDI HIGH SerialInput
-    ;PHI R7
-    ;LDI LOW SerialInput
-    ;PLO R7
-    ;SEP R7
-    
-    ; clear screen
-    ;SEP  R4
-    ;DW   ClearScreen
-
-    ; fixme clean this up    
-    NOP
-    NOP
-    NOP
-    NOP
-    NOP
-    NOP
-    NOP
-    NOP
-    NOP
-    NOP
-    NOP
-    NOP
-    NOP
 
     ; start of main loop
 MainLoad
@@ -958,6 +925,29 @@ MainLoopTail
     BR   MainGetInput              ; otherwise, get next command
 
 ;__________________________________________________________________________________________________
+; Adventure get_action_variable() function
+
+; IN:       P=F, RE=pAcVar
+; OUT:      P=3, D=value
+; TRASHED:  N/A
+
+GAV_Return
+    SEP  R3
+Sub_GetActionVariable
+    INC  RE
+    INC  RE
+GAV_Loop1
+    INC  RE
+    LDN  RE
+    BZ   GAV_FoundVar
+    INC  RE
+    BR   GAV_Loop1
+GAV_FoundVar
+    DEC  RE
+    LDN  RE
+    BR   GAV_Return
+
+;__________________________________________________________________________________________________
 ; Adventure get_input() function
 
 ; IN:       N/A
@@ -1014,7 +1004,7 @@ GILoop1N1
     ; handle enter or return
     GHI  RF
     SMI  $0A
-    BZ   GIEnter
+    LBZ  GIEnter
     GHI  RF
     SMI  $0D
     BNZ  GILoop1N2
@@ -2765,29 +2755,6 @@ DADoLook
     LDN  R2
     PLO  R9
     BR   DAReturnFalse3
-
-;__________________________________________________________________________________________________
-; Adventure get_action_variable() function
-
-; IN:       P=F, RE=pAcVar
-; OUT:      P=3, D=value
-; TRASHED:  N/A
-
-GAV_Return
-    SEP  R3
-Sub_GetActionVariable
-    INC  RE
-    INC  RE
-GAV_Loop1
-    INC  RE
-    LDN  RE
-    BZ   GAV_FoundVar
-    INC  RE
-    BR   GAV_Loop1
-GAV_FoundVar
-    DEC  RE
-    LDN  RE
-    BR   GAV_Return
 
 ;__________________________________________________________________________________________________
 ; Adventure yes_no() function
