@@ -219,7 +219,7 @@ DecompressOkay
 ; Read-only Data
 
 StartingMsg     BYTE        "\r\n\nDecompressing...", 0
-ErrorMsg        BYTE        "\r\nDecompression failed, jumping back to monitor.\r\n", 0
+ErrorMsg        BYTE        "\r\n\nDecompress failed.\r\n", 0
 
 ; These 3 fields must be at the end of the file
 ; They will get replaced with the correct values by the build script
