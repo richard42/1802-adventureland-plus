@@ -78,8 +78,8 @@ RAM in the high space, do the following:
 3. In "game_rom_loader.asm":
    - Near the top, change the directive "ORG $D000" to: "ORG $5000"
    - In the code block following the comment "decompress Splash screen":
-     - change the instruction: "LDI  $CA" to: "LDI  $4A"
-     - change the instruction: "ADCI $CA" to: "ADCI $4A"
+     - change the instruction: "LDI  $C9" to: "LDI  $49"
+     - change the instruction: "ADCI $C9" to: "ADCI $49"
      - change the *second* instruction like "LDI  $00" to: "LDI  $80"
      - change the instruction: "ADCI $00" to: "ADCI $80"
    - In the code block following the comment "print the splash screen":

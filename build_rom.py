@@ -76,8 +76,8 @@ if __name__ == "__main__":
     sizeSplashData = len(ulzSplashData)
     ulzSplashData = chr(sizeSplashData >> 8) + chr(sizeSplashData & 255) + chr(sizeSplashScreen & 255) + chr(sizeSplashScreen >> 8) + ulzSplashData
     sizeSplashData += 4
-    if sizeSplashData > 0x05ff:
-        print("Error: ULZ-compressed splash screen is %i bytes. Maximum allowed is %i." % (sizeSplashData, 0x05ff))
+    if sizeSplashData > 0x0665:
+        print("Error: ULZ-compressed splash screen is %i bytes. Maximum allowed is %i." % (sizeSplashData, 0x0665))
         sys.exit(1)
     # Step 5: assemble game loader, load the binary, and splice in the game starting address and game data sizes
     cmd = "%s game_rom_loader.asm -l game_rom_loader.prn -b game_rom_loader.bin" % a18Path
@@ -94,6 +94,6 @@ if __name__ == "__main__":
         sys.exit(1)
     # Step 6: read machine code of game loader, and splice everything into the ROM image
     romData = open("mcsmp20r_base.bin", "r").read()
-    romData = romData[:0x4A00] + ulzSplashData + romData[0x4A00+sizeSplashData:0x5000] + loaderBin + ulzCoreData + romData[0x5000 + sizeLoader + sizeCoreData:]
+    romData = romData[:0x499B] + ulzSplashData + romData[0x499B+sizeSplashData:0x5000] + loaderBin + ulzCoreData + romData[0x5000 + sizeLoader + sizeCoreData:]
     open("mcsmp20r_final.bin", "w").write(romData)
 

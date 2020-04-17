@@ -63,17 +63,17 @@ LoaderStart
     PLO  RE
 
     ; decompress Splash screen into RAM
-    LDI  $CA
+    LDI  $C9
     PHI  R7
-    LDI  $00
+    LDI  $9B
     PLO  R7                         ; R7 points to the size of the compressed block
     LDA  R7
     PHI  R8
     LDA  R7                         ; now R7 points to the size of the uncompressed text
-    ADI  $04
+    ADI  $9F
     PLO  R8
     GHI  R8
-    ADCI $CA
+    ADCI $C9
     PHI  R8                         ; R8 points to one byte past the end of the compressed data
     LDI  $00                        ; decompressed data should be stored at $0013
     PHI  R9
@@ -84,7 +84,7 @@ LoaderStart
     PLO  RA
     LDA  R7                         ; now R7 points to the start of the compressed data
     ADCI $00
-    PHI  RA
+    PHI  RA                         ; RA points to one byte past the end of the uncompressed data
     SEP  R4
     DW   Do_ULZ_Decompress          ; defined in decompress.asm
 
