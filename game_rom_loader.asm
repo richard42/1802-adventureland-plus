@@ -4,11 +4,11 @@
     INCL        "macros.asm"
 
 ;__________________________________________________________________________________________________
-; The game loader starts at address D000 in the ROM image
+; The game loader starts at address 5000 in the ROM image
 ; (On entry, R0 is our program counter)
 
     CPU         1802
-    ORG         $D000
+    ORG         $5000
 
     ; Setup code to initialize the stack and SCRT registers
     ; SETUP R2 (Stack)
@@ -63,7 +63,7 @@ LoaderStart
     PLO  RE
 
     ; decompress Splash screen into RAM
-    LDI  $C9
+    LDI  $49
     PHI  R7
     LDI  $9B
     PLO  R7                         ; R7 points to the size of the compressed block
@@ -73,9 +73,9 @@ LoaderStart
     ADI  $9F
     PLO  R8
     GHI  R8
-    ADCI $C9
+    ADCI $49
     PHI  R8                         ; R8 points to one byte past the end of the compressed data
-    LDI  $00                        ; decompressed data should be stored at $0013
+    LDI  $80                        ; decompressed data should be stored at $8013
     PHI  R9
     LDI  $13
     PLO  R9
@@ -83,7 +83,7 @@ LoaderStart
     ADI  $13
     PLO  RA
     LDA  R7                         ; now R7 points to the start of the compressed data
-    ADCI $00
+    ADCI $80
     PHI  RA                         ; RA points to one byte past the end of the uncompressed data
     SEP  R4
     DW   Do_ULZ_Decompress          ; defined in decompress.asm
@@ -97,7 +97,7 @@ SplashOkay
     STR  R9
     
     ; print the splash screen
-    LDI  $00
+    LDI  $80
     PHI  R7
     LDI  $13
     PLO  R7
@@ -159,15 +159,15 @@ PrintDecompressing
     GHI  R8
     ADCI HIGH (CompressedSize+4)
     PHI  R8                         ; R8 points to one byte past the end of the compressed data
-    LDI  $00
+    LDI  $80
     PHI  R9
     LDI  $13
-    PLO  R9                         ; R9 decompressed data should be stored at $0013
+    PLO  R9                         ; R9 decompressed data should be stored at $8013
     LDA  R7
     ADI  $13
     PLO  RA
     LDA  R7                         ; now R7 points to the start of the compressed data
-    ADCI $00
+    ADCI $80
     PHI  RA
     SEP  R4
     DW   Do_ULZ_Decompress          ; defined in decompress.asm
@@ -186,7 +186,7 @@ DecompressFailed
     SEP  R4
     DW   MON_OUTSTR
 Exit
-    LDI  $8B
+    LDI  $0B
     PHI  R0
     LDI  $5E
     PLO  R0
@@ -199,7 +199,7 @@ DecompressOkay
     PHI  R7
     LDI  LOW GameStartAddr
     PLO  R7                         ; R7 points to the size of the starting address of the game
-    LDI  $00
+    LDI  $80
     PHI  R8
     LDI  $10
     PLO  R8
@@ -213,7 +213,7 @@ DecompressOkay
     STR  R8
 
     ; Jump to start the game
-    LBR  $0010
+    LBR  $8010
 
 ;__________________________________________________________________________________________________
 ; Read-only Data

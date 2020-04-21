@@ -791,7 +791,7 @@ LogicHandled
     BR   Do_Main
 
 Exit
-    LDI $8B
+    LDI $0B
     PHI R0
     LDI $5E
     PLO R0
