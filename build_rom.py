@@ -38,7 +38,8 @@ if __name__ == "__main__":
     if ord(binData[0]) != 0xC0:
         print("Invalid game core binary: missing starting LBR")
         sys.exit(1)
-    sizeProgram = ord(binData[1]) * 256 + ord(binData[2]) - 0x10
+    endProgram = ord(binData[1]) * 256 + ord(binData[2])
+    sizeProgram = (endProgram & 0x7FFF) - 0x10
     if sizeProgram + 3 > len(binData):
         print("Invalid game core binary: file data length %i is less than required program size %i" % (len(binData), sizeProgram + 3))
         sys.exit(1)
@@ -46,7 +47,7 @@ if __name__ == "__main__":
         print("Invalid game core binary: missing ending LBR")
         sys.exit(1)
     addrGameStart = ord(binData[sizeProgram+1]) * 256 + ord(binData[sizeProgram+2])
-    if addrGameStart < 0x10 or addrGameStart >= sizeProgram + 0x10:
+    if (addrGameStart & 0x7FFF) < 0x10 or (addrGameStart & 0x7FFF) >= sizeProgram + 0x10:
         print("Invalid game core binary: game start address %x is invalid" % addrGameStart)
         sys.exit(1)
     binData = binData[3:sizeProgram]
