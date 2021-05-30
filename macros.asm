@@ -18,26 +18,26 @@ RE      EQU 14
 RF      EQU 15
 
 ;__________________________________________________________________________________________________
-; Macros for the MCSMP20J monitor program
+; Macros for the MCSMP20B monitor program
 
-STACK   EQU 7F6FH
-CALL    EQU 8ADBH
-RETURN  EQU 8AEDH
+STACK   EQU $FF6F
+CALL    EQU $0ADB
+RETURN  EQU $0AED
 
 ;NOTE: REGISTER RE MUST BE LOADED WITH THE BAUD RATE INFO PRIOR TO
 ;USING ANY INPUT OR OUTPUT CALLS
 ;BAUD RATE INFO IS STORED AT 7FCD AND 7FCE
 ;M(7FCD) GOES INTO RE.1
 ;M(7FCE) GOES INTO RE.0
-BAUD    EQU 7FCDH
+BAUD    EQU $FFCD
 
-MON_INPUT   EQU 8005H
-MON_OUTSTR  EQU 8526H
+MON_INPUT   EQU $0005
+MON_OUTSTR  EQU $0526
 
 ;__________________________________________________________________________________________________
 ; Macros for saving/loading game state
 
-STATE_LOC   EQU     7F70H
+STATE_LOC   EQU     $FF70
 STATE_SIZE  EQU     65              ; IL + 4
 
 

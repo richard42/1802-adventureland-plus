@@ -4,18 +4,18 @@
     INCL        "macros.asm"
 
 ;__________________________________________________________________________________________________
-; Entry point when the game is loaded into RAM by a monitor is 0x0010
+; Entry point when the game is loaded into RAM by a monitor is 0x8010
 ; (On entry, R0 is our program counter)
 
     CPU         1802
-    ORG         0010H
+    ORG         8010H
 
     LBR         BootLoader
 
 ;__________________________________________________________________________________________________
 ; Adventureland game code
 
-    ORG         0013H
+    ORG         8013H
     INCL        "adventureland.asm"
 
 ;__________________________________________________________________________________________________
