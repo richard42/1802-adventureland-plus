@@ -4,6 +4,7 @@
 *.ulz
 adventureland_data.asm
 adventureland.asm
+base_roms/*
 convert_data
 adventureland.bin
 game_rom_loader.bin
