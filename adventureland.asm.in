@@ -186,7 +186,7 @@ B96OUT
     PLO RF
 
 STBIT96             ; Send Start Bit (Space)
-    SEQ             ;  2
+    REQ             ;  2
     NOP             ;  5
     NOP             ;  8
     GHI RF          ; 10
@@ -195,9 +195,9 @@ STBIT96             ; Send Start Bit (Space)
     PHI RF          ; 16
     NOP             ; 19 
     BDF STBIT96_1   ; 21 First bit = 1?
-    BR  QHI96       ; 23 bit = 0, output Space
+    BR  QLO96       ; 23 bit = 0, output Space
 STBIT96_1
-    BR  QLO96       ; 23 bit = 1, output Mark
+    BR  QHI96       ; 23 bit = 1, output Mark
 
 QHI96_1
     DEC RF
@@ -213,7 +213,7 @@ QHI96
     GHI RF
     SHRC            ; PUT NEXT BIT IN DF
     PHI RF
-    LBNF    QHI96_1 ; 5.5 TURN Q OFF AFTER 6 MORE INSTRUCTION TIMES
+    LBDF    QHI96_1 ; 5.5 TURN Q OFF AFTER 6 MORE INSTRUCTION TIMES
 
 QLO96_1
     DEC RF
@@ -229,7 +229,7 @@ QLO96
     GHI RF
     SHRC            ;PUT NEXT BIT IN DF
     PHI RF
-    LBDF QLO96_1    ;5.5 TURN Q ON AFTER 6 MORE INSTRUCTION TIMES
+    LBNF QLO96_1    ;5.5 TURN Q ON AFTER 6 MORE INSTRUCTION TIMES
 
     DEC RF
     GLO RF
@@ -244,7 +244,7 @@ DONE96              ;FINISH LAST BIT TIMING
     NOP
 
 DNE961
-    REQ             ; Send stop bit: Q=0
+    SEQ             ; Send stop bit: Q=1
 
     BR B96OUT_Return
 
@@ -412,7 +412,7 @@ B48OBaud
     GHI RD                          ; WAIT 1 BIT TIME MINUS 8 MACHINE CYCLES
     SMI $02
 B48OStartBit
-    SEQ                             ; SET Q, OUTPUT START BIT , RS-232 MARK
+    REQ                             ; RESET Q, OUTPUT START BIT , RS-232 MARK
 
 B48OLoop1
     SMI 01H
@@ -422,10 +422,10 @@ B48OLoop1
     SHR                             ; SHIFT CHARACTER ONE BIT RIGHT , DF EQUAL BIT TO OUTPUT
     BDF B48ODataSpace               ; SKIP IF BIT TO SEND IS A RS-232 SPACE
 B48ODataMark
-    SEQ                             ; SET Q, BIT TO SEND IS A RS-232 MARK
+    REQ                             ; RESET Q, BIT TO SEND IS A RS-232 MARK
     BR  B48OLoop1Next1              ; SKIP
 B48ODataSpace
-    REQ                             ; RESET Q, BIT TO SEND IS A RS-232 SPACE
+    SEQ                             ; SET Q, BIT TO SEND IS A RS-232 SPACE
     SEX R2                          ; WASTE TWO MACHINE CYCLES
 B48OLoop1Next1
     PHI RF                          ; SAVE CHARACTER
@@ -447,7 +447,7 @@ B48OLoop2
     SMI 01H
     BNZ B48OLoop2
 B48OStopBit
-    REQ                             ; RESET Q , RESET THE RS-232 OUTPUT TO A RS-232 MARK
+    SEQ                             ; SET Q , RESET THE RS-232 OUTPUT TO A RS-232 SPACE
                                     ; START SENDING A STOP BIT
 
     GHI RD                          ; WAIT 1 BIT TIME
@@ -657,7 +657,7 @@ GameStart
     INC  R8
     LDI  LOW B96OUT
     STR  R8
-    ; if RS232 logic level is inverted, set up serial input pointer to use 9600 baud inveted logic 
+    ; if RS232 logic level is inverted, set up serial input pointer to use 9600 baud inverted logic
     GHI  RE
     ANI  $01
     BNZ  BaudHandled
@@ -711,7 +711,7 @@ BaudHandled
     PHI  R8
     LDI  LOW STBIT96
     PLO  R8
-    LDI  $7A                        ; REQ
+    LDI  $7B                        ; SEQ
     STR  R8
     LDI  HIGH QHI96
     PHI  R8
@@ -729,32 +729,32 @@ BaudHandled
     PHI  R8
     LDI  LOW DNE961
     PLO  R8
-    LDI  $7B                        ; SEQ
+    LDI  $7A                        ; REQ
     STR  R8
     ; use SMC to modify the 4800 baud output routine to use inverted logic
     LDI  HIGH B48OStartBit
     PHI  R8
     LDI  LOW B48OStartBit
     PLO  R8
-    LDI  $7A                        ; REQ
+    LDI  $7B                        ; SEQ
     STR  R8
     LDI  HIGH B48ODataMark
     PHI  R8
     LDI  LOW B48ODataMark
     PLO  R8
-    LDI  $7A                        ; REQ
+    LDI  $7B                        ; SEQ
     STR  R8
     LDI  HIGH B48ODataSpace
     PHI  R8
     LDI  LOW B48ODataSpace
     PLO  R8
-    LDI  $7B                        ; SEQ
+    LDI  $7A                        ; REQ
     STR  R8
     LDI  HIGH B48OStopBit
     PHI  R8
     LDI  LOW B48OStopBit
     PLO  R8
-    LDI  $7B                        ; SEQ
+    LDI  $7A                        ; REQ
     STR  R8
     ; use SMC to modify the 4800 baud input routine to use inverted logic
     LDI  HIGH B48StopBitLoop
